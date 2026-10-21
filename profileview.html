@@ -2022,7 +2022,7 @@ alert(
     try {
 
       const res = await fetch(
-        'http://localhost:5000/signup',
+        '/signup',
         {
           method: 'POST',
 
@@ -2167,7 +2167,7 @@ forms.signin.addEventListener('submit', async e => {
   btn.disabled = true;
 
   try {
-    const res = await fetch('http://localhost:5000/signin', {
+    const res = await fetch('/signin', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -2530,7 +2530,7 @@ forms.signin.addEventListener('submit', async e => {
     };
 
     try {
-      const res = await fetch(`http://localhost:5000/users/${encodeURIComponent(cu.id)}`, {
+      const res = await fetch(`/users/${encodeURIComponent(cu.id)}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
