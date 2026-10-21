@@ -18,8 +18,11 @@ const {
 
 const app = express();
 
-const PORT = 5000;
-const MONGO_URI = "mongodb://127.0.0.1:27017/clf";
+const PORT = process.env.PORT || 5000;
+
+const MONGO_URI =
+    process.env.MONGO_URI ||
+    "mongodb://127.0.0.1:27017/clf";
 
 // ======================================================
 // MIDDLEWARE
