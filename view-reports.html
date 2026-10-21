@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>View Reports - Campus Lost & Found</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #000000;
+            color: #ffffff;
+        }
+
+        /* ---------- TOP BAR ---------- */
+
+        .topbar {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            border-bottom: 1px solid #333333;
+            background: #080808;
+        }
+
+        .brand {
+            color: #d4af37;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .page-title {
+            color: #ffffff;
+            font-size: 18px;
+        }
+
+        .back-btn {
+            padding: 10px 18px;
+            background: transparent;
+            color: #d4af37;
+            border: 1px solid #b58b2a;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .back-btn:hover {
+            background: #d4af37;
+            color: #000000;
+        }
+
+        /* ---------- MAIN ---------- */
+
+        .container {
+            max-width: 900px;
+            margin: 70px auto;
+            padding: 20px;
+        }
+
+        .heading {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .heading h1 {
+            color: #d4af37;
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .heading p {
+            color: #aaaaaa;
+            font-size: 15px;
+        }
+
+        /* ---------- REPORT CARDS ---------- */
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fit,
+                minmax(280px, 1fr)
+            );
+            gap: 25px;
+        }
+
+        .report-card {
+            background: #111111;
+            border: 1px solid #333333;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .report-card:hover {
+            border-color: #d4af37;
+            transform: translateY(-3px);
+        }
+
+        .icon {
+            font-size: 45px;
+            margin-bottom: 18px;
+        }
+
+        .report-card h2 {
+            color: #d4af37;
+            margin-bottom: 12px;
+            font-size: 21px;
+        }
+
+        .report-card p {
+            color: #aaaaaa;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .view-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 7px;
+            background: #d4af37;
+            color: #000000;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .view-btn:hover {
+            background: #f0cf55;
+        }
+
+        /* ---------- LOADING ---------- */
+
+        .loading {
+            text-align: center;
+            color: #aaaaaa;
+            padding: 40px;
+        }
+
+        .message {
+            text-align: center;
+            color: #aaaaaa;
+            padding: 40px;
+            border: 1px solid #333333;
+            border-radius: 10px;
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+
+        @media(max-width: 600px) {
+
+            .topbar {
+                padding: 0 15px;
+            }
+
+            .brand {
+                font-size: 16px;
+            }
+
+            .page-title {
+                display: none;
+            }
+
+            .container {
+                margin: 40px auto;
+            }
+
+            .heading h1 {
+                font-size: 26px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ---------- TOP BAR ---------- -->
+
+    <div class="topbar">
+
+        <div class="brand">
+            Campus Lost & Found
+        </div>
+
+        <div class="page-title">
+            View Reports
+        </div>
+
+        <button
+            class="back-btn"
+            type="button"
+            onclick="goBack()"
+        >
+            ← Back
+        </button>
+
+    </div>
+
+
+    <!-- ---------- MAIN CONTENT ---------- -->
+
+    <div class="container">
+
+        <div class="heading">
+
+            <h1>
+                My Reports
+            </h1>
+
+            <p>
+                View the reports submitted by you.
+            </p>
+
+        </div>
+
+
+        <div
+            id="reportsContainer"
+            class="reports-grid"
+        >
+
+            <div class="loading">
+                Loading your reports...
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        // ==================================================
+        // LOAD USER REPORTS
+        // ==================================================
+
+        async function loadReports()
+        {
+            try
+            {
+                const currentUser =
+                    JSON.parse(
+                        sessionStorage.getItem(
+                            "campusCurrentUser"
+                        ) || "{}"
+                    );
+
+
+                console.log(
+                    "📋 Current user:",
+                    currentUser
+                );
+
+
+                // ------------------------------------------
+                // CHECK LOGIN
+                // ------------------------------------------
+
+                if(!currentUser.id)
+                {
+                    document.getElementById(
+                        "reportsContainer"
+                    ).innerHTML =
+                        `
+                        <div class="message">
+
+                            <p>
+                                Please login first.
+                            </p>
+
+                        </div>
+                        `;
+
+                    return;
+                }
+
+
+                const userId =
+                    currentUser.id;
+
+
+                // ------------------------------------------
+                // LOAD LOST + FOUND REPORTS
+                // ------------------------------------------
+
+                const [
+                    lostResponse,
+                    foundResponse
+                ] =
+                    await Promise.all([
+                        fetch(
+                            `/lost-reports/user/${userId}`
+                        ),
+
+                        fetch(
+                            `/found-reports/user/${userId}`
+                        )
+                    ]);
+
+
+                const lostData =
+                    await lostResponse.json();
+
+                const foundData =
+                    await foundResponse.json();
+
+
+                console.log(
+                    "📋 Lost reports:",
+                    lostData
+                );
+
+                console.log(
+                    "📋 Found reports:",
+                    foundData
+                );
+
+
+                if(
+                    !lostResponse.ok ||
+                    !lostData.success
+                )
+                {
+                    throw new Error(
+                        "Failed to load lost reports"
+                    );
+                }
+
+
+                if(
+                    !foundResponse.ok ||
+                    !foundData.success
+                )
+                {
+                    throw new Error(
+                        "Failed to load found reports"
+                    );
+                }
+
+
+                const lostReports =
+                    lostData.reports || [];
+
+                const foundReports =
+                    foundData.reports || [];
+
+
+                const container =
+                    document.getElementById(
+                        "reportsContainer"
+                    );
+
+
+                container.innerHTML = "";
+
+
+                // ------------------------------------------
+                // LOST REPORT CARD
+                // ------------------------------------------
+
+                if(lostReports.length > 0)
+                {
+                    container.innerHTML +=
+                        `
+                        <div class="report-card">
+
+                            <div class="icon">
+                                🔍
+                            </div>
+
+                            <h2>
+                                My Lost Reports
+                            </h2>
+
+                            <p>
+                                You have
+                                <strong>
+                                    ${lostReports.length}
+                                </strong>
+                                lost report(s).
+                            </p>
+
+                            <button
+                                class="view-btn"
+                                type="button"
+                                onclick="
+                                    window.location.href =
+                                    'my-lost-reports.html'
+                                "
+                            >
+                                View Lost Reports →
+                            </button>
+
+                        </div>
+                        `;
+                }
+
+
+                // ------------------------------------------
+                // FOUND REPORT CARD
+                // ------------------------------------------
+
+                if(foundReports.length > 0)
+                {
+                    container.innerHTML +=
+                        `
+                        <div class="report-card">
+
+                            <div class="icon">
+                                📦
+                            </div>
+
+                            <h2>
+                                My Found Reports
+                            </h2>
+
+                            <p>
+                                You have
+                                <strong>
+                                    ${foundReports.length}
+                                </strong>
+                                found report(s).
+                            </p>
+
+                            <button
+                                class="view-btn"
+                                type="button"
+                                onclick="
+                                    window.location.href =
+                                    'my-found-reports.html'
+                                "
+                            >
+                                View Found Reports →
+                            </button>
+
+                        </div>
+                        `;
+                }
+
+
+                // ------------------------------------------
+                // NO REPORTS
+                // ------------------------------------------
+
+                if(
+                    lostReports.length === 0 &&
+                    foundReports.length === 0
+                )
+                {
+                    container.innerHTML =
+                        `
+                        <div class="message">
+
+                            <p>
+                                You have not submitted
+                                any reports yet.
+                            </p>
+
+                        </div>
+                        `;
+                }
+
+            }
+            catch(error)
+            {
+                console.error(
+                    "❌ View reports error:",
+                    error
+                );
+
+
+                document.getElementById(
+                    "reportsContainer"
+                ).innerHTML =
+                    `
+                    <div class="message">
+
+                        <p>
+                            Unable to load your reports.
+                        </p>
+
+                        <br>
+
+                        <p>
+                            Please make sure the
+                            server is running.
+                        </p>
+
+                    </div>
+                    `;
+            }
+        }
+
+
+        // ==================================================
+        // BACK BUTTON
+        // ==================================================
+
+        function goBack()
+        {
+            window.location.href =
+                "profileview.html#dashboard";
+        }
+
+
+        // ==================================================
+        // LOAD WHEN PAGE OPENS
+        // ==================================================
+
+        loadReports();
+
+    </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Campus Lost & Found - Extra Questions</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0d0d0d;
+            color: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            height: 70px;
+            background: #151515;
+            border-bottom: 1px solid #8a6a2f;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+        }
+
+        .logo {
+            font-size: 21px;
+            font-weight: bold;
+            color: #d4af37;
+        }
+
+        .page-name {
+            color: #aaa;
+            font-size: 15px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 45px auto;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 1px solid #8a6a2f;
+            color: #d4af37;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 30px;
+        }
+
+        .back-btn:hover {
+            background: #211d12;
+        }
+
+        h1 {
+            color: #d4af37;
+            margin-bottom: 10px;
+            font-size: 30px;
+        }
+
+        .subtitle {
+            color: #aaa;
+            margin-bottom: 35px;
+            line-height: 1.6;
+        }
+
+        .card {
+            background: #171717;
+            border: 1px solid #39301e;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .card-title {
+            color: #d4af37;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #ddd;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        select,
+        input,
+        textarea {
+            width: 100%;
+            background: #0f0f0f;
+            color: white;
+            border: 1px solid #514528;
+            border-radius: 7px;
+            padding: 13px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        select:focus,
+        input:focus,
+        textarea:focus {
+            border-color: #d4af37;
+        }
+
+        .question-box {
+            background: #111;
+            border: 1px solid #40351e;
+            border-radius: 10px;
+            padding: 22px;
+            margin-top: 20px;
+        }
+
+        .question-number {
+            color: #d4af37;
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 18px;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        .field:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-box {
+            background: #211d12;
+            border-left: 4px solid #d4af37;
+            padding: 16px;
+            border-radius: 6px;
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .generate-btn,
+        .save-btn {
+            border: none;
+            border-radius: 7px;
+            padding: 13px 24px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .generate-btn {
+            background: #d4af37;
+            color: #111;
+        }
+
+        .generate-btn:hover {
+            background: #e3c052;
+        }
+
+        .save-btn {
+            background: #d4af37;
+            color: #111;
+        }
+
+        .save-btn:hover {
+            background: #e3c052;
+        }
+
+        .save-btn:disabled {
+            background: #555;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            color: #ff7777;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .success {
+            color: #7ee787;
+            margin-top: 15px;
+            display: none;
+        }
+
+        @media(max-width: 700px) {
+
+            .topbar {
+                padding: 0 20px;
+            }
+
+            .container {
+                width: 94%;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="topbar">
+
+        <div class="logo">
+            Campus Lost & Found
+        </div>
+
+        <div class="page-name">
+            Add Extra Questions
+        </div>
+
+    </div>
+
+
+    <div class="container">
+
+
+        <button
+            class="back-btn"
+            type="button"
+            onclick="goBack()"
+        >
+            ← Back
+        </button>
+
+
+        <h1>
+            Add Extra Questions
+        </h1>
+
+
+        <p class="subtitle">
+            Add your own questions to strengthen the ownership
+            verification process.
+        </p>
+
+
+        <div class="info-box">
+
+            These questions will be shown to the Lost User later.
+            <br>
+
+            <strong>
+                Do not enter information that you do not want the
+                Lost User to see.
+            </strong>
+
+            <br>
+
+            Enter the correct answer privately. The correct answer
+            will be used only for verification.
+
+        </div>
+
+
+        <!-- NUMBER OF QUESTIONS -->
+
+        <div class="card">
+
+            <div class="card-title">
+                1. Choose Number of Extra Questions
+            </div>
+
+
+            <label for="questionCount">
+                How many extra questions do you want to add?
+            </label>
+
+
+            <select id="questionCount">
+
+                <option value="">
+                    Select number of questions
+                </option>
+
+                <option value="1">
+                    1 Question
+                </option>
+
+                <option value="2">
+                    2 Questions
+                </option>
+
+                <option value="3">
+                    3 Questions
+                </option>
+
+                <option value="4">
+                    4 Questions
+                </option>
+
+                <option value="5">
+                    5 Questions
+                </option>
+
+            </select>
+
+
+            <div class="button-row">
+
+                <button
+                    type="button"
+                    class="generate-btn"
+                    onclick="generateQuestionFields()"
+                >
+                    Continue
+                </button>
+
+            </div>
+
+
+            <div
+                id="countError"
+                class="error"
+            >
+                Please select the number of questions.
+            </div>
+
+        </div>
+
+
+        <!-- QUESTION ENTRY -->
+
+        <div
+            id="questionSection"
+            class="card hidden"
+        >
+
+            <div class="card-title">
+                2. Enter Your Questions
+            </div>
+
+
+            <p
+                style="
+                    color:#aaa;
+                    margin-bottom:20px;
+                    line-height:1.6;
+                "
+            >
+                Enter each question and its correct answer.
+                The answer will remain hidden from the Lost User.
+            </p>
+
+
+            <div id="questionContainer"></div>
+
+
+            <div class="button-row">
+
+                <button
+                    type="button"
+                    class="save-btn"
+                    id="saveBtn"
+                    onclick="saveExtraQuestions()"
+                >
+                    Save Extra Questions
+                </button>
+
+            </div>
+
+
+            <div
+                id="saveError"
+                class="error"
+            ></div>
+
+
+            <div
+                id="saveSuccess"
+                class="success"
+            ></div>
+
+        </div>
+
+
+    </div>
+
+
+<script>
+
+
+    // =====================================================
+    // GET VERIFICATION ID
+    // =====================================================
+
+    const urlParams =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const verificationId =
+        urlParams.get(
+            "verification_id"
+        );
+
+
+    console.log(
+        "Verification ID:",
+        verificationId
+    );
+
+
+    // =====================================================
+    // CHECK VERIFICATION ID
+    // =====================================================
+
+    if(!verificationId)
+    {
+        alert(
+            "Verification ID is missing."
+        );
+    }
+
+
+    // =====================================================
+    // GENERATE QUESTION FIELDS
+    // =====================================================
+
+    function generateQuestionFields()
+    {
+
+        const count =
+            document.getElementById(
+                "questionCount"
+            ).value;
+
+
+        const countError =
+            document.getElementById(
+                "countError"
+            );
+
+
+        if(!count)
+        {
+            countError.style.display =
+                "block";
+
+            return;
+        }
+
+
+        countError.style.display =
+            "none";
+
+
+        const questionContainer =
+            document.getElementById(
+                "questionContainer"
+            );
+
+
+        questionContainer.innerHTML =
+            "";
+
+
+        for(
+            let i = 1;
+            i <= Number(count);
+            i++
+        )
+        {
+
+            const questionBox =
+                document.createElement(
+                    "div"
+                );
+
+
+            questionBox.className =
+                "question-box";
+
+
+            questionBox.innerHTML = `
+
+                <div class="question-number">
+                    Question ${i}
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Question
+                    </label>
+
+                    <textarea
+                        class="extra-question"
+                        rows="3"
+                        placeholder="Example: What was inside the hidden zip section?"
+                    ></textarea>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Correct Answer
+                    </label>
+
+                    <input
+                        type="text"
+                        class="extra-answer"
+                        placeholder="Enter the correct answer"
+                    >
+
+                </div>
+
+            `;
+
+
+            questionContainer.appendChild(
+                questionBox
+            );
+
+        }
+
+
+        document
+            .getElementById(
+                "questionSection"
+            )
+            .classList
+            .remove("hidden");
+
+
+        document
+            .getElementById(
+                "questionSection"
+            )
+            .scrollIntoView({
+                behavior: "smooth"
+            });
+
+    }
+
+
+    // =====================================================
+    // SAVE EXTRA QUESTIONS
+    // =====================================================
+
+
+async function saveExtraQuestions() {
+    const questionElements =
+        document.querySelectorAll(".extra-question");
+
+    const answerElements =
+        document.querySelectorAll(".extra-answer");
+
+    const saveError =
+        document.getElementById("saveError");
+
+    const saveSuccess =
+        document.getElementById("saveSuccess");
+
+    const saveBtn =
+        document.getElementById("saveBtn");
+
+    saveError.style.display = "none";
+    saveSuccess.style.display = "none";
+
+    // Check logged-in user
+    let currentUser;
+
+    try {
+        currentUser = JSON.parse(
+            sessionStorage.getItem("campusCurrentUser") || "null"
+        );
+    } catch (error) {
+        currentUser = null;
+    }
+
+    if (!currentUser || !currentUser.id) {
+        saveError.textContent =
+            "User information not found. Please log in again.";
+
+        saveError.style.display = "block";
+        return;
+    }
+
+    // Check verification ID
+    if (!verificationId) {
+        saveError.textContent =
+            "Verification ID is missing. Please reopen this page.";
+
+        saveError.style.display = "block";
+        return;
+    }
+
+    // Collect and validate questions
+    const questions = [];
+
+    for (let i = 0; i < questionElements.length; i++) {
+        const question = questionElements[i].value.trim();
+        const answer = answerElements[i].value.trim();
+
+        if (!question || !answer) {
+            saveError.textContent = !question
+                ? `Please enter Question ${i + 1}.`
+                : `Please enter the correct answer for Question ${i + 1}.`;
+
+            saveError.style.display = "block";
+            (!question ? questionElements[i] : answerElements[i]).focus();
+            return;
+        }
+
+        questions.push({
+            question: question,
+            correct_answer: answer
+        });
+    }
+
+    if (questions.length === 0) {
+        saveError.textContent =
+            "Please add at least one extra question.";
+
+        saveError.style.display = "block";
+        return;
+    }
+
+    try {
+        saveBtn.disabled = true;
+        saveBtn.textContent = "Saving...";
+
+        const response = await fetch(
+            `/verification/${verificationId}/extra-questions`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    user_id: currentUser.id,
+                    questions: questions
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        console.log("Save response:", response.status, data);
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.message ||
+                data.error ||
+                "Failed to save extra questions."
+            );
+        }
+
+        saveSuccess.textContent =
+            data.message || "Extra questions saved successfully!";
+
+        saveSuccess.style.display = "block";
+
+        setTimeout(() => {
+            window.location.href =
+                "founder-question-review.html?verification_id=" +
+                encodeURIComponent(verificationId);
+        }, 1000);
+
+    } catch (error) {
+        console.error("Save extra questions error:", error);
+
+        saveError.textContent = error.message;
+        saveError.style.display = "block";
+
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Save Extra Questions";
+    }
+}
+
+    // =====================================================
+    // BACK
+    // =====================================================
+
+    function goBack()
+    {
+
+        window.location.href =
+            "founder-question-review.html?verification_id=" +
+            verificationId;
+
+    }
+
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Found Matches | Campus Lost & Found</title>
+
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+
+            background: #0b0b0b;
+
+            color: #f5f5f5;
+
+            min-height: 100vh;
+        }
+
+
+        /* =========================
+           TOP BAR
+        ========================= */
+
+        .top-bar {
+            height: 72px;
+
+            background: #111111;
+
+            border-bottom: 1px solid #8f741f;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 40px;
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 100;
+        }
+
+
+        .brand-title {
+            color: #d4af37;
+
+            font-size: 21px;
+
+            font-weight: bold;
+        }
+
+
+        .brand-subtitle {
+            color: #888888;
+
+            font-size: 12px;
+
+            margin-top: 4px;
+        }
+
+
+        .user-area {
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+        }
+
+
+        .user-name {
+            color: #dddddd;
+
+            font-size: 14px;
+        }
+
+
+        .user-icon {
+            width: 38px;
+
+            height: 38px;
+
+            border-radius: 50%;
+
+            background: #d4af37;
+
+            color: #111111;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-weight: bold;
+        }
+
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .main-container {
+            max-width: 1100px;
+
+            margin: auto;
+
+            padding: 40px 25px 70px;
+        }
+
+
+        /* =========================
+           BACK BUTTON
+        ========================= */
+
+        .back-button {
+            background: transparent;
+
+            border: 1px solid #555555;
+
+            color: #cccccc;
+
+            padding: 10px 17px;
+
+            border-radius: 7px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+            transition: 0.2s;
+        }
+
+
+        .back-button:hover {
+            border-color: #d4af37;
+
+            color: #d4af37;
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .page-header {
+            text-align: center;
+
+            margin-top: 40px;
+
+            margin-bottom: 40px;
+        }
+
+
+        .page-header h1 {
+            color: #d4af37;
+
+            font-size: 32px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .page-header p {
+            color: #999999;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =========================
+           REPORT SELECTOR
+        ========================= */
+
+        .report-section {
+            margin-bottom: 30px;
+        }
+
+
+        .section-title {
+            color: #dddddd;
+
+            font-size: 18px;
+
+            margin-bottom: 15px;
+        }
+
+
+        .report-select {
+            width: 100%;
+
+            padding: 13px 15px;
+
+            background: #141414;
+
+            border: 1px solid #444444;
+
+            color: #eeeeee;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            outline: none;
+        }
+
+
+        .report-select:focus {
+            border-color: #d4af37;
+        }
+
+
+        /* =========================
+           MATCH COUNT
+        ========================= */
+
+        .match-count {
+            color: #888888;
+
+            font-size: 13px;
+
+            margin-bottom: 20px;
+        }
+
+
+        /* =========================
+           MATCH GRID
+        ========================= */
+
+        .matches-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 25px;
+        }
+
+
+        /* =========================
+           MATCH CARD
+        ========================= */
+
+        .match-card {
+            background: #141414;
+
+            border: 1px solid #333333;
+
+            border-radius: 14px;
+
+            overflow: hidden;
+
+            transition: 0.25s;
+        }
+
+
+        .match-card:hover {
+            border-color: #8f741f;
+
+            transform: translateY(-3px);
+        }
+
+
+        /* =========================
+           IMAGE
+        ========================= */
+
+        .item-image {
+            width: 100%;
+
+            height: 220px;
+
+            background: #1b1b1b;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            overflow: hidden;
+        }
+
+
+        .item-image img {
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+        }
+
+
+        .no-image {
+            color: #666666;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           CARD BODY
+        ========================= */
+
+        .card-body {
+            padding: 22px;
+        }
+
+
+        .match-label {
+            color: #d4af37;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            text-transform: uppercase;
+
+            margin-bottom: 7px;
+        }
+
+
+        .item-title {
+            color: #eeeeee;
+
+            font-size: 20px;
+
+            margin-bottom: 15px;
+        }
+
+
+        /* =========================
+           DETAILS
+        ========================= */
+
+        .details {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 12px;
+
+            margin-bottom: 18px;
+        }
+
+
+        .detail {
+            background: #101010;
+
+            padding: 10px;
+
+            border-radius: 7px;
+        }
+
+
+        .detail span {
+            display: block;
+
+            color: #666666;
+
+            font-size: 11px;
+
+            margin-bottom: 4px;
+        }
+
+
+        .detail strong {
+            color: #dddddd;
+
+            font-size: 13px;
+        }
+
+
+        /* =========================
+           DESCRIPTION
+        ========================= */
+
+        .description {
+            border-top: 1px solid #292929;
+
+            padding-top: 15px;
+
+            margin-top: 5px;
+        }
+
+
+        .description-title {
+            color: #888888;
+
+            font-size: 12px;
+
+            margin-bottom: 7px;
+        }
+
+
+        .description p {
+            color: #bbbbbb;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =========================
+           SCORE
+        ========================= */
+
+        .score-box {
+            margin-top: 20px;
+
+            background: #19160c;
+
+            border: 1px solid #66551b;
+
+            border-radius: 9px;
+
+            padding: 15px;
+        }
+
+
+        .score-title {
+            color: #999999;
+
+            font-size: 12px;
+
+            margin-bottom: 5px;
+        }
+
+
+        .score-value {
+            color: #d4af37;
+
+            font-size: 27px;
+
+            font-weight: bold;
+        }
+
+
+        .score-breakdown {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 8px;
+
+            margin-top: 13px;
+        }
+
+
+        .score-part {
+            text-align: center;
+
+            background: #111111;
+
+            padding: 8px;
+
+            border-radius: 6px;
+        }
+
+
+        .score-part span {
+            display: block;
+
+            color: #666666;
+
+            font-size: 10px;
+
+            margin-bottom: 3px;
+        }
+
+
+        .score-part strong {
+            color: #dddddd;
+
+            font-size: 12px;
+        }
+
+
+        /* =========================
+           STATUS
+        ========================= */
+
+        .status {
+            margin-top: 15px;
+
+            color: #999999;
+
+            font-size: 12px;
+        }
+
+
+        /* =========================
+           EMPTY / ERROR
+        ========================= */
+
+        .message-card {
+            background: #141414;
+
+            border: 1px solid #333333;
+
+            border-radius: 12px;
+
+            padding: 40px;
+
+            text-align: center;
+        }
+
+
+        .message-card h3 {
+            color: #d4af37;
+
+            margin-bottom: 10px;
+        }
+
+
+        .message-card p {
+            color: #888888;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            text-align: center;
+
+            color: #555555;
+
+            font-size: 12px;
+
+            margin-top: 50px;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 750px) {
+
+            .top-bar {
+                padding: 0 20px;
+            }
+
+
+            .user-name {
+                display: none;
+            }
+
+
+            .main-container {
+                padding: 30px 18px 50px;
+            }
+
+
+            .matches-grid {
+                grid-template-columns: 1fr;
+            }
+
+
+            .page-header h1 {
+                font-size: 27px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         TOP BAR
+    ========================= -->
+
+    <header class="top-bar">
+
+        <div>
+
+            <div class="brand-title">
+                Campus Lost & Found
+            </div>
+
+            <div class="brand-subtitle">
+                Found Matches
+            </div>
+
+        </div>
+
+
+        <div class="user-area">
+
+            <div
+                class="user-name"
+                id="userName"
+            >
+                Student
+            </div>
+
+            <div
+                class="user-icon"
+                id="userIcon"
+            >
+                U
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================
+         MAIN
+    ========================= -->
+
+    <main class="main-container">
+
+
+        <button
+            class="back-button"
+            onclick="goBack()"
+        >
+            ← Possible Matches
+        </button>
+
+
+
+        <section class="page-header">
+
+            <h1>
+                Found Items Matching Your Lost Report
+            </h1>
+
+            <p>
+                Select one of your lost reports to see
+                found items that the system identified
+                as possible matches.
+            </p>
+
+        </section>
+
+
+
+        <!-- =========================
+             LOST REPORT SELECTOR
+        ========================= -->
+
+        <section class="report-section">
+
+            <div class="section-title">
+                Select Your Lost Report
+            </div>
+
+            <select
+                id="reportSelect"
+                class="report-select"
+                onchange="loadMatchesForSelectedReport()"
+            >
+
+                <option value="">
+                    Loading your lost reports...
+                </option>
+
+            </select>
+
+        </section>
+
+
+
+        <div
+            id="matchCount"
+            class="match-count"
+        >
+            Loading matches...
+        </div>
+
+
+
+        <!-- =========================
+             MATCHES
+        ========================= -->
+
+        <div
+            id="matchesContainer"
+            class="matches-grid"
+        >
+
+        </div>
+
+
+
+        <div class="footer">
+
+            Campus Lost & Found Management System
+
+        </div>
+
+
+    </main>
+
+
+
+    <script>
+
+
+        let currentUser = null;
+
+        let lostReports = [];
+
+
+
+        /* =========================
+           ESCAPE HTML
+        ========================= */
+
+        function escapeHTML(value)
+        {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+
+
+        /* =========================
+           GET USER
+        ========================= */
+
+        function getCurrentUser()
+        {
+            try
+            {
+                const stored =
+                    sessionStorage.getItem(
+                        "campusCurrentUser"
+                    );
+
+                if(!stored)
+                {
+                    return null;
+                }
+
+                return JSON.parse(stored);
+            }
+            catch(error)
+            {
+                console.error(error);
+
+                return null;
+            }
+        }
+
+
+
+        /* =========================
+           LOAD USER
+        ========================= */
+
+        function loadUser()
+        {
+            currentUser =
+                getCurrentUser();
+
+
+            if(!currentUser)
+            {
+                window.location.href =
+                    "profileview.html";
+
+                return false;
+            }
+
+
+            const name =
+                currentUser.name ||
+                currentUser.username ||
+                "Student";
+
+
+            document.getElementById(
+                "userName"
+            ).textContent = name;
+
+
+            document.getElementById(
+                "userIcon"
+            ).textContent =
+                name.charAt(0).toUpperCase();
+
+
+            return true;
+        }
+
+
+
+        /* =========================
+           LOAD LOST REPORTS
+        ========================= */
+
+        async function loadLostReports()
+        {
+            const select =
+                document.getElementById(
+                    "reportSelect"
+                );
+
+
+            try
+            {
+                const response =
+                    await fetch(
+                        `/lost-reports/user/${currentUser.id}`
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if(
+                    !response.ok ||
+                    !data.success
+                )
+                {
+                    throw new Error(
+                        data.error ||
+                        "Failed to load lost reports"
+                    );
+                }
+
+
+                lostReports =
+                    data.reports || [];
+
+
+                select.innerHTML = "";
+
+
+                if(lostReports.length === 0)
+                {
+                    select.innerHTML = `
+                        <option value="">
+                            No lost reports found
+                        </option>
+                    `;
+
+
+                    showMessage(
+                        "No Lost Reports",
+                        "You have not reported any lost items yet."
+                    );
+
+
+                    document.getElementById(
+                        "matchCount"
+                    ).textContent =
+                        "0 MATCHES";
+
+
+                    return;
+                }
+
+
+                lostReports.forEach(
+                    function(report)
+                    {
+                        const option =
+                            document.createElement(
+                                "option"
+                            );
+
+
+                        option.value =
+                            report._id;
+
+
+                        option.textContent =
+                            `${report.item_type || "Item"} - ${report.category || "Other"} - ${report.date_lost || ""}`;
+
+
+                        select.appendChild(
+                            option
+                        );
+                    }
+                );
+
+
+                await loadMatchesForSelectedReport();
+
+            }
+            catch(error)
+            {
+                console.error(error);
+
+
+                select.innerHTML = `
+                    <option value="">
+                        Unable to load reports
+                    </option>
+                `;
+
+
+                showMessage(
+                    "Unable to Load Reports",
+                    error.message
+                );
+            }
+        }
+
+
+
+        /* =========================
+           LOAD MATCHES
+        ========================= */
+
+        async function loadMatchesForSelectedReport()
+        {
+            const reportId =
+                document.getElementById(
+                    "reportSelect"
+                ).value;
+
+
+            if(!reportId)
+            {
+                return;
+            }
+
+
+            const container =
+                document.getElementById(
+                    "matchesContainer"
+                );
+
+
+            container.innerHTML = `
+                <div class="message-card">
+                    <h3>Searching...</h3>
+                    <p>
+                        Loading possible found items.
+                    </p>
+                </div>
+            `;
+
+
+            try
+            {
+                const response =
+                    await fetch(
+                        `/matches/lost/${reportId}`
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if(
+                    !response.ok ||
+                    !data.success
+                )
+                {
+                    throw new Error(
+                        data.error ||
+                        "Failed to load matches"
+                    );
+                }
+
+
+                const matches =
+                    data.matches || [];
+
+
+                document.getElementById(
+                    "matchCount"
+                ).textContent =
+                    `${matches.length} POSSIBLE MATCH${matches.length === 1 ? "" : "ES"}`;
+
+
+                if(matches.length === 0)
+                {
+                    showMessage(
+                        "No Possible Matches",
+                        "No found item has been identified as a possible match for this lost report yet."
+                    );
+
+                    return;
+                }
+
+
+                container.innerHTML =
+                    matches
+                        .map(
+                            createMatchCard
+                        )
+                        .join("");
+
+            }
+            catch(error)
+            {
+                console.error(error);
+
+
+                showMessage(
+                    "Unable to Load Matches",
+                    error.message
+                );
+            }
+        }
+
+
+
+        /* =========================
+           CREATE MATCH CARD
+        ========================= */
+
+        function createMatchCard(match)
+        {
+            const found =
+                match.found_report ||
+                match.foundReport ||
+                {};
+
+
+            const score =
+                Number(
+                    match.match_score || 0
+                );
+
+
+            const description =
+                Number(
+                    match.description_score || 0
+                );
+
+
+            const image =
+                Number(
+                    match.image_score || 0
+                );
+
+
+            const attribute =
+                Number(
+                    match.attribute_score || 0
+                );
+
+
+            const imageHTML =
+                found.image_data
+                ?
+                `
+                    <img
+                        src="${found.image_data}"
+                        alt="Found item"
+                    >
+                `
+                :
+                `
+                    <div class="no-image">
+                        No Image
+                    </div>
+                `;
+
+
+            return `
+
+                <div class="match-card">
+
+                    <div class="item-image">
+
+                        ${imageHTML}
+
+                    </div>
+
+
+                    <div class="card-body">
+
+                        <div class="match-label">
+                            Possible Found Item
+                        </div>
+
+
+                        <div class="item-title">
+                            ${escapeHTML(
+                                found.item_type ||
+                                "Found Item"
+                            )}
+                        </div>
+
+
+                        <div class="details">
+
+                            <div class="detail">
+
+                                <span>
+                                    Category
+                                </span>
+
+                                <strong>
+                                    ${escapeHTML(
+                                        found.category ||
+                                        "—"
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="detail">
+
+                                <span>
+                                    Color
+                                </span>
+
+                                <strong>
+                                    ${escapeHTML(
+                                        found.color ||
+                                        "—"
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="detail">
+
+                                <span>
+                                    Brand
+                                </span>
+
+                                <strong>
+                                    ${escapeHTML(
+                                        found.brand ||
+                                        "—"
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="detail">
+
+                                <span>
+                                    Location Found
+                                </span>
+
+                                <strong>
+                                    ${escapeHTML(
+                                        found.location ||
+                                        "—"
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="detail">
+
+                                <span>
+                                    Date Found
+                                </span>
+
+                                <strong>
+                                    ${escapeHTML(
+                                        found.date_found ||
+                                        "—"
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="detail">
+
+                                <span>
+                                    Time Found
+                                </span>
+
+                                <strong>
+                                    ${escapeHTML(
+                                        found.time_found ||
+                                        "—"
+                                    )}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="description">
+
+                            <div class="description-title">
+                                Found Item Description
+                            </div>
+
+                            <p>
+                                ${escapeHTML(
+                                    found.description ||
+                                    "No description available."
+                                )}
+                            </p>
+
+                        </div>
+
+
+
+                        <div class="score-box">
+
+                            <div class="score-title">
+                                Total Match Score
+                            </div>
+
+                            <div class="score-value">
+                                ${score.toFixed(2)}%
+                            </div>
+
+
+                            <div class="score-breakdown">
+
+                                <div class="score-part">
+
+                                    <span>
+                                        Description
+                                    </span>
+
+                                    <strong>
+                                        ${description.toFixed(2)}%
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="score-part">
+
+                                    <span>
+                                        Image
+                                    </span>
+
+                                    <strong>
+                                        ${image.toFixed(2)}%
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="score-part">
+
+                                    <span>
+                                        Attributes
+                                    </span>
+
+                                    <strong>
+                                        ${attribute.toFixed(2)}%
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="status">
+
+                            Status:
+                            ${escapeHTML(
+                                match.status ||
+                                "POSSIBLE_MATCH"
+                            )}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `;
+        }
+
+
+
+        /* =========================
+           MESSAGE
+        ========================= */
+
+        function showMessage(title, message)
+        {
+            document.getElementById(
+                "matchesContainer"
+            ).innerHTML = `
+
+                <div class="message-card">
+
+                    <h3>
+                        ${escapeHTML(title)}
+                    </h3>
+
+                    <p>
+                        ${escapeHTML(message)}
+                    </p>
+
+                </div>
+
+            `;
+        }
+
+
+
+        /* =========================
+           BACK
+        ========================= */
+
+        function goBack()
+        {
+            window.location.href =
+                "possibleview.html";
+        }
+
+
+
+        /* =========================
+           START
+        ========================= */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            async function()
+            {
+                if(!loadUser())
+                {
+                    return;
+                }
+
+
+                await loadLostReports();
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>

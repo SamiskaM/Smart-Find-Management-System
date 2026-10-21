@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Ownership Verification</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top,
+                    #182131 0%,
+                    #0a0e14 55%,
+                    #06080c 100%
+                );
+
+            color: #f3ead0;
+        }
+
+
+        /* =========================================
+           TOP BAR
+           ========================================= */
+
+        .topbar {
+            height: 70px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 35px;
+
+            border-bottom:
+                1px solid
+                rgba(232,196,104,.18);
+
+            background:
+                rgba(8,12,18,.92);
+        }
+
+
+        .brand {
+            color: #e8c468;
+
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+
+        .subtitle {
+            color: #8f9aaa;
+
+            font-size: 12px;
+
+            margin-top: 4px;
+        }
+
+
+        /* =========================================
+           BACK BUTTON
+           ========================================= */
+
+        .back-btn {
+            border:
+                1px solid
+                rgba(232,196,104,.35);
+
+            background:
+                rgba(232,196,104,.08);
+
+            color: #e8c468;
+
+            padding: 10px 16px;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+        }
+
+
+        .back-btn:hover {
+            background:
+                rgba(232,196,104,.15);
+        }
+
+
+        /* =========================================
+           MAIN CONTAINER
+           ========================================= */
+
+        .container {
+            width: min(850px, 92%);
+
+            margin: 50px auto;
+        }
+
+
+        .title {
+            font-size: 28px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .description {
+            color: #8f9aaa;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+            margin-bottom: 30px;
+        }
+
+
+        /* =========================================
+           VERIFICATION CARD
+           ========================================= */
+
+        .verification-card {
+            background:
+                rgba(14,21,32,.88);
+
+            border:
+                1px solid
+                rgba(232,196,104,.22);
+
+            border-radius: 16px;
+
+            padding: 28px;
+
+            box-shadow:
+                0 18px 45px
+                rgba(0,0,0,.35);
+        }
+
+
+        /* =========================================
+           QUESTION
+           ========================================= */
+
+        .question {
+            margin-bottom: 25px;
+        }
+
+
+        .question-number {
+            color: #e8c468;
+
+            font-size: 12px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .question-text {
+            font-size: 15px;
+
+            line-height: 1.5;
+
+            margin-bottom: 10px;
+        }
+
+
+        /* =========================================
+           ANSWER INPUT
+           ========================================= */
+
+        .answer-input {
+            width: 100%;
+
+            padding: 12px 14px;
+
+            border-radius: 8px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.12);
+
+            background:
+                rgba(255,255,255,.04);
+
+            color: white;
+
+            outline: none;
+        }
+
+
+        .answer-input:focus {
+            border-color:
+                rgba(232,196,104,.65);
+        }
+
+
+        .answer-input::placeholder {
+            color: #707887;
+        }
+
+
+        /* =========================================
+           SUBMIT BUTTON
+           ========================================= */
+
+        .submit-btn {
+            margin-top: 10px;
+
+            width: 100%;
+
+            padding: 13px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background:
+                linear-gradient(
+                    155deg,
+                    #e8c468,
+                    #b99543
+                );
+
+            color: #160f04;
+
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 8px 20px
+                rgba(232,196,104,.15);
+        }
+
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+
+            cursor: not-allowed;
+
+            transform: none;
+        }
+
+
+        /* =========================================
+           MESSAGE
+           ========================================= */
+
+        .message {
+            text-align: center;
+
+            color: #8f9aaa;
+
+            padding: 30px;
+        }
+
+
+        /* =========================================
+           STATUS
+           ========================================= */
+
+        .verification-status {
+            margin-bottom: 25px;
+
+            padding: 12px 15px;
+
+            border-radius: 8px;
+
+            background:
+                rgba(232,196,104,.06);
+
+            border:
+                1px solid
+                rgba(232,196,104,.15);
+
+            color: #b8bec9;
+
+            font-size: 12px;
+        }
+
+
+        .verification-status span {
+            color: #e8c468;
+
+            font-weight: 600;
+        }
+
+
+        /* =========================================
+           EXTRA QUESTION HEADER
+           ========================================= */
+
+        .extra-heading {
+            color: #e8c468;
+
+            font-size: 20px;
+
+            font-weight: 700;
+
+            margin-bottom: 12px;
+        }
+
+
+        .extra-description {
+            color: #8f9aaa;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+            margin-bottom: 25px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================
+         TOP BAR
+         ========================================= -->
+
+    <div class="topbar">
+
+        <div>
+
+            <div class="brand">
+                Campus Lost & Found
+            </div>
+
+            <div class="subtitle">
+                Ownership Verification
+            </div>
+
+        </div>
+
+
+        <button
+            class="back-btn"
+            type="button"
+            onclick="goBack()"
+        >
+            ← Back
+        </button>
+
+    </div>
+
+
+
+    <!-- =========================================
+         MAIN CONTENT
+         ========================================= -->
+
+    <div class="container">
+
+
+        <div class="title">
+            Ownership Verification
+        </div>
+
+
+        <div
+            class="description"
+            id="pageDescription"
+        >
+            Please answer the following questions
+            about your lost item.
+
+            <br>
+
+            These questions are based on
+            private identifying details provided
+            by the person who found the item.
+        </div>
+
+
+
+        <!-- =====================================
+             VERIFICATION CARD
+             ===================================== -->
+
+        <div
+            class="verification-card"
+            id="verificationCard"
+        >
+
+            <div class="message">
+                Loading verification questions...
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+    <script>
+
+
+        /* =========================================
+           BACK TO DASHBOARD
+           ========================================= */
+
+        function goBack()
+        {
+            window.location.href =
+                "profileview.html#dashboard";
+        }
+
+
+
+        /* =========================================
+           ESCAPE HTML
+           ========================================= */
+
+        function escapeHTML(value)
+        {
+            return String(value || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+
+
+        /* =========================================
+           LOAD VERIFICATION
+           ========================================= */
+
+        async function loadVerification()
+        {
+
+            try
+            {
+
+                /* ---------------------------------
+                   GET VERIFICATION ID
+                   --------------------------------- */
+
+                const params =
+                    new URLSearchParams(
+                        window.location.search
+                    );
+
+
+                const verificationId =
+                    params.get(
+                        "verification_id"
+                    );
+
+
+                console.log(
+                    "🔎 Verification ID:",
+                    verificationId
+                );
+
+
+                if(!verificationId)
+                {
+
+                    document.getElementById(
+                        "verificationCard"
+                    ).innerHTML =
+                    `
+                        <div class="message">
+
+                            Verification ID not found.
+
+                            <br><br>
+
+                            Please open the verification
+                            from your notification.
+
+                        </div>
+                    `;
+
+                    return;
+                }
+
+
+
+                /* ---------------------------------
+                   LOADING
+                   --------------------------------- */
+
+                document.getElementById(
+                    "verificationCard"
+                ).innerHTML =
+                `
+                    <div class="message">
+                        Loading verification...
+                    </div>
+                `;
+
+
+
+                /* ---------------------------------
+                   BACKEND REQUEST
+                   --------------------------------- */
+
+                const response =
+                    await fetch(
+                        `/verification/${verificationId}`
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "🔎 Verification response:",
+                    data
+                );
+
+
+
+                /* ---------------------------------
+                   CHECK RESPONSE
+                   --------------------------------- */
+
+                if(
+                    !response.ok ||
+                    !data.success
+                )
+                {
+
+                    document.getElementById(
+                        "verificationCard"
+                    ).innerHTML =
+                    `
+                        <div class="message">
+
+                            ${
+                                escapeHTML(
+                                    data.error ||
+                                    data.message ||
+                                    "Unable to load verification."
+                                )
+                            }
+
+                        </div>
+                    `;
+
+                    return;
+                }
+
+
+
+                /* =================================================
+                   IMPORTANT:
+                   EXTRA ROUND IS CHECKED FIRST
+                   ================================================= */
+
+                if(
+                    data.extra_status === "SENT" &&
+                    Array.isArray(data.extra_questions) &&
+                    data.extra_questions.length > 0
+                )
+                {
+
+                    console.log(
+                        "🟡 EXTRA VERIFICATION ROUND"
+                    );
+
+
+                    displayExtraQuestions(
+                        data.extra_questions
+                    );
+
+
+                    return;
+                }
+
+
+
+                /* ================================================
+                   EXTRA ROUND ALREADY ANSWERED
+                   ================================================ */
+
+                if(
+                    data.extra_status === "ANSWERED"
+                )
+                {
+
+                    document.getElementById(
+                        "verificationCard"
+                    ).innerHTML =
+                    `
+                        <div class="message">
+
+                            <h2
+                                style="
+                                    color:#e8c468;
+                                    margin-bottom:15px;
+                                "
+                            >
+                                Additional Verification Submitted
+                            </h2>
+
+
+                            <p>
+                                Your additional ownership
+                                answers have already been submitted.
+                            </p>
+
+
+                            <p
+                                style="
+                                    margin-top:12px;
+                                "
+                            >
+                                Please wait for the Founder
+                                to review your answers.
+                            </p>
+
+                        </div>
+                    `;
+
+                    return;
+                }
+
+
+
+                /* ================================================
+                   ORIGINAL VERIFICATION ALREADY ANSWERED
+                   ================================================ */
+
+                if(
+                    data.status === "ANSWERED"
+                )
+                {
+
+                    document.getElementById(
+                        "verificationCard"
+                    ).innerHTML =
+                    `
+                        <div class="message">
+
+                            <h2
+                                style="
+                                    color:#e8c468;
+                                    margin-bottom:15px;
+                                "
+                            >
+                                Original Verification Completed
+                            </h2>
+
+
+                            <p>
+                                Your original verification
+                                answers have already been submitted.
+                            </p>
+
+
+                            <p
+                                style="
+                                    margin-top:12px;
+                                "
+                            >
+                                Please wait for the Founder
+                                to review them or send
+                                additional questions.
+                            </p>
+
+                        </div>
+                    `;
+
+                    return;
+                }
+
+
+
+                /* ================================================
+                   ORIGINAL QUESTIONS
+                   ================================================ */
+
+                if(
+                    !Array.isArray(data.questions) ||
+                    data.questions.length === 0
+                )
+                {
+
+                    document.getElementById(
+                        "verificationCard"
+                    ).innerHTML =
+                    `
+                        <div class="message">
+
+                            No verification questions found.
+
+                        </div>
+                    `;
+
+                    return;
+                }
+
+
+
+                displayOriginalQuestions(
+                    data.questions,
+                    data.status
+                );
+
+            }
+            catch(error)
+            {
+
+                console.error(
+                    "❌ Verification loading error:",
+                    error
+                );
+
+
+                document.getElementById(
+                    "verificationCard"
+                ).innerHTML =
+                `
+                    <div class="message">
+
+                        Unable to load verification
+                        questions.
+
+                        <br><br>
+
+                        Please try again.
+
+                    </div>
+                `;
+
+            }
+
+        }
+
+
+
+        /* =========================================
+           DISPLAY ORIGINAL QUESTIONS
+           ========================================= */
+
+        function displayOriginalQuestions(
+            questions,
+            status
+        )
+        {
+
+            /* Change page description */
+
+            document.getElementById(
+                "pageDescription"
+            ).innerHTML =
+            `
+                Please answer the following questions
+                about your lost item.
+
+                <br>
+
+                These questions are based on
+                private identifying details provided
+                by the person who found the item.
+            `;
+
+
+            let questionsHTML = "";
+
+
+            /* ---------------------------------
+               STATUS
+               --------------------------------- */
+
+            questionsHTML +=
+            `
+                <div class="verification-status">
+
+                    Verification Status:
+
+                    <span>
+                        ${escapeHTML(status || "PENDING")}
+                    </span>
+
+                </div>
+            `;
+
+
+
+            /* ---------------------------------
+               QUESTIONS
+               --------------------------------- */
+
+            questions.forEach(
+                (item, index) =>
+                {
+
+                    questionsHTML +=
+                    `
+                        <div class="question">
+
+                            <div class="question-number">
+
+                                QUESTION ${index + 1}
+
+                            </div>
+
+
+                            <div class="question-text">
+
+                                ${escapeHTML(
+                                    item.question
+                                )}
+
+                            </div>
+
+
+                            <input
+                                type="text"
+                                class="answer-input original-answer-input"
+                                id="answer-${index}"
+                                placeholder="Enter your answer"
+                            >
+
+                        </div>
+                    `;
+
+                }
+            );
+
+
+
+            /* ---------------------------------
+               SUBMIT
+               --------------------------------- */
+
+            questionsHTML +=
+            `
+                <button
+                    type="button"
+                    class="submit-btn"
+                    onclick="submitOriginalVerification()"
+                >
+                    Submit Verification
+                </button>
+            `;
+
+
+
+            document.getElementById(
+                "verificationCard"
+            ).innerHTML =
+                questionsHTML;
+
+        }
+
+
+
+        /* =========================================
+           DISPLAY EXTRA QUESTIONS ONLY
+           ========================================= */
+
+        function displayExtraQuestions(
+            extraQuestions
+        )
+        {
+
+            /* Change page description */
+
+            document.getElementById(
+                "pageDescription"
+            ).innerHTML =
+            `
+                The Founder has requested
+                additional information to verify
+                ownership.
+
+                <br>
+
+                Please answer <strong>only these
+                additional questions</strong>.
+            `;
+
+
+            let questionsHTML = "";
+
+
+            /* ---------------------------------
+               EXTRA HEADER
+               --------------------------------- */
+
+            questionsHTML +=
+            `
+                <div class="verification-status">
+
+                    Verification Status:
+
+                    <span>
+                        ADDITIONAL QUESTIONS
+                    </span>
+
+                </div>
+
+
+                <div class="extra-heading">
+
+                    Additional Ownership Questions
+
+                </div>
+
+
+                <div class="extra-description">
+
+                    These questions were added by
+                    the Founder after your original
+                    verification.
+
+                    <br>
+
+                    Your original answers and original
+                    verification score will remain unchanged.
+
+                </div>
+            `;
+
+
+
+            /* ---------------------------------
+               EXTRA QUESTIONS
+               --------------------------------- */
+
+            extraQuestions.forEach(
+                (item, index) =>
+                {
+
+                    questionsHTML +=
+                    `
+                        <div class="question">
+
+                            <div class="question-number">
+
+                                EXTRA QUESTION ${index + 1}
+
+                            </div>
+
+
+                            <div class="question-text">
+
+                                ${escapeHTML(
+                                    item.question
+                                )}
+
+                            </div>
+
+
+                            <input
+                                type="text"
+                                class="answer-input extra-answer-input"
+                                id="extra-answer-${index}"
+                                placeholder="Enter your answer"
+                            >
+
+                        </div>
+                    `;
+
+                }
+            );
+
+
+
+            /* ---------------------------------
+               EXTRA SUBMIT BUTTON
+               --------------------------------- */
+
+            questionsHTML +=
+            `
+                <button
+                    type="button"
+                    class="submit-btn"
+                    onclick="submitExtraVerification()"
+                >
+                    Submit Additional Answers
+                </button>
+            `;
+
+
+
+            document.getElementById(
+                "verificationCard"
+            ).innerHTML =
+                questionsHTML;
+
+        }
+
+
+
+        /* =========================================
+           SUBMIT ORIGINAL VERIFICATION
+           ========================================= */
+
+        async function submitOriginalVerification()
+        {
+
+            try
+            {
+
+                /* ---------------------------------
+                   GET VERIFICATION ID
+                   --------------------------------- */
+
+                const params =
+                    new URLSearchParams(
+                        window.location.search
+                    );
+
+
+                const verificationId =
+                    params.get(
+                        "verification_id"
+                    );
+
+
+                if(!verificationId)
+                {
+                    alert(
+                        "Verification ID not found."
+                    );
+
+                    return;
+                }
+
+
+
+                /* ---------------------------------
+                   CURRENT USER
+                   --------------------------------- */
+
+                const currentUser =
+                    JSON.parse(
+                        sessionStorage.getItem(
+                            "campusCurrentUser"
+                        ) || "{}"
+                    );
+
+
+                if(!currentUser.id)
+                {
+                    alert(
+                        "User information not found. Please login again."
+                    );
+
+                    return;
+                }
+
+
+
+                /* ---------------------------------
+                   GET ORIGINAL ANSWERS ONLY
+                   --------------------------------- */
+
+                const answerInputs =
+                    document.querySelectorAll(
+                        ".original-answer-input"
+                    );
+
+
+                const answers = [];
+
+
+                answerInputs.forEach(
+                    input =>
+                    {
+
+                        answers.push(
+                        {
+                            answer:
+                                input.value.trim()
+                        });
+
+                    }
+                );
+
+
+
+                /* ---------------------------------
+                   CHECK ANSWERS
+                   --------------------------------- */
+
+                for(
+                    let i = 0;
+                    i < answers.length;
+                    i++
+                )
+                {
+
+                    if(
+                        !answers[i].answer
+                    )
+                    {
+
+                        alert(
+                            "Please answer Question " +
+                            (i + 1)
+                        );
+
+                        return;
+                    }
+
+                }
+
+
+
+                /* ---------------------------------
+                   BUTTON
+                   --------------------------------- */
+
+                const submitButton =
+                    document.querySelector(
+                        ".submit-btn"
+                    );
+
+
+                if(submitButton)
+                {
+
+                    submitButton.disabled =
+                        true;
+
+                    submitButton.textContent =
+                        "Submitting...";
+
+                }
+
+
+
+                /* ---------------------------------
+                   ORIGINAL BACKEND ROUTE
+                   --------------------------------- */
+
+                const response =
+                    await fetch(
+                        `/verification/${verificationId}/submit`,
+                        {
+                            method: "POST",
+
+                            headers:
+                            {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify(
+                                {
+                                    user_id:
+                                        currentUser.id,
+
+                                    answers:
+                                        answers
+                                })
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "Original verification response:",
+                    data
+                );
+
+
+
+                /* ---------------------------------
+                   CHECK RESPONSE
+                   --------------------------------- */
+
+                if(
+                    !response.ok ||
+                    !data.success
+                )
+                {
+
+                    alert(
+                        data.error ||
+                        data.message ||
+                        "Failed to submit verification."
+                    );
+
+
+                    if(submitButton)
+                    {
+
+                        submitButton.disabled =
+                            false;
+
+                        submitButton.textContent =
+                            "Submit Verification";
+
+                    }
+
+                    return;
+                }
+
+
+
+                /* ---------------------------------
+                   SUCCESS
+                   --------------------------------- */
+
+                document.getElementById(
+                    "verificationCard"
+                ).innerHTML =
+                `
+                    <div class="message">
+
+                        <h2
+                            style="
+                                color:#e8c468;
+                                margin-bottom:15px;
+                            "
+                        >
+                            Verification Submitted
+                        </h2>
+
+
+                        <p>
+                            Your original verification
+                            answers have been submitted successfully.
+                        </p>
+
+
+                        <p
+                            style="
+                                margin-top:12px;
+                            "
+                        >
+                            The Founder will review
+                            your verification.
+                        </p>
+
+                    </div>
+                `;
+
+            }
+            catch(error)
+            {
+
+                console.error(
+                    "❌ Original verification submission error:",
+                    error
+                );
+
+
+                alert(
+                    "Unable to submit verification."
+                );
+
+
+                const submitButton =
+                    document.querySelector(
+                        ".submit-btn"
+                    );
+
+
+                if(submitButton)
+                {
+
+                    submitButton.disabled =
+                        false;
+
+                    submitButton.textContent =
+                        "Submit Verification";
+
+                }
+
+            }
+
+        }
+
+
+
+        /* =========================================
+           SUBMIT EXTRA VERIFICATION
+           ========================================= */
+
+        async function submitExtraVerification()
+        {
+
+            try
+            {
+
+                /* ---------------------------------
+                   GET VERIFICATION ID
+                   --------------------------------- */
+
+                const params =
+                    new URLSearchParams(
+                        window.location.search
+                    );
+
+
+                const verificationId =
+                    params.get(
+                        "verification_id"
+                    );
+
+
+                if(!verificationId)
+                {
+
+                    alert(
+                        "Verification ID not found."
+                    );
+
+                    return;
+                }
+
+
+
+                /* ---------------------------------
+                   CURRENT USER
+                   --------------------------------- */
+
+                const currentUser =
+                    JSON.parse(
+                        sessionStorage.getItem(
+                            "campusCurrentUser"
+                        ) || "{}"
+                    );
+
+
+                if(!currentUser.id)
+                {
+
+                    alert(
+                        "User information not found. Please login again."
+                    );
+
+                    return;
+                }
+
+
+
+                /* ---------------------------------
+                   GET EXTRA ANSWERS ONLY
+                   --------------------------------- */
+
+                const answerInputs =
+                    document.querySelectorAll(
+                        ".extra-answer-input"
+                    );
+
+
+                const answers = [];
+
+
+                answerInputs.forEach(
+                    input =>
+                    {
+
+                        answers.push(
+                        {
+                            answer:
+                                input.value.trim()
+                        });
+
+                    }
+                );
+
+
+
+                /* ---------------------------------
+                   CHECK EXTRA ANSWERS
+                   --------------------------------- */
+
+                for(
+                    let i = 0;
+                    i < answers.length;
+                    i++
+                )
+                {
+
+                    if(
+                        !answers[i].answer
+                    )
+                    {
+
+                        alert(
+                            "Please answer Extra Question " +
+                            (i + 1)
+                        );
+
+                        return;
+                    }
+
+                }
+
+
+
+                /* ---------------------------------
+                   BUTTON
+                   --------------------------------- */
+
+                const submitButton =
+                    document.querySelector(
+                        ".submit-btn"
+                    );
+
+
+                if(submitButton)
+                {
+
+                    submitButton.disabled =
+                        true;
+
+                    submitButton.textContent =
+                        "Submitting...";
+
+                }
+
+
+
+                /* ---------------------------------
+                   EXTRA BACKEND ROUTE
+                   --------------------------------- */
+
+                const response =
+                    await fetch(
+                        `/verification/${verificationId}/extra-submit`,
+                        {
+                            method: "POST",
+
+                            headers:
+                            {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify(
+                                {
+                                    user_id:
+                                        currentUser.id,
+
+                                    answers:
+                                        answers
+                                })
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "Extra verification response:",
+                    data
+                );
+
+
+
+                /* ---------------------------------
+                   CHECK RESPONSE
+                   --------------------------------- */
+
+                if(
+                    !response.ok ||
+                    !data.success
+                )
+                {
+
+                    alert(
+                        data.error ||
+                        data.message ||
+                        "Failed to submit additional answers."
+                    );
+
+
+                    if(submitButton)
+                    {
+
+                        submitButton.disabled =
+                            false;
+
+                        submitButton.textContent =
+                            "Submit Additional Answers";
+
+                    }
+
+                    return;
+                }
+
+
+
+                /* ---------------------------------
+                   SUCCESS
+                   --------------------------------- */
+
+                document.getElementById(
+                    "verificationCard"
+                ).innerHTML =
+                `
+                    <div class="message">
+
+                        <h2
+                            style="
+                                color:#e8c468;
+                                margin-bottom:15px;
+                            "
+                        >
+                            Additional Verification Submitted
+                        </h2>
+
+
+                        <p>
+                            Your additional answers
+                            have been submitted successfully.
+                        </p>
+
+
+                        <p
+                            style="
+                                margin-top:12px;
+                            "
+                        >
+                            The Founder will review
+                            your additional answers.
+                        </p>
+
+                    </div>
+                `;
+
+            }
+            catch(error)
+            {
+
+                console.error(
+                    "❌ Extra verification submission error:",
+                    error
+                );
+
+
+                alert(
+                    "Unable to submit additional verification."
+                );
+
+
+                const submitButton =
+                    document.querySelector(
+                        ".submit-btn"
+                    );
+
+
+                if(submitButton)
+                {
+
+                    submitButton.disabled =
+                        false;
+
+                    submitButton.textContent =
+                        "Submit Additional Answers";
+
+                }
+
+            }
+
+        }
+
+
+
+        /* =========================================
+           START
+           ========================================= */
+
+        loadVerification();
+
+    </script>
+
+
+</body>
+
+</html>

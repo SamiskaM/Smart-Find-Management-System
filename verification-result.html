@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Verification Result | Campus Lost & Found</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+
+            background: radial-gradient(
+                circle at top,
+                #182131 0%,
+                #0a0e14 55%,
+                #06080c 100%
+            );
+
+            color: #f3ead0;
+        }
+
+        /* TOP BAR */
+
+        .topbar {
+            min-height: 70px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 15px;
+            padding: 15px 35px;
+
+            border-bottom:
+                1px solid rgba(232,196,104,.18);
+
+            background:
+                rgba(8,12,18,.92);
+        }
+
+        .brand {
+            color: #e8c468;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #8f9aaa;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .back-btn {
+            border:
+                1px solid rgba(232,196,104,.35);
+
+            background:
+                rgba(232,196,104,.08);
+
+            color: #e8c468;
+
+            padding: 10px 16px;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background:
+                rgba(232,196,104,.15);
+        }
+
+
+        /* MAIN */
+
+        .container {
+            width: min(850px, 92%);
+            margin: 50px auto;
+        }
+
+        .title {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            color: #8f9aaa;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+
+        /* RESULT CARD */
+
+        .result-card {
+            background:
+                rgba(14,21,32,.88);
+
+            border:
+                1px solid rgba(232,196,104,.22);
+
+            border-radius: 16px;
+
+            padding: 30px;
+
+            box-shadow:
+                0 18px 45px rgba(0,0,0,.35);
+        }
+
+
+        /* USER */
+
+        .user-section {
+            padding-bottom: 25px;
+            margin-bottom: 25px;
+
+            border-bottom:
+                1px solid rgba(255,255,255,.08);
+        }
+
+        .section-title {
+            color: #e8c468;
+            font-size: 13px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .user-name {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .user-email {
+            color: #8f9aaa;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+
+        /* VERIFICATION ROUND */
+
+        .verification-round {
+            margin-top: 30px;
+            padding-top: 25px;
+
+            border-top:
+                1px solid rgba(255,255,255,.08);
+        }
+
+        .round-title {
+            color: #e8c468;
+            font-size: 19px;
+            font-weight: 700;
+
+            margin-bottom: 8px;
+        }
+
+        .round-description {
+            color: #8f9aaa;
+            font-size: 13px;
+
+            margin-bottom: 20px;
+
+            line-height: 1.5;
+        }
+
+
+        /* SCORE */
+
+        .score-section {
+            text-align: center;
+
+            padding: 25px;
+
+            margin-bottom: 25px;
+
+            border-radius: 12px;
+
+            background:
+                rgba(232,196,104,.06);
+
+            border:
+                1px solid rgba(232,196,104,.18);
+        }
+
+        .score-label {
+            color: #8f9aaa;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .score {
+            color: #e8c468;
+            font-size: 42px;
+            font-weight: 700;
+        }
+
+        .status {
+            margin-top: 10px;
+
+            color: #b8bec9;
+
+            font-size: 13px;
+        }
+
+
+        /* QUESTIONS */
+
+        .question {
+            padding: 18px 0;
+
+            border-bottom:
+                1px solid rgba(255,255,255,.07);
+        }
+
+        .question:last-child {
+            border-bottom: none;
+        }
+
+        .question-number {
+            color: #e8c468;
+            font-size: 12px;
+            margin-bottom: 7px;
+        }
+
+        .question-text {
+            font-size: 15px;
+
+            line-height: 1.5;
+
+            margin-bottom: 10px;
+
+            overflow-wrap: anywhere;
+        }
+
+        .answer-label {
+            color: #8f9aaa;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .answer {
+            padding: 10px 12px;
+
+            border-radius: 7px;
+
+            background:
+                rgba(255,255,255,.04);
+
+            border:
+                1px solid rgba(255,255,255,.08);
+
+            color: #f3ead0;
+
+            font-size: 14px;
+
+            overflow-wrap: anywhere;
+        }
+
+
+        /* EXTRA STATUS */
+
+        .extra-pending {
+            padding: 20px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(232,196,104,.05);
+
+            border:
+                1px solid rgba(232,196,104,.15);
+
+            color: #b8bec9;
+
+            line-height: 1.6;
+
+            font-size: 14px;
+        }
+
+        .extra-not-started {
+            padding: 20px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(255,255,255,.03);
+
+            border:
+                1px solid rgba(255,255,255,.07);
+
+            color: #8f9aaa;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+        }
+
+
+        /* BUTTONS */
+
+        .confirm-btn,
+        .extra-btn {
+            width: 100%;
+
+            margin-top: 15px;
+
+            padding: 14px;
+
+            border-radius: 8px;
+
+            font-size: 15px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        .confirm-btn {
+            margin-top: 30px;
+
+            border: none;
+
+            background:
+                linear-gradient(
+                    155deg,
+                    #e8c468,
+                    #b99543
+                );
+
+            color: #160f04;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 8px 20px
+                rgba(232,196,104,.15);
+        }
+
+        .extra-btn {
+            border:
+                1px solid #e8c468;
+
+            background: transparent;
+
+            color: #e8c468;
+        }
+
+        .extra-btn:hover {
+            background:
+                rgba(232,196,104,.10);
+        }
+
+
+        /* MESSAGE */
+
+        .message {
+            text-align: center;
+
+            color: #8f9aaa;
+
+            padding: 35px;
+
+            line-height: 1.6;
+        }
+
+
+        /* MOBILE */
+
+        @media (max-width: 600px) {
+
+            .topbar {
+                padding: 15px 18px;
+            }
+
+            .container {
+                margin: 30px auto;
+            }
+
+            .result-card {
+                padding: 20px;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+
+            .score {
+                font-size: 36px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ==========================================
+         TOP BAR
+    ========================================== -->
+
+    <header class="topbar">
+
+        <div>
+
+            <div class="brand">
+                Campus Lost & Found
+            </div>
+
+            <div class="subtitle">
+                Verification Result
+            </div>
+
+        </div>
+
+
+        <button
+            class="back-btn"
+            type="button"
+            onclick="goBack()">
+
+            ← Back
+
+        </button>
+
+    </header>
+
+
+
+    <!-- ==========================================
+         MAIN
+    ========================================== -->
+
+    <main class="container">
+
+        <div class="title">
+            Ownership Verification Result
+        </div>
+
+
+        <div class="description">
+
+            Review the answers provided by the Lost User before
+            deciding whether to confirm ownership or request
+            additional verification questions.
+
+        </div>
+
+
+        <div
+            class="result-card"
+            id="resultCard">
+
+            <div class="message">
+                Loading verification result...
+            </div>
+
+        </div>
+
+    </main>
+
+
+
+    <script>
+
+        let verificationId = null;
+
+        let currentUser = null;
+
+        let verificationData = null;
+
+
+
+        /* ==========================================
+           ESCAPE HTML
+        ========================================== */
+
+        function escapeHTML(value)
+        {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+
+
+        /* ==========================================
+           BACK
+        ========================================== */
+
+        function goBack()
+        {
+            window.location.href =
+                "founder-handover.html?verification_id=" +
+                encodeURIComponent(verificationId);
+        }
+
+
+
+        /* ==========================================
+           LOAD RESULT
+        ========================================== */
+
+        async function loadVerificationResult()
+        {
+            const resultCard =
+                document.getElementById(
+                    "resultCard"
+                );
+
+
+            try
+            {
+                const params =
+                    new URLSearchParams(
+                        window.location.search
+                    );
+
+
+                verificationId =
+                    params.get(
+                        "verification_id"
+                    );
+
+
+                if(!verificationId)
+                {
+                    resultCard.innerHTML = `
+
+                        <div class="message">
+
+                            Verification ID not found.
+
+                        </div>
+
+                    `;
+
+                    return;
+                }
+
+
+
+                /* GET CURRENT USER */
+
+                currentUser =
+                    JSON.parse(
+                        sessionStorage.getItem(
+                            "campusCurrentUser"
+                        ) || "{}"
+                    );
+
+
+                if(!currentUser.id)
+                {
+                    resultCard.innerHTML = `
+
+                        <div class="message">
+
+                            User information not found.
+
+                            <br>
+
+                            Please log in again.
+
+                        </div>
+
+                    `;
+
+                    return;
+                }
+
+
+
+                /* CALL BACKEND */
+
+                const response =
+                    await fetch(
+
+                        `/verification/${encodeURIComponent(
+                            verificationId
+                        )}/result?user_id=${encodeURIComponent(
+                            currentUser.id
+                        )}`
+
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+
+                if(
+                    !response.ok ||
+                    !data.success
+                )
+                {
+                    resultCard.innerHTML = `
+
+                        <div class="message">
+
+                            ${escapeHTML(
+                                data.error ||
+                                "Unable to load verification result."
+                            )}
+
+                        </div>
+
+                    `;
+
+                    return;
+                }
+
+
+
+                verificationData =
+                    data;
+
+
+
+                /*
+                 * Original verification must
+                 * be answered before Founder
+                 * can review the result.
+                 */
+
+                if(
+                    data.status !==
+                    "ANSWERED"
+                )
+                {
+                    resultCard.innerHTML = `
+
+                        <div class="message">
+
+                            Verification is not yet completed.
+
+                            <br><br>
+
+                            The Lost User must answer the
+                            original verification questions first.
+
+                        </div>
+
+                    `;
+
+                    return;
+                }
+
+
+
+                renderResult(data);
+
+            }
+            catch(error)
+            {
+                console.error(
+                    "Verification result error:",
+                    error
+                );
+
+
+                resultCard.innerHTML = `
+
+                    <div class="message">
+
+                        Unable to load verification result.
+
+                        <br><br>
+
+                        Please check that the server is
+                        running and try again.
+
+                    </div>
+
+                `;
+            }
+        }
+
+
+
+        /* ==========================================
+           RENDER RESULT
+        ========================================== */
+
+        function renderResult(data)
+        {
+            let html = "";
+
+
+
+            /* ======================================
+               LOST USER
+            ====================================== */
+
+            if(data.lost_user)
+            {
+                html += `
+
+                    <div class="user-section">
+
+                        <div class="section-title">
+                            LOST USER
+                        </div>
+
+
+                        <div class="user-name">
+
+                            ${escapeHTML(
+                                data.lost_user.name ||
+                                "Student"
+                            )}
+
+                        </div>
+
+
+                        <div class="user-email">
+
+                            ${escapeHTML(
+                                data.lost_user.email ||
+                                ""
+                            )}
+
+                        </div>
+
+                    </div>
+
+                `;
+            }
+
+
+
+            /* ======================================
+               ORIGINAL VERIFICATION
+            ====================================== */
+
+            html += `
+
+                <div class="verification-round">
+
+                    <div class="round-title">
+
+                        Original Verification
+
+                    </div>
+
+
+                    <div class="round-description">
+
+                        These are the original ownership
+                        verification questions and the
+                        answers provided by the Lost User.
+
+                    </div>
+
+
+                    <div class="score-section">
+
+                        <div class="score-label">
+
+                            ORIGINAL VERIFICATION SCORE
+
+                        </div>
+
+
+                        <div class="score">
+
+                            ${Number(
+                                data.verification_score || 0
+                            ).toFixed(2)}%
+
+                        </div>
+
+
+                        <div class="status">
+
+                            Original verification completed
+
+                        </div>
+
+                    </div>
+
+            `;
+
+
+
+            /* ORIGINAL QUESTIONS */
+
+            if(
+                Array.isArray(
+                    data.questions
+                ) &&
+                data.questions.length > 0
+            )
+            {
+                html += `
+
+                    <div class="section-title">
+
+                        ORIGINAL ANSWERS
+
+                    </div>
+
+                `;
+
+
+                data.questions.forEach(
+                    (item, index) =>
+                    {
+                        html += `
+
+                            <div class="question">
+
+                                <div class="question-number">
+
+                                    QUESTION ${index + 1}
+
+                                </div>
+
+
+                                <div class="question-text">
+
+                                    ${escapeHTML(
+                                        item.question ||
+                                        ""
+                                    )}
+
+                                </div>
+
+
+                                <div class="answer-label">
+
+                                    Lost User's Answer
+
+                                </div>
+
+
+                                <div class="answer">
+
+                                    ${escapeHTML(
+                                        item.user_answer ||
+                                        "No answer provided"
+                                    )}
+
+                                </div>
+
+                            </div>
+
+                        `;
+                    }
+                );
+            }
+
+
+            html += `
+
+                </div>
+
+            `;
+
+
+
+            /* ======================================
+               ADDITIONAL VERIFICATION
+            ====================================== */
+
+            html += `
+
+                <div class="verification-round">
+
+                    <div class="round-title">
+
+                        Additional Verification
+
+                    </div>
+
+
+                    <div class="round-description">
+
+                        Additional questions are handled
+                        separately from the original
+                        verification.
+
+                    </div>
+
+            `;
+
+
+
+            const extraStatus =
+                data.extra_status ||
+                "NOT_STARTED";
+
+
+
+            /* ======================================
+               EXTRA ANSWERED
+            ====================================== */
+
+            if(
+                extraStatus ===
+                "ANSWERED"
+            )
+            {
+                html += `
+
+                    <div class="score-section">
+
+                        <div class="score-label">
+
+                            ADDITIONAL VERIFICATION SCORE
+
+                        </div>
+
+
+                        <div class="score">
+
+                            ${Number(
+                                data.extra_verification_score ||
+                                0
+                            ).toFixed(2)}%
+
+                        </div>
+
+
+                        <div class="status">
+
+                            Additional verification completed
+
+                        </div>
+
+                    </div>
+
+                `;
+
+
+
+                if(
+                    Array.isArray(
+                        data.extra_questions
+                    ) &&
+                    data.extra_questions.length > 0
+                )
+                {
+                    html += `
+
+                        <div class="section-title">
+
+                            ADDITIONAL ANSWERS
+
+                        </div>
+
+                    `;
+
+
+                    data.extra_questions.forEach(
+                        (item, index) =>
+                        {
+                            html += `
+
+                                <div class="question">
+
+                                    <div class="question-number">
+
+                                        ADDITIONAL QUESTION
+                                        ${index + 1}
+
+                                    </div>
+
+
+                                    <div class="question-text">
+
+                                        ${escapeHTML(
+                                            item.question ||
+                                            ""
+                                        )}
+
+                                    </div>
+
+
+                                    <div class="answer-label">
+
+                                        Lost User's Answer
+
+                                    </div>
+
+
+                                    <div class="answer">
+
+                                        ${escapeHTML(
+                                            item.user_answer ||
+                                            "No answer provided"
+                                        )}
+
+                                    </div>
+
+                                </div>
+
+                            `;
+                        }
+                    );
+                }
+            }
+
+
+
+            /* ======================================
+               EXTRA QUESTIONS SENT
+            ====================================== */
+
+            else if(
+                extraStatus ===
+                "SENT"
+            )
+            {
+                html += `
+
+                    <div class="extra-pending">
+
+                        Additional verification questions
+                        have been sent to the Lost User.
+
+                        <br><br>
+
+                        Waiting for the Lost User to
+                        answer the additional questions.
+
+                    </div>
+
+                `;
+            }
+
+
+
+            /* ======================================
+               NO EXTRA QUESTIONS
+            ====================================== */
+
+            else
+            {
+                html += `
+
+                    <div class="extra-not-started">
+
+                        No additional verification has
+                        been completed yet.
+
+                        <br><br>
+
+                        You can request additional
+                        questions if you need more proof
+                        of ownership.
+
+                    </div>
+
+                `;
+            }
+
+
+
+            html += `
+
+                </div>
+
+            `;
+
+
+
+            /* ======================================
+               CONFIRM OWNERSHIP
+            ====================================== */
+
+            html += `
+
+                <button
+                    type="button"
+                    class="confirm-btn"
+                    id="confirmButton"
+                    onclick="confirmOwnership()">
+
+                    Confirm Ownership
+
+                </button>
+
+            `;
+
+
+
+            /* ======================================
+               ADD EXTRA QUESTIONS
+               
+               IMPORTANT:
+               BUTTON IS ALWAYS SHOWN
+            ====================================== */
+
+            html += `
+
+                <button
+                    type="button"
+                    class="extra-btn"
+                    id="extraButton"
+                    onclick="addExtraQuestions()">
+
+                    Add Extra Questions
+
+                </button>
+
+            `;
+
+
+
+            document.getElementById(
+                "resultCard"
+            ).innerHTML = html;
+        }
+
+
+
+        /* ==========================================
+           ADD EXTRA QUESTIONS
+        ========================================== */
+
+        function addExtraQuestions()
+        {
+            if(!verificationId)
+            {
+                alert(
+                    "Verification ID not found."
+                );
+
+                return;
+            }
+
+
+            window.location.href =
+                "founder-extra-questions.html?verification_id=" +
+                encodeURIComponent(
+                    verificationId
+                );
+        }
+
+
+
+        /* ==========================================
+           CONFIRM OWNERSHIP
+        ========================================== */
+
+        async function confirmOwnership()
+        {
+            if(
+                !verificationId ||
+                !currentUser?.id
+            )
+            {
+                alert(
+                    "Verification or user information is missing."
+                );
+
+                return;
+            }
+
+
+
+            const confirmed =
+                window.confirm(
+
+                    "Are you sure you want to confirm this Lost User as the rightful owner?"
+
+                );
+
+
+            if(!confirmed)
+            {
+                return;
+            }
+
+
+
+            const button =
+                document.getElementById(
+                    "confirmButton"
+                );
+
+
+            if(button)
+            {
+                button.disabled =
+                    true;
+
+                button.textContent =
+                    "Confirming...";
+            }
+
+
+
+            try
+            {
+                const response =
+                    await fetch(
+
+                        `/verification/${encodeURIComponent(
+                            verificationId
+                        )}/confirm`,
+
+                        {
+                            method:
+                                "POST",
+
+                            headers:
+                            {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify({
+
+                                    user_id:
+                                        currentUser.id
+
+                                })
+                        }
+
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+
+                if(
+                    !response.ok ||
+                    !data.success
+                )
+                {
+                    throw new Error(
+
+                        data.error ||
+                        "Unable to confirm ownership."
+
+                    );
+                }
+
+
+
+                alert(
+
+                    data.message ||
+                    "Ownership confirmation submitted successfully."
+
+                );
+
+
+
+                window.location.href =
+                    "founder-matches.html";
+
+            }
+            catch(error)
+            {
+                console.error(
+                    "Confirm ownership error:",
+                    error
+                );
+
+
+                alert(
+                    error.message ||
+                    "Unable to confirm ownership."
+                );
+
+
+                if(button)
+                {
+                    button.disabled =
+                        false;
+
+                    button.textContent =
+                        "Confirm Ownership";
+                }
+            }
+        }
+
+
+
+        /* ==========================================
+           START
+        ========================================== */
+
+        loadVerificationResult();
+
+    </script>
+
+</body>
+
+</html>

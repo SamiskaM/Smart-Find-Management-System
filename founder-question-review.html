@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Question Review | Campus Lost & Found</title>
+
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+
+            background: #0b0b0b;
+
+            color: #f5f5f5;
+
+            min-height: 100vh;
+        }
+
+
+        /* =========================
+           TOP BAR
+        ========================= */
+
+        .top-bar {
+            height: 72px;
+
+            background: #111111;
+
+            border-bottom: 1px solid #8f741f;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 40px;
+        }
+
+
+        .brand-title {
+            color: #d4af37;
+
+            font-size: 21px;
+
+            font-weight: bold;
+        }
+
+
+        .brand-subtitle {
+            color: #888888;
+
+            font-size: 12px;
+
+            margin-top: 4px;
+        }
+
+
+        .user-area {
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+        }
+
+
+        .user-name {
+            color: #dddddd;
+
+            font-size: 14px;
+        }
+
+
+        .user-icon {
+            width: 38px;
+
+            height: 38px;
+
+            border-radius: 50%;
+
+            background: #d4af37;
+
+            color: #111111;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-weight: bold;
+        }
+
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .main-container {
+            max-width: 950px;
+
+            margin: auto;
+
+            padding: 40px 25px 70px;
+        }
+
+
+        /* =========================
+           BACK BUTTON
+        ========================= */
+
+        .back-button {
+            background: transparent;
+
+            border: 1px solid #555555;
+
+            color: #cccccc;
+
+            padding: 10px 17px;
+
+            border-radius: 7px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+            transition: 0.2s;
+        }
+
+
+        .back-button:hover {
+            border-color: #d4af37;
+
+            color: #d4af37;
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .page-header {
+            text-align: center;
+
+            margin-top: 40px;
+
+            margin-bottom: 35px;
+        }
+
+
+        .page-header h1 {
+            color: #d4af37;
+
+            font-size: 31px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .page-header p {
+            color: #999999;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =========================
+           INFO BOX
+        ========================= */
+
+        .info-box {
+            background: #19160c;
+
+            border: 1px solid #66551b;
+
+            border-radius: 10px;
+
+            padding: 17px;
+
+            margin-bottom: 30px;
+        }
+
+
+        .info-box strong {
+            color: #d4af37;
+
+            font-size: 14px;
+        }
+
+
+        .info-box p {
+            color: #aaaaaa;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+            margin-top: 6px;
+        }
+
+
+        /* =========================
+           SECTION TITLE
+        ========================= */
+
+        .section-title {
+            color: #dddddd;
+
+            font-size: 18px;
+
+            margin-bottom: 17px;
+        }
+
+
+        /* =========================
+           QUESTION CARD
+        ========================= */
+
+        .question-card {
+            background: #141414;
+
+            border: 1px solid #333333;
+
+            border-radius: 12px;
+
+            padding: 22px;
+
+            margin-bottom: 18px;
+        }
+
+
+        .question-number {
+            color: #d4af37;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            text-transform: uppercase;
+
+            margin-bottom: 9px;
+        }
+
+
+        .question-text {
+            color: #eeeeee;
+
+            font-size: 16px;
+
+            line-height: 1.5;
+
+            margin-bottom: 18px;
+        }
+
+
+        /* =========================
+           ANSWER
+        ========================= */
+
+        .answer-box {
+            background: #101010;
+
+            border: 1px solid #292929;
+
+            border-radius: 8px;
+
+            padding: 13px 15px;
+        }
+
+
+        .answer-label {
+            color: #777777;
+
+            font-size: 11px;
+
+            margin-bottom: 5px;
+
+            text-transform: uppercase;
+        }
+
+
+        .answer-text {
+            color: #d4af37;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            line-height: 1.5;
+        }
+
+
+        /* =========================
+           BUTTON AREA
+        ========================= */
+
+        .action-area {
+            margin-top: 30px;
+
+            display: grid;
+
+            grid-template-columns: 1fr;
+
+            gap: 12px;
+        }
+
+
+        .add-button {
+            width: 100%;
+
+            padding: 14px;
+
+            background: transparent;
+
+            color: #d4af37;
+
+            border: 1px solid #b58b2a;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+
+        .add-button:hover {
+            background: #d4af37;
+
+            color: #111111;
+        }
+
+
+        .send-button {
+            width: 100%;
+
+            padding: 14px;
+
+            background: #d4af37;
+
+            color: #111111;
+
+            border: none;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+
+        .send-button:hover {
+            background: #e5c04a;
+        }
+
+
+        /* =========================
+           MESSAGE
+        ========================= */
+
+        .message-card {
+            background: #141414;
+
+            border: 1px solid #333333;
+
+            border-radius: 12px;
+
+            padding: 40px;
+
+            text-align: center;
+        }
+
+
+        .message-card h3 {
+            color: #d4af37;
+
+            margin-bottom: 10px;
+        }
+
+
+        .message-card p {
+            color: #888888;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            text-align: center;
+
+            color: #555555;
+
+            font-size: 12px;
+
+            margin-top: 50px;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 700px) {
+
+            .top-bar {
+                padding: 0 20px;
+            }
+
+
+            .user-name {
+                display: none;
+            }
+
+
+            .main-container {
+                padding: 30px 18px 50px;
+            }
+
+
+            .page-header h1 {
+                font-size: 27px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         TOP BAR
+    ========================= -->
+
+    <header class="top-bar">
+
+        <div>
+
+            <div class="brand-title">
+                Campus Lost & Found
+            </div>
+
+            <div class="brand-subtitle">
+                Founder Question Review
+            </div>
+
+        </div>
+
+
+        <div class="user-area">
+
+            <div
+                class="user-name"
+                id="userName"
+            >
+                Student
+            </div>
+
+            <div
+                class="user-icon"
+                id="userIcon"
+            >
+                U
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================
+         MAIN
+    ========================= -->
+
+    <main class="main-container">
+
+
+        <button
+            class="back-button"
+            type="button"
+            onclick="goBack()"
+        >
+            ← Founder Matches
+        </button>
+
+
+
+        <!-- =========================
+             PAGE HEADER
+        ========================= -->
+
+        <section class="page-header">
+
+            <h1>
+                Verification Question Review
+            </h1>
+
+            <p>
+                Review the automatically generated
+                ownership verification questions before
+                sending them to the Lost User.
+            </p>
+
+        </section>
+
+
+
+        <!-- =========================
+             INFO
+        ========================= -->
+
+        <div class="info-box">
+
+            <strong>
+                Founder Only
+            </strong>
+
+            <p>
+                The answers shown below are the correct
+                answers stored from your private identifying
+                details. They will not be shown to the
+                Lost User.
+            </p>
+
+        </div>
+
+
+
+        <!-- =========================
+             QUESTIONS
+        ========================= -->
+
+        <div class="section-title">
+            Automatically Generated Questions
+        </div>
+
+
+        <div id="questionsContainer">
+
+            <div class="message-card">
+
+                <h3>
+                    Loading Questions...
+                </h3>
+
+                <p>
+                    Please wait while the verification
+                    questions are loaded.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =========================
+             ACTION BUTTONS
+        ========================= -->
+
+        <div
+            class="action-area"
+            id="actionArea"
+            style="display: none;"
+        >
+
+            <button
+                type="button"
+                class="add-button"
+                onclick="addExtraQuestions()"
+            >
+                + Add Extra Questions
+            </button>
+
+
+            <button
+                type="button"
+                class="send-button"
+                onclick="giveQuestionsToLostUser()"
+            >
+                Give Questions to Lost User
+            </button>
+
+        </div>
+
+
+
+        <div class="footer">
+
+            Campus Lost & Found Management System
+
+        </div>
+
+
+    </main>
+
+
+
+    <script>
+
+
+        let currentUser = null;
+
+        let verificationId = null;
+
+        let verificationData = null;
+
+
+
+        /* =========================
+           ESCAPE HTML
+        ========================= */
+
+        function escapeHTML(value)
+        {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+
+
+        /* =========================
+           GET CURRENT USER
+        ========================= */
+
+        function getCurrentUser()
+        {
+            try
+            {
+                const stored =
+                    sessionStorage.getItem(
+                        "campusCurrentUser"
+                    );
+
+
+                if(!stored)
+                {
+                    return null;
+                }
+
+
+                return JSON.parse(stored);
+            }
+            catch(error)
+            {
+                console.error(
+                    "User session error:",
+                    error
+                );
+
+                return null;
+            }
+        }
+
+
+
+        /* =========================
+           LOAD USER
+        ========================= */
+
+        function loadUser()
+        {
+            currentUser =
+                getCurrentUser();
+
+
+            if(!currentUser)
+            {
+                window.location.href =
+                    "profileview.html";
+
+                return false;
+            }
+
+
+            const name =
+                currentUser.name ||
+                currentUser.username ||
+                "Student";
+
+
+            document.getElementById(
+                "userName"
+            ).textContent = name;
+
+
+            document.getElementById(
+                "userIcon"
+            ).textContent =
+                name.charAt(0).toUpperCase();
+
+
+            return true;
+        }
+
+
+
+        /* =========================
+           GET VERIFICATION ID
+        ========================= */
+
+        function getVerificationId()
+        {
+            const params =
+                new URLSearchParams(
+                    window.location.search
+                );
+
+
+            return params.get(
+                "verification_id"
+            );
+        }
+
+
+
+        /* =========================
+           LOAD QUESTIONS
+        ========================= */
+
+        async function loadQuestions()
+        {
+            const container =
+                document.getElementById(
+                    "questionsContainer"
+                );
+
+
+            verificationId =
+                getVerificationId();
+
+
+            if(!verificationId)
+            {
+                showMessage(
+                    "Verification ID Missing",
+                    "The verification ID was not provided."
+                );
+
+                return;
+            }
+
+
+            try
+            {
+                /*
+                 * This Founder page uses the
+                 * verification endpoint.
+                 *
+                 * For now we load the complete
+                 * verification document from
+                 * the Founder review endpoint.
+                 */
+
+                const response =
+                    await fetch(
+                        `/verification/${verificationId}/founder-review?user_id=${encodeURIComponent(currentUser.id)}`
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "Founder verification data:",
+                    data
+                );
+
+
+                if(
+                    !response.ok ||
+                    !data.success
+                )
+                {
+                    throw new Error(
+                        data.error ||
+                        "Failed to load verification questions"
+                    );
+                }
+
+
+                verificationData =
+                    data;
+
+
+                const questions =
+                    data.questions || [];
+
+
+                if(questions.length === 0)
+                {
+                    showMessage(
+                        "No Questions Generated",
+                        "No verification questions were generated for this verification."
+                    );
+
+                    return;
+                }
+
+
+                container.innerHTML =
+                    questions
+                        .map(
+                            createQuestionCard
+                        )
+                        .join("");
+
+
+                document.getElementById(
+                    "actionArea"
+                ).style.display =
+                    "grid";
+
+            }
+            catch(error)
+            {
+                console.error(
+                    "Question loading error:",
+                    error
+                );
+
+
+                showMessage(
+                    "Unable to Load Questions",
+                    error.message
+                );
+            }
+        }
+
+
+
+        /* =========================
+           CREATE QUESTION CARD
+        ========================= */
+
+        function createQuestionCard(
+            question,
+            index
+        )
+        {
+            return `
+
+                <div class="question-card">
+
+                    <div class="question-number">
+
+                        Question ${index + 1}
+
+                    </div>
+
+
+                    <div class="question-text">
+
+                        ${escapeHTML(
+                            question.question ||
+                            "Question not available"
+                        )}
+
+                    </div>
+
+
+                    <div class="answer-box">
+
+                        <div class="answer-label">
+
+                            Correct Answer
+
+                        </div>
+
+
+                        <div class="answer-text">
+
+                            ${escapeHTML(
+                                question.correct_answer ||
+                                "Answer not available"
+                            )}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `;
+        }
+
+
+
+        /* =========================
+           ADD EXTRA QUESTIONS
+        ========================= */
+
+        function addExtraQuestions()
+{
+    if(!verificationId)
+    {
+        alert(
+            "Verification ID not found."
+        );
+
+        return;
+    }
+
+
+    window.location.href =
+        "founder-extra-questions.html" +
+        "?verification_id=" +
+        encodeURIComponent(
+            verificationId
+        );
+}
+
+        /* =========================
+           GIVE QUESTIONS
+        ========================= */
+
+        async function giveQuestionsToLostUser()
+{
+    if(!verificationId)
+    {
+        alert(
+            "Verification ID not found."
+        );
+
+        return;
+    }
+
+
+    if(!currentUser || !currentUser.id)
+    {
+        alert(
+            "Founder user information not found."
+        );
+
+        return;
+    }
+
+
+    const confirmSend =
+        confirm(
+            "Are you sure you want to send these verification questions to the Lost User?"
+        );
+
+
+    if(!confirmSend)
+    {
+        return;
+    }
+
+
+    try
+    {
+        const response =
+            await fetch(
+            `http://localhost:5000/verification/${verificationId}/send`,
+            {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                user_id: currentUser.id
+                })
+        }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Send verification response:",
+            data
+        );
+
+
+        if(
+            !response.ok ||
+            !data.success
+        )
+        {
+            alert(
+                data.error ||
+                "Failed to send verification questions."
+            );
+
+            return;
+        }
+
+
+        alert(
+            "Verification questions have been sent to the Lost User."
+        );
+
+
+        window.location.href =
+            "founder-matches.html";
+    }
+    catch(error)
+    {
+        console.error(
+            "Send verification error:",
+            error
+        );
+
+
+        alert(
+            "Unable to send verification questions."
+        );
+    }
+}
+
+        /* =========================
+           MESSAGE
+        ========================= */
+
+        function showMessage(
+            title,
+            message
+        )
+        {
+            document.getElementById(
+                "questionsContainer"
+            ).innerHTML = `
+
+                <div class="message-card">
+
+                    <h3>
+                        ${escapeHTML(title)}
+                    </h3>
+
+                    <p>
+                        ${escapeHTML(message)}
+                    </p>
+
+                </div>
+
+            `;
+
+            document.getElementById(
+                "actionArea"
+            ).style.display =
+                "none";
+        }
+
+
+
+        /* =========================
+           BACK
+        ========================= */
+
+        function goBack()
+        {
+            window.location.href =
+                "founder-matches.html";
+        }
+
+
+
+        /* =========================
+           START
+        ========================= */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function()
+            {
+                if(!loadUser())
+                {
+                    return;
+                }
+
+
+                loadQuestions();
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>

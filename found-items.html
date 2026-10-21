@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Found Items | Campus Lost & Found</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(212, 175, 55, 0.12),
+                    transparent 35%
+                ),
+                linear-gradient(
+                    135deg,
+                    #080808,
+                    #111111 55%,
+                    #080808
+                );
+
+            color: #f5f0df;
+
+            min-height: 100vh;
+        }
+
+
+        /* ==============================
+           TOP BAR
+        ============================== */
+
+        .topbar {
+
+            height: 72px;
+
+            padding: 0 45px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            background: rgba(10, 10, 10, 0.94);
+
+            border-bottom:
+                1px solid
+                rgba(212, 175, 55, 0.35);
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 10;
+        }
+
+
+        .brand {
+
+            font-size: 21px;
+
+            font-weight: bold;
+
+            letter-spacing: 1px;
+
+            color: #d4af37;
+        }
+
+
+        .back-btn {
+
+            text-decoration: none;
+
+            color: #111;
+
+            background: #d4af37;
+
+            padding: 11px 18px;
+
+            border-radius: 9px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            transition: 0.2s;
+        }
+
+
+        .back-btn:hover {
+
+            background: #f0cf55;
+
+            transform:
+                translateY(-1px);
+        }
+
+
+        /* ==============================
+           MAIN
+        ============================== */
+
+        .container {
+
+            width: min(1000px, 92%);
+
+            margin: 50px auto 70px;
+        }
+
+
+        .heading {
+
+            text-align: center;
+
+            margin-bottom: 35px;
+        }
+
+
+        .heading h1 {
+
+            font-size: 34px;
+
+            color: #d4af37;
+
+            margin-bottom: 10px;
+        }
+
+
+        .heading p {
+
+            color: #b9b2a0;
+
+            font-size: 15px;
+        }
+
+
+        /* ==============================
+           ACTION CARDS
+        ============================== */
+
+        .action-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 25px;
+
+            margin-bottom: 45px;
+        }
+
+
+        .action-card {
+
+            background:
+                rgba(22, 22, 22, 0.96);
+
+            border:
+                1px solid
+                rgba(212, 175, 55, 0.30);
+
+            border-radius: 18px;
+
+            padding: 32px;
+
+            text-align: center;
+
+            cursor: pointer;
+
+            transition: 0.25s;
+
+            box-shadow:
+                0 15px 40px
+                rgba(0, 0, 0, 0.35);
+        }
+
+
+        .action-card:hover {
+
+            border-color: #d4af37;
+
+            transform:
+                translateY(-4px);
+
+            box-shadow:
+                0 20px 50px
+                rgba(212, 175, 55, 0.12);
+        }
+
+
+        .action-icon {
+
+            font-size: 42px;
+
+            margin-bottom: 18px;
+        }
+
+
+        .action-card h2 {
+
+            color: #d4af37;
+
+            font-size: 21px;
+
+            margin-bottom: 12px;
+        }
+
+
+        .action-card p {
+
+            color: #aaa;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+            margin-bottom: 22px;
+        }
+
+
+        .action-btn {
+
+            display: inline-block;
+
+            background: #d4af37;
+
+            color: #111;
+
+            border: none;
+
+            border-radius: 9px;
+
+            padding: 12px 22px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            text-decoration: none;
+        }
+
+
+        .action-btn:hover {
+
+            background: #f0cf55;
+        }
+
+
+        /* ==============================
+           DETAILS SECTION
+        ============================== */
+
+        #detailsSection {
+
+            display: none;
+        }
+
+
+        .section-title {
+
+            color: #d4af37;
+
+            font-size: 21px;
+
+            margin-bottom: 20px;
+
+            padding-bottom: 12px;
+
+            border-bottom:
+                1px solid
+                rgba(212, 175, 55, 0.18);
+        }
+
+
+        .items-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 20px;
+        }
+
+
+        .item-card {
+
+            background:
+                rgba(22, 22, 22, 0.96);
+
+            border:
+                1px solid
+                rgba(212, 175, 55, 0.25);
+
+            border-radius: 15px;
+
+            padding: 22px;
+
+            transition: 0.2s;
+        }
+
+
+        .item-card:hover {
+
+            border-color:
+                rgba(212, 175, 55, 0.65);
+
+            transform:
+                translateY(-2px);
+        }
+
+
+        .item-card h3 {
+
+            color: #d4af37;
+
+            margin-bottom: 15px;
+
+            font-size: 18px;
+        }
+
+
+        .item-row {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            padding: 8px 0;
+
+            border-bottom:
+                1px solid
+                rgba(255, 255, 255, 0.05);
+
+            font-size: 13px;
+        }
+
+
+        .item-row:last-child {
+
+            border-bottom: none;
+        }
+
+
+        .item-label {
+
+            color: #999;
+
+            min-width: 100px;
+        }
+
+
+        .item-value {
+
+            color: #eee;
+
+            text-align: right;
+
+            word-break: break-word;
+        }
+
+
+        .status {
+
+            display: inline-block;
+
+            padding: 4px 9px;
+
+            border-radius: 20px;
+
+            background:
+                rgba(80, 180, 110, 0.15);
+
+            color: #9ee6ad;
+
+            font-size: 11px;
+
+            font-weight: bold;
+        }
+
+
+        .no-items {
+
+            text-align: center;
+
+            padding: 45px 20px;
+
+            background:
+                rgba(22, 22, 22, 0.96);
+
+            border:
+                1px solid
+                rgba(212, 175, 55, 0.20);
+
+            border-radius: 15px;
+
+            color: #999;
+        }
+
+
+        .loading {
+
+            text-align: center;
+
+            color: #aaa;
+
+            padding: 30px;
+        }
+
+
+        .error {
+
+            text-align: center;
+
+            color: #ffaaaa;
+
+            padding: 30px;
+        }
+
+
+        /* ==============================
+           RESPONSIVE
+        ============================== */
+
+        @media (max-width: 700px) {
+
+            .topbar {
+
+                padding: 0 18px;
+            }
+
+
+            .brand {
+
+                font-size: 16px;
+            }
+
+
+            .container {
+
+                width: 94%;
+
+                margin-top: 30px;
+            }
+
+
+            .action-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .items-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header class="topbar">
+
+    <div class="brand">
+        CAMPUS LOST & FOUND
+    </div>
+
+
+    <a
+        href="profileview.html#dashboard"
+        class="back-btn"
+    >
+        ← Back to Dashboard
+    </a>
+
+</header>
+
+
+
+<main class="container">
+
+
+    <!-- ==============================
+         HEADING
+    ============================== -->
+
+    <div class="heading">
+
+        <h1>
+            Found Items
+        </h1>
+
+        <p>
+            Manage the items you have reported as found.
+        </p>
+
+    </div>
+
+
+
+    <!-- ==============================
+         TWO OPTIONS
+    ============================== -->
+
+    <div class="action-grid">
+
+
+        <!-- VIEW EXISTING -->
+
+        <div
+            class="action-card"
+            onclick="showExistingDetails()"
+        >
+
+            <div class="action-icon">
+                📋
+            </div>
+
+            <h2>
+                View Already Given Details
+            </h2>
+
+            <p>
+                View the found items you have already
+                reported and their submitted details.
+            </p>
+
+            <button
+                type="button"
+                class="action-btn"
+                onclick="showExistingDetails()"
+            >
+                View Details
+            </button>
+
+        </div>
+
+
+
+        <!-- ADD NEW -->
+
+        <div
+            class="action-card"
+            onclick="addNewFoundItem()"
+        >
+
+            <div class="action-icon">
+                ➕
+            </div>
+
+            <h2>
+                Add New Found Item
+            </h2>
+
+            <p>
+                Report another item that you have
+                recently found on campus.
+            </p>
+
+            <button
+                type="button"
+                class="action-btn"
+                onclick="addNewFoundItem()"
+            >
+                Add New Item
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==============================
+         EXISTING DETAILS
+    ============================== -->
+
+    <section id="detailsSection">
+
+        <div class="section-title">
+            Your Previously Reported Found Items
+        </div>
+
+
+        <div
+            id="itemsContainer"
+            class="items-grid"
+        >
+
+            <div class="loading">
+                Loading your found items...
+            </div>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+
+<script>
+
+
+    const API_URL =
+        "http://localhost:5000";
+
+
+    // ==========================================
+    // GET CURRENT USER
+    // ==========================================
+
+    function getCurrentUser()
+    {
+
+        const storedUser =
+            sessionStorage.getItem(
+                "campusCurrentUser"
+            );
+
+
+        if(!storedUser)
+        {
+            return null;
+        }
+
+
+        try
+        {
+            return JSON.parse(
+                storedUser
+            );
+        }
+        catch(error)
+        {
+            return null;
+        }
+
+    }
+
+
+
+    // ==========================================
+    // ESCAPE HTML
+    // ==========================================
+
+    function escapeHTML(value)
+    {
+
+        if(
+            value === null ||
+            value === undefined
+        )
+        {
+            return "";
+        }
+
+
+        return String(value)
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            )
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+    }
+
+
+
+    // ==========================================
+    // ADD NEW FOUND ITEM
+    // ==========================================
+
+    function addNewFoundItem()
+    {
+
+        window.location.href =
+            "report-found.html";
+
+    }
+
+
+
+    // ==========================================
+    // SHOW EXISTING DETAILS
+    // ==========================================
+
+    async function showExistingDetails()
+    {
+
+        const currentUser =
+            getCurrentUser();
+
+
+        if(!currentUser)
+        {
+
+            alert(
+                "Please login before viewing your found items."
+            );
+
+            window.location.href =
+                "profileview.html";
+
+            return;
+        }
+
+
+        const section =
+            document.getElementById(
+                "detailsSection"
+            );
+
+
+        const container =
+            document.getElementById(
+                "itemsContainer"
+            );
+
+
+        section.style.display =
+            "block";
+
+
+        container.innerHTML =
+            `
+                <div class="loading">
+                    Loading your found items...
+                </div>
+            `;
+
+
+        section.scrollIntoView({
+            behavior: "smooth"
+        });
+
+
+        try
+        {
+
+            const response =
+                await fetch(
+                    API_URL +
+                    "/found-reports"
+                );
+
+
+            const result =
+                await response.json();
+
+
+            if(
+                !response.ok
+            )
+            {
+                throw new Error(
+                    result.error ||
+                    "Failed to load found reports."
+                );
+            }
+
+
+            const reports =
+                result.found_reports ||
+                result.reports ||
+                [];
+
+
+            // --------------------------------------
+            // ONLY CURRENT USER'S REPORTS
+            // --------------------------------------
+
+            const myReports =
+                reports.filter(
+                    report =>
+                    {
+
+                        if(
+                            !report.user_id
+                        )
+                        {
+                            return false;
+                        }
+
+
+                        const reportUserId =
+                            typeof report.user_id ===
+                            "object"
+
+                                ? report.user_id._id ||
+                                  report.user_id.id
+
+                                : report.user_id;
+
+
+                        return (
+                            String(reportUserId) ===
+                            String(currentUser.id)
+                        );
+
+                    }
+                );
+
+
+            if(
+                myReports.length === 0
+            )
+            {
+
+                container.innerHTML =
+                    `
+                        <div class="no-items">
+
+                            <h3>
+                                No Found Items Yet
+                            </h3>
+
+                            <p>
+                                You have not reported
+                                any found items.
+                            </p>
+
+                        </div>
+                    `;
+
+                return;
+            }
+
+
+            // --------------------------------------
+            // DISPLAY REPORTS
+            // --------------------------------------
+
+            container.innerHTML =
+                myReports
+                    .map(
+                        (item, index) =>
+                        {
+
+                            const privateDetails =
+                                item.private_details ||
+                                {};
+
+
+                            return `
+                                <div class="item-card">
+
+                                    <h3>
+                                        Found Item ${index + 1}
+                                    </h3>
+
+
+                                    <div class="item-row">
+
+                                        <span class="item-label">
+                                            Category
+                                        </span>
+
+                                        <span class="item-value">
+                                            ${escapeHTML(
+                                                item.category ||
+                                                "—"
+                                            )}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="item-row">
+
+                                        <span class="item-label">
+                                            Item Type
+                                        </span>
+
+                                        <span class="item-value">
+                                            ${escapeHTML(
+                                                item.item_type ||
+                                                "—"
+                                            )}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="item-row">
+
+                                        <span class="item-label">
+                                            Color
+                                        </span>
+
+                                        <span class="item-value">
+                                            ${escapeHTML(
+                                                item.color ||
+                                                "—"
+                                            )}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="item-row">
+
+                                        <span class="item-label">
+                                            Brand
+                                        </span>
+
+                                        <span class="item-value">
+                                            ${escapeHTML(
+                                                item.brand ||
+                                                "—"
+                                            )}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="item-row">
+
+                                        <span class="item-label">
+                                            Location
+                                        </span>
+
+                                        <span class="item-value">
+                                            ${escapeHTML(
+                                                item.location ||
+                                                "—"
+                                            )}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="item-row">
+
+                                        <span class="item-label">
+                                            Date Found
+                                        </span>
+
+                                        <span class="item-value">
+                                            ${escapeHTML(
+                                                item.date_found ||
+                                                "—"
+                                            )}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="item-row">
+
+                                        <span class="item-label">
+                                            Time Found
+                                        </span>
+
+                                        <span class="item-value">
+                                            ${escapeHTML(
+                                                item.time_found ||
+                                                "—"
+                                            )}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="item-row">
+
+                                        <span class="item-label">
+                                            Description
+                                        </span>
+
+                                        <span class="item-value">
+                                            ${escapeHTML(
+                                                item.description ||
+                                                "—"
+                                            )}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="item-row">
+
+                                        <span class="item-label">
+                                            Special Mark
+                                        </span>
+
+                                        <span class="item-value">
+                                            ${escapeHTML(
+                                                privateDetails.special_mark ||
+                                                "—"
+                                            )}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="item-row">
+
+                                        <span class="item-label">
+                                            Inner Lining
+                                        </span>
+
+                                        <span class="item-value">
+                                            ${escapeHTML(
+                                                privateDetails.inner_lining ||
+                                                "—"
+                                            )}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="item-row">
+
+                                        <span class="item-label">
+                                            Unique Contents
+                                        </span>
+
+                                        <span class="item-value">
+                                            ${escapeHTML(
+                                                privateDetails.unique_contents ||
+                                                "—"
+                                            )}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="item-row">
+
+                                        <span class="item-label">
+                                            Pattern / Logo
+                                        </span>
+
+                                        <span class="item-value">
+                                            ${escapeHTML(
+                                                privateDetails.pattern ||
+                                                "—"
+                                            )}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="item-row">
+
+                                        <span class="item-label">
+                                            Other Detail
+                                        </span>
+
+                                        <span class="item-value">
+                                            ${escapeHTML(
+                                                privateDetails.other ||
+                                                "—"
+                                            )}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="item-row">
+
+                                        <span class="item-label">
+                                            Status
+                                        </span>
+
+                                        <span class="item-value">
+
+                                            <span class="status">
+                                                ${escapeHTML(
+                                                    item.status ||
+                                                    "OPEN"
+                                                )}
+                                            </span>
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                            `;
+
+                        }
+                    )
+                    .join("");
+
+        }
+        catch(error)
+        {
+
+            console.error(
+                "Error loading found items:",
+                error
+            );
+
+
+            container.innerHTML =
+                `
+                    <div class="error">
+
+                        Unable to load your
+                        previously reported items.
+
+                        <br><br>
+
+                        ${escapeHTML(
+                            error.message
+                        )}
+
+                    </div>
+                `;
+
+        }
+
+    }
+
+</script>
+
+
+</body>
+
+</html>

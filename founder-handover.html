@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Complete Handover</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b0b0b;
+            color: white;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 850px;
+            margin: 40px auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #d4af37;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #aaa;
+        }
+
+        .card {
+            background: #151515;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .card h2 {
+            color: #d4af37;
+            margin-top: 0;
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .detail-box {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .detail-box label {
+            display: block;
+            color: #aaa;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .detail-box span {
+            color: white;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ddd;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 13px;
+            border-radius: 7px;
+            border: 1px solid #444;
+            background: #202020;
+            color: white;
+            font-size: 16px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #d4af37;
+            color: #111;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #e6c65c;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .step {
+            margin-bottom: 10px;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #d4af37;
+            color: #111;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 25px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        #codeSection {
+            display: none;
+        }
+
+        #successSection {
+            display: none;
+        }
+
+        .pickup-input {
+            text-align: center;
+            font-size: 28px !important;
+            letter-spacing: 10px;
+            font-weight: bold;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error {
+            background: #3a1515;
+            border: 1px solid #8b3030;
+            color: #ff8c8c;
+        }
+
+        .success {
+            background: #153a1f;
+            border: 1px solid #318b4b;
+            color: #8cffaa;
+        }
+
+        .completion-box {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .completion-icon {
+            font-size: 55px;
+            margin-bottom: 10px;
+        }
+
+        .completion-box h2 {
+            color: #d4af37;
+        }
+
+        .completion-details {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .completion-details p {
+            margin: 10px 0;
+        }
+
+        .completion-details strong {
+            color: #d4af37;
+        }
+
+        @media(max-width: 600px) {
+
+            .details {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <h1>Complete Item Handover</h1>
+
+        <p>Enter the handover details and verify the pickup code.</p>
+
+    </div>
+
+
+    <!-- ITEM DETAILS -->
+
+    <div class="card">
+
+        <h2>Item Details</h2>
+
+        <div class="details">
+
+            <div class="detail-box">
+
+                <label>Lost User</label>
+
+                <span id="lostUser">
+                    Loading...
+                </span>
+
+            </div>
+
+            <div class="detail-box">
+
+                <label>Founder</label>
+
+                <span id="founderUser">
+                    Loading...
+                </span>
+
+            </div>
+
+            <div class="detail-box">
+
+                <label>Category</label>
+
+                <span id="category">
+                    Loading...
+                </span>
+
+            </div>
+
+            <div class="detail-box">
+
+                <label>Item</label>
+
+                <span id="itemType">
+                    Loading...
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- STEP 1 -->
+
+    <div class="card" id="detailsSection">
+
+        <div class="step">
+
+            <span class="step-number">1</span>
+
+            Enter Handover Details
+
+        </div>
+
+        <h2>Handover Place & Time</h2>
+
+        <div id="detailsError"
+             class="message error">
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="handoverPlace">
+                Handover Place
+            </label>
+
+            <input
+                type="text"
+                id="handoverPlace"
+                placeholder="Example: CSE Department Office"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="handoverDate">
+                Handover Date
+            </label>
+
+            <input
+                type="date"
+                id="handoverDate"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="handoverTime">
+                Handover Time
+            </label>
+
+            <input
+                type="time"
+                id="handoverTime"
+            >
+
+        </div>
+
+
+        <button
+            class="btn"
+            onclick="proceedToCode()">
+
+            Proceed to Verify Pickup Code →
+
+        </button>
+
+    </div>
+
+
+    <!-- STEP 2 -->
+
+    <div class="card" id="codeSection">
+
+        <div class="step">
+
+            <span class="step-number">2</span>
+
+            Verify Pickup Code
+
+        </div>
+
+        <h2>Enter Pickup Code</h2>
+
+        <p style="color:#aaa;">
+
+            Ask the Lost User for the 6-digit pickup code.
+
+        </p>
+
+
+        <div id="codeError"
+             class="message error">
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="pickupCode">
+                6-Digit Pickup Code
+            </label>
+
+            <input
+                type="text"
+                id="pickupCode"
+                class="pickup-input"
+                maxlength="6"
+                inputmode="numeric"
+                placeholder="------"
+            >
+
+        </div>
+
+
+        <button
+            class="btn"
+            id="completeButton"
+            onclick="completeHandover()">
+
+            Verify & Complete Handover
+
+        </button>
+
+    </div>
+
+
+    <!-- SUCCESS -->
+
+    <div class="card" id="successSection">
+
+        <div class="completion-box">
+
+            <div class="completion-icon">
+                ✅
+            </div>
+
+            <h2>
+                Handover Completed Successfully
+            </h2>
+
+            <p style="color:#aaa;">
+                The item has been successfully handed over.
+            </p>
+
+
+            <div class="completion-details">
+
+                <p>
+                    <strong>Place:</strong>
+                    <span id="completedPlace"></span>
+                </p>
+
+                <p>
+                    <strong>Date:</strong>
+                    <span id="completedDate"></span>
+                </p>
+
+                <p>
+                    <strong>Time:</strong>
+                    <span id="completedTime"></span>
+                </p>
+
+                <p>
+                    <strong>Status:</strong>
+                    <span style="color:#8cffaa;">
+                        COMPLETED
+                    </span>
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const API = "http://localhost:5000";
+
+    let verificationId = null;
+
+    let handoverId = null;
+
+    let currentUser = null;
+
+
+    // ==========================================
+    // GET VERIFICATION ID
+    // ==========================================
+
+    const params =
+        new URLSearchParams(window.location.search);
+
+    verificationId =
+        params.get("verification_id");
+
+
+    // ==========================================
+    // LOAD CURRENT USER
+    // ==========================================
+
+    try {
+
+        currentUser =
+            JSON.parse(
+                sessionStorage.getItem("campusCurrentUser")
+            );
+
+    } catch (error) {
+
+        console.error("User session error:", error);
+
+    }
+
+
+    if (!currentUser || !currentUser.id) {
+
+        alert("Please login again.");
+
+        window.location.href = "login.html";
+
+    }
+
+
+    if (!verificationId) {
+
+        alert("Verification ID is missing.");
+
+    }
+
+
+    // ==========================================
+    // LOAD HANDOVER
+    // ==========================================
+
+    async function loadHandover() {
+
+        try {
+
+            const response = await fetch(
+                `${API}/handover/verification/${verificationId}`
+            );
+
+            const data = await response.json();
+
+
+            if (!response.ok || !data.success) {
+
+                throw new Error(
+                    data.message ||
+                    "Failed to load handover."
+                );
+
+            }
+
+
+            console.log("Handover data:", data);
+
+
+            // Handover ID
+
+            handoverId =
+                data.handover.id;
+
+
+            // Item information
+
+            if (data.lostUser) {
+
+                document.getElementById("lostUser")
+                    .textContent =
+                    data.lostUser.name || "Unknown";
+
+            }
+
+
+            if (data.founder) {
+
+                document.getElementById("founderUser")
+                    .textContent =
+                    data.founder.name || "Unknown";
+
+            }
+
+
+            if (data.lostReport) {
+
+                document.getElementById("category")
+                    .textContent =
+                    data.lostReport.category || "-";
+
+                document.getElementById("itemType")
+                    .textContent =
+                    data.lostReport.item_type || "-";
+
+            }
+
+
+            // ==================================
+            // IF ALREADY COMPLETED
+            // ==================================
+
+            if (
+                data.handover.status ===
+                "COMPLETED"
+            ) {
+
+                document.getElementById(
+                    "detailsSection"
+                ).style.display = "none";
+
+                document.getElementById(
+                    "codeSection"
+                ).style.display = "none";
+
+                showSuccess(
+                    data.handover.handover_place,
+                    data.handover.handover_date,
+                    data.handover.handover_time
+                );
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(error.message);
+
+        }
+
+    }
+
+
+    // ==========================================
+    // STEP 1
+    // ==========================================
+
+    function proceedToCode() {
+
+        const place =
+            document.getElementById(
+                "handoverPlace"
+            ).value.trim();
+
+        const date =
+            document.getElementById(
+                "handoverDate"
+            ).value;
+
+        const time =
+            document.getElementById(
+                "handoverTime"
+            ).value;
+
+
+        const errorBox =
+            document.getElementById(
+                "detailsError"
+            );
+
+
+        // Clear previous error
+
+        errorBox.style.display = "none";
+
+        errorBox.textContent = "";
+
+
+        // Validate
+
+        if (!place) {
+
+            showError(
+                errorBox,
+                "Please enter the handover place."
+            );
+
+            return;
+
+        }
+
+
+        if (!date) {
+
+            showError(
+                errorBox,
+                "Please select the handover date."
+            );
+
+            return;
+
+        }
+
+
+        if (!time) {
+
+            showError(
+                errorBox,
+                "Please select the handover time."
+            );
+
+            return;
+
+        }
+
+
+        // Hide Step 1
+
+        document.getElementById(
+            "detailsSection"
+        ).style.display = "none";
+
+
+        // Show Step 2
+
+        document.getElementById(
+            "codeSection"
+        ).style.display = "block";
+
+
+        // Focus code
+
+        document.getElementById(
+            "pickupCode"
+        ).focus();
+
+    }
+
+
+    // ==========================================
+    // STEP 2
+    // ==========================================
+
+    async function completeHandover() {
+
+        const pickupCode =
+            document.getElementById(
+                "pickupCode"
+            ).value.trim();
+
+
+        const place =
+            document.getElementById(
+                "handoverPlace"
+            ).value.trim();
+
+        const date =
+            document.getElementById(
+                "handoverDate"
+            ).value;
+
+        const time =
+            document.getElementById(
+                "handoverTime"
+            ).value;
+
+
+        const errorBox =
+            document.getElementById(
+                "codeError"
+            );
+
+
+        errorBox.style.display = "none";
+
+
+        // Validate code
+
+        if (!/^\d{6}$/.test(pickupCode)) {
+
+            showError(
+                errorBox,
+                "Please enter a valid 6-digit pickup code."
+            );
+
+            return;
+
+        }
+
+
+        // Disable button
+
+        const button =
+            document.getElementById(
+                "completeButton"
+            );
+
+        button.disabled = true;
+
+        button.textContent =
+            "Verifying...";
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API}/handover/${handoverId}/complete`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            user_id:
+                                currentUser.id,
+
+                            pickup_code:
+                                pickupCode,
+
+                            handover_place:
+                                place,
+
+                            handover_date:
+                                date,
+
+                            handover_time:
+                                time
+
+                        })
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok ||
+                !data.success) {
+
+                throw new Error(
+                    data.message ||
+                    "Failed to complete handover."
+                );
+
+            }
+
+
+            console.log(
+                "Handover completed:",
+                data
+            );
+
+
+            // Hide code section
+
+            document.getElementById(
+                "codeSection"
+            ).style.display = "none";
+
+
+            // Show success
+
+            showSuccess(
+                place,
+                date,
+                time
+            );
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            showError(
+                errorBox,
+                error.message
+            );
+
+
+            button.disabled = false;
+
+            button.textContent =
+                "Verify & Complete Handover";
+
+        }
+
+    }
+
+
+    // ==========================================
+    // SHOW ERROR
+    // ==========================================
+
+    function showError(element, message) {
+
+        element.textContent = message;
+
+        element.style.display = "block";
+
+    }
+
+
+    // ==========================================
+    // SHOW SUCCESS
+    // ==========================================
+
+    function showSuccess(
+        place,
+        date,
+        time
+    ) {
+
+        document.getElementById(
+            "completedPlace"
+        ).textContent =
+            place || "-";
+
+
+        document.getElementById(
+            "completedDate"
+        ).textContent =
+            formatDate(date);
+
+
+        document.getElementById(
+            "completedTime"
+        ).textContent =
+            formatTime(time);
+
+
+        document.getElementById(
+            "successSection"
+        ).style.display =
+            "block";
+
+    }
+
+
+    // ==========================================
+    // FORMAT DATE
+    // ==========================================
+
+    function formatDate(date) {
+
+        if (!date) return "-";
+
+        const d =
+            new Date(date + "T00:00:00");
+
+        return d.toLocaleDateString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+            }
+        );
+
+    }
+
+
+    // ==========================================
+    // FORMAT TIME
+    // ==========================================
+
+    function formatTime(time) {
+
+        if (!time) return "-";
+
+        const parts =
+            time.split(":");
+
+        let hour =
+            parseInt(parts[0]);
+
+        const minute =
+            parts[1];
+
+        const ampm =
+            hour >= 12 ? "PM" : "AM";
+
+        hour =
+            hour % 12 || 12;
+
+        return `${hour}:${minute} ${ampm}`;
+
+    }
+
+
+    // ==========================================
+    // LOAD PAGE
+    // ==========================================
+
+    loadHandover();
+
+</script>
+
+</body>
+
+</html>

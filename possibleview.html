@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Possible Matches | Campus Lost & Found</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0b0b0b;
+            color: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           TOP BAR
+        ========================= */
+
+        .top-bar {
+            width: 100%;
+            height: 72px;
+
+            background: #111111;
+
+            border-bottom: 1px solid #8f741f;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 40px;
+
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .brand-title {
+            font-size: 21px;
+            font-weight: bold;
+            color: #d4af37;
+        }
+
+        .brand-subtitle {
+            font-size: 12px;
+            color: #999999;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            color: #dddddd;
+            font-size: 14px;
+        }
+
+        .user-icon {
+            width: 38px;
+            height: 38px;
+
+            border-radius: 50%;
+
+            background: #d4af37;
+            color: #111111;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-weight: bold;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .main-container {
+            width: 100%;
+            max-width: 1100px;
+
+            margin: 0 auto;
+
+            padding: 50px 25px 70px;
+        }
+
+        /* =========================
+           BACK BUTTON
+        ========================= */
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            background: transparent;
+
+            border: 1px solid #555555;
+
+            color: #cccccc;
+
+            padding: 10px 17px;
+
+            border-radius: 7px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+            transition: 0.2s;
+        }
+
+        .back-button:hover {
+            border-color: #d4af37;
+            color: #d4af37;
+        }
+
+        /* =========================
+           PAGE TITLE
+        ========================= */
+
+        .page-header {
+            text-align: center;
+
+            margin-top: 45px;
+            margin-bottom: 50px;
+        }
+
+        .page-header h1 {
+            font-size: 34px;
+
+            color: #d4af37;
+
+            margin-bottom: 12px;
+        }
+
+        .page-header p {
+            color: #999999;
+
+            font-size: 15px;
+
+            line-height: 1.6;
+
+            max-width: 650px;
+
+            margin: auto;
+        }
+
+        /* =========================
+           CHOICE CARDS
+        ========================= */
+
+        .choices {
+            display: grid;
+
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 30px;
+
+            max-width: 900px;
+
+            margin: 0 auto;
+        }
+
+        .choice-card {
+            background: #141414;
+
+            border: 1px solid #333333;
+
+            border-radius: 15px;
+
+            padding: 38px 32px;
+
+            text-align: center;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.25s ease,
+                border-color 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        .choice-card:hover {
+            transform: translateY(-6px);
+
+            border-color: #d4af37;
+
+            box-shadow:
+                0 10px 30px rgba(212, 175, 55, 0.12);
+        }
+
+        /* =========================
+           ICON
+        ========================= */
+
+        .choice-icon {
+            width: 78px;
+            height: 78px;
+
+            margin: 0 auto 25px;
+
+            border-radius: 50%;
+
+            background: #1d1d1d;
+
+            border: 1px solid #8f741f;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 35px;
+        }
+
+        /* =========================
+           CARD TEXT
+        ========================= */
+
+        .choice-card h2 {
+            color: #f1f1f1;
+
+            font-size: 23px;
+
+            margin-bottom: 13px;
+        }
+
+        .choice-card p {
+            color: #999999;
+
+            font-size: 14px;
+
+            line-height: 1.7;
+
+            min-height: 70px;
+        }
+
+        /* =========================
+           CARD BUTTON
+        ========================= */
+
+        .choice-button {
+            margin-top: 25px;
+
+            width: 100%;
+
+            padding: 13px 18px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background: #d4af37;
+
+            color: #111111;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .choice-button:hover {
+            background: #e5c04a;
+
+            transform: translateY(-1px);
+        }
+
+        /* =========================
+           INFORMATION BOX
+        ========================= */
+
+        .info-box {
+            max-width: 900px;
+
+            margin: 45px auto 0;
+
+            padding: 20px 25px;
+
+            background: #111111;
+
+            border: 1px solid #292929;
+
+            border-radius: 10px;
+
+            text-align: center;
+        }
+
+        .info-box-title {
+            color: #d4af37;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            margin-bottom: 8px;
+        }
+
+        .info-box p {
+            color: #888888;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            text-align: center;
+
+            margin-top: 50px;
+
+            color: #555555;
+
+            font-size: 12px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 750px) {
+
+            .top-bar {
+                padding: 0 20px;
+            }
+
+            .brand-title {
+                font-size: 18px;
+            }
+
+            .brand-subtitle {
+                display: none;
+            }
+
+            .user-name {
+                display: none;
+            }
+
+            .main-container {
+                padding: 35px 18px 50px;
+            }
+
+            .page-header {
+                margin-top: 35px;
+                margin-bottom: 35px;
+            }
+
+            .page-header h1 {
+                font-size: 28px;
+            }
+
+            .choices {
+                grid-template-columns: 1fr;
+            }
+
+            .choice-card {
+                padding: 32px 25px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         TOP BAR
+    ========================= -->
+
+    <header class="top-bar">
+
+        <div class="brand">
+
+            <div class="brand-title">
+                Campus Lost & Found
+            </div>
+
+            <div class="brand-subtitle">
+                Possible Matches
+            </div>
+
+        </div>
+
+
+        <div class="user-area">
+
+            <div
+                class="user-name"
+                id="userName"
+            >
+                Student
+            </div>
+
+            <div
+                class="user-icon"
+                id="userIcon"
+            >
+                U
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================= -->
+
+    <main class="main-container">
+
+
+        <!-- BACK -->
+
+        <button
+            class="back-button"
+            type="button"
+            onclick="goBack()"
+        >
+            ← Dashboard
+        </button>
+
+
+
+        <!-- PAGE HEADER -->
+
+        <section class="page-header">
+
+            <h1>
+                Possible Matches
+            </h1>
+
+            <p>
+                What would you like to do?
+                Select the option that matches your situation
+                to view the relevant possible matches.
+            </p>
+
+        </section>
+
+
+
+        <!-- =========================
+             TWO CHOICES
+        ========================= -->
+
+        <section class="choices">
+
+
+            <!-- =====================
+                 LOST ITEM
+            ====================== -->
+
+            <div
+                class="choice-card"
+                onclick="openClaimantView()"
+            >
+
+                <div class="choice-icon">
+                    🔍
+                </div>
+
+
+                <h2>
+                    I Lost an Item
+                </h2>
+
+
+                <p>
+                    I reported an item as lost and want to
+                    see found items that may match my lost item.
+                </p>
+
+
+                <button
+                    class="choice-button"
+                    type="button"
+                    onclick="openClaimantView(event)"
+                >
+                    View Found Matches
+                </button>
+
+            </div>
+
+
+
+            <!-- =====================
+                 FOUND ITEM
+            ====================== -->
+
+            <div
+                class="choice-card"
+                onclick="openFounderView()"
+            >
+
+                <div class="choice-icon">
+                    📦
+                </div>
+
+
+                <h2>
+                    I Found an Item
+                </h2>
+
+
+                <p>
+                    I reported an item that I found and want to
+                    see students whose lost reports may match it.
+                </p>
+
+
+                <button
+                    class="choice-button"
+                    type="button"
+                    onclick="openFounderView(event)"
+                >
+                    View Lost Users
+                </button>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =========================
+             INFORMATION
+        ========================= -->
+
+        <div class="info-box">
+
+            <div class="info-box-title">
+                How Possible Matches Work
+            </div>
+
+            <p>
+                The system compares item descriptions,
+                attributes and available images to identify
+                possible matches. A match only indicates that
+                the items may be related. Ownership is confirmed
+                later through the verification process.
+            </p>
+
+        </div>
+
+
+
+        <!-- FOOTER -->
+
+        <div class="footer">
+
+            Campus Lost & Found Management System
+
+        </div>
+
+
+    </main>
+
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================= -->
+
+    <script>
+
+
+        /* =========================
+           GET CURRENT USER
+        ========================= */
+
+        function getCurrentUser()
+        {
+            try
+            {
+                const storedUser =
+                    sessionStorage.getItem(
+                        "campusCurrentUser"
+                    );
+
+                if(!storedUser)
+                {
+                    return null;
+                }
+
+                return JSON.parse(storedUser);
+            }
+            catch(error)
+            {
+                console.error(
+                    "Unable to read current user:",
+                    error
+                );
+
+                return null;
+            }
+        }
+
+
+
+        /* =========================
+           LOAD USER NAME
+        ========================= */
+
+        function loadUserName()
+        {
+            const user =
+                getCurrentUser();
+
+            const nameElement =
+                document.getElementById(
+                    "userName"
+                );
+
+            const iconElement =
+                document.getElementById(
+                    "userIcon"
+                );
+
+
+            if(!user)
+            {
+                nameElement.textContent =
+                    "Student";
+
+                iconElement.textContent =
+                    "U";
+
+                return;
+            }
+
+
+            const name =
+                user.name ||
+                user.username ||
+                "Student";
+
+
+            nameElement.textContent =
+                name;
+
+
+            iconElement.textContent =
+                name
+                    .charAt(0)
+                    .toUpperCase();
+        }
+
+
+
+        /* =========================
+           OPEN CLAIMANT VIEW
+        ========================= */
+
+        function openClaimantView(event)
+        {
+            if(event)
+            {
+                event.stopPropagation();
+            }
+
+            window.location.href =
+                "claimant-matches.html";
+        }
+
+
+
+        /* =========================
+           OPEN FOUNDER VIEW
+        ========================= */
+
+        function openFounderView(event)
+        {
+            if(event)
+            {
+                event.stopPropagation();
+            }
+
+            window.location.href =
+                "founder-matches.html";
+        }
+
+
+
+        /* =========================
+           BACK TO DASHBOARD
+        ========================= */
+
+        function goBack()
+        {
+            window.location.href =
+                "profileview.html#dashboard";
+        }
+
+
+
+        /* =========================
+           PAGE START
+        ========================= */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function()
+            {
+                loadUserName();
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>

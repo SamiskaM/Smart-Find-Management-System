@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Pickup Code - Campus Lost & Found</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b0b0b;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background: #151515;
+            border: 1px solid #d4af37;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.2);
+        }
+
+        h1 {
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #cccccc;
+            margin-bottom: 30px;
+        }
+
+        .success {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .code-title {
+            color: #cccccc;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .pickup-code {
+            font-size: 48px;
+            font-weight: bold;
+            letter-spacing: 10px;
+            color: #d4af37;
+            background: #0b0b0b;
+            border: 2px dashed #d4af37;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0 30px;
+        }
+
+        .info {
+            background: #202020;
+            border-radius: 10px;
+            padding: 20px;
+            color: #dddddd;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .warning {
+            color: #ffcc66;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            color: #d4af37;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #d4af37;
+            color: #000000;
+        }
+
+        .error {
+            color: #ff6b6b;
+            font-size: 17px;
+            display: none;
+        }
+
+        .loading {
+            color: #cccccc;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="success">✓</div>
+
+    <h1>Ownership Confirmed</h1>
+
+    <p class="subtitle">
+        Your lost item has been successfully verified.
+    </p>
+
+    <div id="loading" class="loading">
+        Loading your pickup code...
+    </div>
+
+    <div id="content" style="display:none;">
+
+        <div class="code-title">
+            Your Pickup Code
+        </div>
+
+        <div id="pickupCode"
+             class="pickup-code">
+            ------
+        </div>
+
+        <div class="info">
+
+            <strong>Important</strong>
+
+            <br><br>
+
+            Please show this pickup code to the Founder
+            when collecting your item.
+
+            <br><br>
+
+            Do not share this code with other students.
+
+        </div>
+
+        <div class="warning">
+            Keep this code safe until the item is handed over.
+        </div>
+
+        <br><br>
+
+        <a href="notification-history.html"
+           class="back-btn">
+            Back to Notifications
+        </a>
+
+    </div>
+
+    <div id="error"
+         class="error">
+        Unable to load your pickup code.
+    </div>
+
+</div>
+
+
+<script>
+
+    const API_BASE = "http://localhost:5000";
+
+    // --------------------------------------------------
+    // GET CURRENT USER
+    // --------------------------------------------------
+
+    const storedUser =
+        sessionStorage.getItem("campusCurrentUser");
+
+    if (!storedUser) {
+
+        document.getElementById("loading").style.display =
+            "none";
+
+        document.getElementById("error").innerText =
+            "Please login again.";
+
+        document.getElementById("error").style.display =
+            "block";
+
+    } else {
+
+        const currentUser =
+            JSON.parse(storedUser);
+
+        loadPickupCode(currentUser.id);
+    }
+
+
+    // --------------------------------------------------
+    // LOAD PICKUP CODE
+    // --------------------------------------------------
+
+    async function loadPickupCode(userId) {
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_BASE}/handover/user/${userId}`
+                );
+
+            const data =
+                await response.json();
+
+            console.log(
+                "Pickup code response:",
+                data
+            );
+
+
+            if (!response.ok || !data.success) {
+
+                throw new Error(
+                    data.error ||
+                    "Failed to load pickup code"
+                );
+            }
+
+
+            document.getElementById("pickupCode")
+                .innerText =
+                data.handover.pickup_code;
+
+            document.getElementById("loading")
+                .style.display =
+                "none";
+
+            document.getElementById("content")
+                .style.display =
+                "block";
+
+        }
+        catch (error) {
+
+            console.error(
+                "Pickup code error:",
+                error
+            );
+
+            document.getElementById("loading")
+                .style.display =
+                "none";
+
+            document.getElementById("error")
+                .innerText =
+                error.message ||
+                "Unable to load your pickup code.";
+
+            document.getElementById("error")
+                .style.display =
+                "block";
+        }
+
+    }
+
+</script>
+
+</body>
+</html>
