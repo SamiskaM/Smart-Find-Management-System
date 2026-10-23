@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handover Management</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #050505;
+            color: #f5f5f5;
+            padding: 30px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .title-section h1 {
+            color: #d4af37;
+            font-size: 32px;
+            margin-bottom: 6px;
+        }
+
+        .title-section p {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .back-btn {
+            border: 1px solid #d4af37;
+            background: transparent;
+            color: #d4af37;
+            padding: 11px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .back-btn:hover {
+            background: #d4af37;
+            color: #000;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .filter-btn {
+            border: 1px solid #555;
+            background: #111;
+            color: #ccc;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #d4af37;
+            color: #000;
+            border-color: #d4af37;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: #111;
+            border: 1px solid #292929;
+            border-radius: 12px;
+            padding: 18px;
+        }
+
+        .summary-card span {
+            display: block;
+            color: #999;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .summary-card strong {
+            color: #d4af37;
+            font-size: 25px;
+        }
+
+        .loading,
+        .empty,
+        .error {
+            background: #111;
+            border: 1px solid #292929;
+            border-radius: 12px;
+            padding: 35px;
+            text-align: center;
+            color: #aaa;
+        }
+
+        .error {
+            color: #ff7777;
+        }
+
+        .handover-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+        .handover-card {
+            background: #101010;
+            border: 1px solid #292929;
+            border-radius: 14px;
+            padding: 22px;
+            transition: 0.2s;
+        }
+
+        .handover-card:hover {
+            border-color: #d4af37;
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .item-name {
+            color: #fff;
+            font-size: 21px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .category {
+            color: #999;
+            font-size: 13px;
+        }
+
+        .status {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .status.pending {
+            color: #f0c85a;
+            border: 1px solid #806a20;
+            background: #1b180d;
+        }
+
+        .status.scheduled {
+            color: #67b7ff;
+            border: 1px solid #275d85;
+            background: #0d1720;
+        }
+
+        .status.completed {
+            color: #65df91;
+            border: 1px solid #276c43;
+            background: #0d1b13;
+        }
+
+        .info-row {
+            display: flex;
+            gap: 12px;
+            padding: 9px 0;
+            border-bottom: 1px solid #1f1f1f;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            width: 125px;
+            flex-shrink: 0;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .value {
+            color: #ddd;
+            font-size: 13px;
+            word-break: break-word;
+        }
+
+        .value.highlight {
+            color: #d4af37;
+            font-weight: bold;
+        }
+
+        .completed-box {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #0d1b13;
+            border: 1px solid #276c43;
+            color: #65df91;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 11px 12px;
+            border-radius: 8px;
+            border: 1px solid #d4af37;
+            background: #d4af37;
+            color: #000;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .action-btn.secondary {
+            background: transparent;
+            color: #d4af37;
+        }
+
+        .action-btn:hover {
+            opacity: 0.85;
+        }
+
+        @media (max-width: 800px) {
+            .summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 500px) {
+            body {
+                padding: 18px;
+            }
+
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .handover-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-header {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="topbar">
+        <div class="title-section">
+            <h1>Handover Management</h1>
+            <p>Track items, receivers, schedules and completed handovers.</p>
+        </div>
+
+        <button class="back-btn" onclick="goBack()">
+            ← Back to Dashboard
+        </button>
+    </div>
+
+    <div class="summary">
+        <div class="summary-card">
+            <span>All Handovers</span>
+            <strong id="countAll">0</strong>
+        </div>
+
+        <div class="summary-card">
+            <span>Pending</span>
+            <strong id="countPending">0</strong>
+        </div>
+
+        <div class="summary-card">
+            <span>Scheduled</span>
+            <strong id="countScheduled">0</strong>
+        </div>
+
+        <div class="summary-card">
+            <span>Completed</span>
+            <strong id="countCompleted">0</strong>
+        </div>
+    </div>
+
+    <div class="filters">
+        <button class="filter-btn active" onclick="setFilter('ALL', this)">All</button>
+        <button class="filter-btn" onclick="setFilter('PENDING', this)">Pending</button>
+        <button class="filter-btn" onclick="setFilter('SCHEDULED', this)">Scheduled</button>
+        <button class="filter-btn" onclick="setFilter('COMPLETED', this)">Completed</button>
+    </div>
+
+    <div id="content">
+        <div class="loading">Loading handovers...</div>
+    </div>
+
+</div>
+
+<script>
+
+    let allHandovers = [];
+    let currentFilter = "ALL";
+
+    const currentUser =
+        JSON.parse(
+            sessionStorage.getItem("campusCurrentUser")
+        );
+
+    document.addEventListener("DOMContentLoaded", function()
+    {
+        if(!currentUser || !currentUser.id)
+        {
+            document.getElementById("content").innerHTML =
+                '<div class="error">Please login again to view handovers.</div>';
+
+            return;
+        }
+
+        loadHandovers();
+    });
+
+    async function loadHandovers()
+    {
+        const content =
+            document.getElementById("content");
+
+        content.innerHTML =
+            '<div class="loading">Loading handovers...</div>';
+
+        try
+        {
+            const response =
+                await fetch(
+                    `/handovers/founder/${currentUser.id}`
+                );
+
+            const data =
+                await response.json();
+
+            if(!response.ok || !data.success)
+            {
+                throw new Error(
+                    data.error ||
+                    "Failed to load handovers"
+                );
+            }
+
+            allHandovers =
+                Array.isArray(data.handovers)
+                    ? data.handovers
+                    : [];
+
+            updateSummary();
+            renderHandovers();
+        }
+        catch(error)
+        {
+            console.error(
+                "Load handovers error:",
+                error
+            );
+
+            content.innerHTML =
+                `<div class="error">
+                    Failed to load handovers.<br><br>
+                    ${escapeHtml(error.message)}
+                </div>`;
+        }
+    }
+
+    function updateSummary()
+    {
+        const pending =
+            allHandovers.filter(
+                h => normalizeStatus(h.status) === "PENDING"
+            ).length;
+
+        const scheduled =
+            allHandovers.filter(
+                h => normalizeStatus(h.status) === "SCHEDULED"
+            ).length;
+
+        const completed =
+            allHandovers.filter(
+                h => normalizeStatus(h.status) === "COMPLETED"
+            ).length;
+
+        document.getElementById("countAll").textContent =
+            allHandovers.length;
+
+        document.getElementById("countPending").textContent =
+            pending;
+
+        document.getElementById("countScheduled").textContent =
+            scheduled;
+
+        document.getElementById("countCompleted").textContent =
+            completed;
+    }
+
+    function setFilter(filter, button)
+    {
+        currentFilter = filter;
+
+        document
+            .querySelectorAll(".filter-btn")
+            .forEach(btn =>
+                btn.classList.remove("active")
+            );
+
+        button.classList.add("active");
+
+        renderHandovers();
+    }
+
+    function renderHandovers()
+    {
+        const content =
+            document.getElementById("content");
+
+        let filtered =
+            allHandovers.filter(function(handover)
+            {
+                if(currentFilter === "ALL")
+                {
+                    return true;
+                }
+
+                return normalizeStatus(handover.status) ===
+                       currentFilter;
+            });
+
+        if(filtered.length === 0)
+        {
+            content.innerHTML =
+                `<div class="empty">
+                    No ${currentFilter === "ALL" ? "" : currentFilter.toLowerCase() + " "}
+                    handovers found.
+                </div>`;
+
+            return;
+        }
+
+        content.innerHTML =
+            `<div class="handover-grid">
+                ${filtered.map(createHandoverCard).join("")}
+            </div>`;
+    }
+
+    function createHandoverCard(handover)
+    {
+        const status =
+            normalizeStatus(handover.status);
+
+        const lostReport =
+            handover.lostReport ||
+            handover.lost_report ||
+            {};
+
+        const foundReport =
+            handover.foundReport ||
+            handover.found_report ||
+            {};
+
+        const lostUser =
+            handover.lostUser ||
+            handover.lost_user ||
+            {};
+
+        const founderUser =
+            handover.founderUser ||
+            handover.founder_user ||
+            {};
+
+        const item =
+            lostReport.item_type ||
+            foundReport.item_type ||
+            "Unknown Item";
+
+        const category =
+            lostReport.category ||
+            foundReport.category ||
+            "Not specified";
+
+        const receiver =
+            lostUser.name ||
+            lostUser.full_name ||
+            lostUser.email ||
+            handover.lost_user_id ||
+            "Unknown";
+
+        const receiverEmail =
+            lostUser.email || "";
+
+        const founder =
+            founderUser.name ||
+            founderUser.full_name ||
+            founderUser.email ||
+            handover.founder_user_id ||
+            "Unknown";
+
+        const place =
+            handover.handover_place ||
+            "";
+
+        const date =
+            handover.handover_date ||
+            "";
+
+        const time =
+            handover.handover_time ||
+            "";
+
+        const completedAt =
+            handover.handed_over_at ||
+            "";
+
+        const verificationId =
+            handover.verification_id ||
+            handover.verificationId ||
+            "";
+
+        let actionHtml = "";
+
+        if(status === "COMPLETED")
+        {
+            actionHtml =
+                `<button
+                    class="action-btn secondary"
+                    onclick="viewDetails('${escapeJs(handover.id || handover._id || "")}')">
+                    View Details
+                </button>`;
+        }
+        else
+        {
+            actionHtml =
+                `<button
+                    class="action-btn"
+                    onclick="openHandover('${escapeJs(verificationId)}')">
+                    ${status === "SCHEDULED"
+                        ? "Manage Handover"
+                        : "Enter Pickup Code"}
+                </button>`;
+        }
+
+        return `
+            <div class="handover-card">
+
+                <div class="card-header">
+                    <div>
+                        <div class="item-name">
+                            ${escapeHtml(item)}
+                        </div>
+
+                        <div class="category">
+                            ${escapeHtml(category)}
+                        </div>
+                    </div>
+
+                    <span class="status ${status.toLowerCase()}">
+                        ${escapeHtml(status)}
+                    </span>
+                </div>
+
+                <div class="info-row">
+                    <div class="label">Lost User</div>
+                    <div class="value highlight">
+                        ${escapeHtml(receiver)}
+                        ${receiverEmail
+                            ? `<br><span style="color:#888">${escapeHtml(receiverEmail)}</span>`
+                            : ""}
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="label">Founder</div>
+                    <div class="value">
+                        ${escapeHtml(founder)}
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="label">Place</div>
+                    <div class="value">
+                        ${escapeHtml(place || "Not scheduled")}
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="label">Date</div>
+                    <div class="value">
+                        ${escapeHtml(date || "Not scheduled")}
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="label">Time</div>
+                    <div class="value">
+                        ${escapeHtml(time || "Not scheduled")}
+                    </div>
+                </div>
+
+                ${
+                    completedAt
+                    ?
+                    `<div class="completed-box">
+                        ✓ Handover Completed<br>
+                        <span style="font-weight:normal;font-size:12px;">
+                            ${escapeHtml(formatDateTime(completedAt))}
+                        </span>
+                    </div>`
+                    :
+                    ""
+                }
+
+                <div class="actions">
+                    ${actionHtml}
+                </div>
+
+            </div>
+        `;
+    }
+
+    function openHandover(verificationId)
+    {
+        if(!verificationId)
+        {
+            alert(
+                "Verification ID is missing for this handover."
+            );
+
+            return;
+        }
+
+        window.location.href =
+            `founder-handover.html?verification_id=${encodeURIComponent(verificationId)}`;
+    }
+
+    function viewDetails(handoverId)
+    {
+        const handover =
+            allHandovers.find(
+                h =>
+                    String(h.id || h._id) ===
+                    String(handoverId)
+            );
+
+        if(!handover)
+        {
+            alert("Handover details not found.");
+            return;
+        }
+
+        const receiver =
+            handover.lostUser?.name ||
+            handover.lostUser?.email ||
+            handover.lost_user_id ||
+            "Unknown";
+
+        alert(
+            "Handover Completed\n\n" +
+            "Item: " +
+            (handover.lostReport?.item_type ||
+             handover.foundReport?.item_type ||
+             "Unknown") +
+            "\n\nReceived by: " +
+            receiver +
+            "\n\nPlace: " +
+            (handover.handover_place || "Not specified") +
+            "\nDate: " +
+            (handover.handover_date || "Not specified") +
+            "\nTime: " +
+            (handover.handover_time || "Not specified") +
+            "\n\nCompleted at: " +
+            formatDateTime(handover.handed_over_at)
+        );
+    }
+
+    function goBack()
+    {
+        window.location.href =
+            "profileview.html#dashboard";
+    }
+
+    function normalizeStatus(status)
+    {
+        return String(status || "PENDING")
+            .trim()
+            .toUpperCase();
+    }
+
+    function formatDateTime(value)
+    {
+        if(!value)
+        {
+            return "Not available";
+        }
+
+        const date =
+            new Date(value);
+
+        if(Number.isNaN(date.getTime()))
+        {
+            return String(value);
+        }
+
+        return date.toLocaleString();
+    }
+
+    function escapeHtml(value)
+    {
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function escapeJs(value)
+    {
+        return String(value ?? "")
+            .replace(/\\/g, "\\\\")
+            .replace(/'/g, "\\'");
+    }
+
+</script>
+
+</body>
+</html>

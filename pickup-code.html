@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Pickup Code - Campus Lost & Found</title>
+    <title>Pickup Details - Campus Lost & Found</title>
 
     <style>
 
@@ -20,6 +21,7 @@
             background: #0b0b0b;
             color: #ffffff;
             min-height: 100vh;
+
             display: flex;
             justify-content: center;
             align-items: center;
@@ -27,13 +29,20 @@
 
         .container {
             width: 90%;
-            max-width: 600px;
+            max-width: 650px;
+
             background: #151515;
+
             border: 1px solid #d4af37;
             border-radius: 15px;
+
             padding: 40px;
+
             text-align: center;
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.2);
+
+            box-shadow:
+                0 0 25px
+                rgba(212, 175, 55, 0.2);
         }
 
         h1 {
@@ -44,12 +53,17 @@
         .subtitle {
             color: #cccccc;
             margin-bottom: 30px;
+            line-height: 1.5;
         }
 
         .success {
             font-size: 50px;
             margin-bottom: 15px;
         }
+
+        /* -----------------------------------------
+           PICKUP CODE
+        ----------------------------------------- */
 
         .code-title {
             color: #cccccc;
@@ -60,37 +74,144 @@
         .pickup-code {
             font-size: 48px;
             font-weight: bold;
+
             letter-spacing: 10px;
+
             color: #d4af37;
+
             background: #0b0b0b;
+
             border: 2px dashed #d4af37;
+
             border-radius: 12px;
+
             padding: 20px;
+
             margin: 20px 0 30px;
         }
 
+        /* -----------------------------------------
+           HANDOVER DETAILS
+        ----------------------------------------- */
+
+        .schedule-title {
+            color: #d4af37;
+            font-size: 21px;
+            font-weight: bold;
+
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .schedule-box {
+            background: #202020;
+
+            border: 1px solid #333333;
+
+            border-radius: 10px;
+
+            padding: 20px;
+
+            margin-bottom: 25px;
+
+            text-align: left;
+        }
+
+        .schedule-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 12px 0;
+
+            border-bottom: 1px solid #333333;
+        }
+
+        .schedule-row:last-child {
+            border-bottom: none;
+        }
+
+        .schedule-label {
+            color: #aaaaaa;
+            font-weight: bold;
+        }
+
+        .schedule-value {
+            color: #ffffff;
+            text-align: right;
+            max-width: 60%;
+        }
+
+        /* -----------------------------------------
+           INFO
+        ----------------------------------------- */
+
         .info {
             background: #202020;
+
             border-radius: 10px;
+
             padding: 20px;
+
             color: #dddddd;
+
             line-height: 1.6;
-            margin-bottom: 25px;
+
+            margin-bottom: 20px;
         }
 
         .warning {
             color: #ffcc66;
+
             font-size: 14px;
+
+            line-height: 1.5;
+
             margin-top: 15px;
+            margin-bottom: 25px;
         }
+
+        /* -----------------------------------------
+           STATUS
+        ----------------------------------------- */
+
+        .status {
+            display: inline-block;
+
+            padding: 8px 18px;
+
+            border-radius: 20px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            margin-bottom: 20px;
+
+            background: #183b1f;
+
+            color: #7cff91;
+
+            border: 1px solid #3d8b4a;
+        }
+
+        /* -----------------------------------------
+           BUTTON
+        ----------------------------------------- */
 
         .back-btn {
             display: inline-block;
+
             padding: 12px 25px;
+
             border: 1px solid #d4af37;
+
             border-radius: 8px;
+
             color: #d4af37;
+
             text-decoration: none;
+
             transition: 0.3s;
         }
 
@@ -99,118 +220,361 @@
             color: #000000;
         }
 
+        /* -----------------------------------------
+           ERROR / LOADING
+        ----------------------------------------- */
+
         .error {
             color: #ff6b6b;
+
             font-size: 17px;
+
             display: none;
+
+            line-height: 1.5;
         }
 
         .loading {
             color: #cccccc;
         }
 
+        /* -----------------------------------------
+           MOBILE
+        ----------------------------------------- */
+
+        @media (max-width: 600px) {
+
+            .container {
+                padding: 25px;
+            }
+
+            .pickup-code {
+                font-size: 36px;
+                letter-spacing: 7px;
+            }
+
+            .schedule-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .schedule-value {
+                text-align: left;
+                max-width: 100%;
+            }
+
+        }
+
     </style>
+
 </head>
+
 
 <body>
 
 <div class="container">
 
-    <div class="success">✓</div>
+    <div class="success">
+        ✓
+    </div>
 
-    <h1>Ownership Confirmed</h1>
+    <h1>
+        Ownership Confirmed
+    </h1>
 
     <p class="subtitle">
         Your lost item has been successfully verified.
+        Please use the details below to collect your item.
     </p>
 
-    <div id="loading" class="loading">
-        Loading your pickup code...
+
+    <!-- -----------------------------------------
+         LOADING
+    ------------------------------------------ -->
+
+    <div id="loading"
+         class="loading">
+
+        Loading your pickup details...
+
     </div>
 
-    <div id="content" style="display:none;">
+
+    <!-- -----------------------------------------
+         MAIN CONTENT
+    ------------------------------------------ -->
+
+    <div id="content"
+         style="display:none;">
+
+
+        <!-- STATUS -->
+
+        <div id="status"
+             class="status">
+
+            Pickup Scheduled
+
+        </div>
+
+
+        <!-- -----------------------------------------
+             PICKUP CODE
+        ------------------------------------------ -->
 
         <div class="code-title">
-            Your Pickup Code
+
+            Your Secret Pickup Code
+
         </div>
+
 
         <div id="pickupCode"
              class="pickup-code">
+
             ------
+
         </div>
+
+
+        <!-- -----------------------------------------
+             HANDOVER SCHEDULE
+        ------------------------------------------ -->
+
+        <div class="schedule-title">
+
+            📍 Handover Details
+
+        </div>
+
+
+        <div class="schedule-box">
+
+
+            <div class="schedule-row">
+
+                <div class="schedule-label">
+                    Place
+                </div>
+
+                <div id="handoverPlace"
+                     class="schedule-value">
+
+                    Not scheduled
+
+                </div>
+
+            </div>
+
+
+            <div class="schedule-row">
+
+                <div class="schedule-label">
+                    Date
+                </div>
+
+                <div id="handoverDate"
+                     class="schedule-value">
+
+                    Not scheduled
+
+                </div>
+
+            </div>
+
+
+            <div class="schedule-row">
+
+                <div class="schedule-label">
+                    Time
+                </div>
+
+                <div id="handoverTime"
+                     class="schedule-value">
+
+                    Not scheduled
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- -----------------------------------------
+             IMPORTANT INFORMATION
+        ------------------------------------------ -->
 
         <div class="info">
 
-            <strong>Important</strong>
+            <strong>
+                How to collect your item
+            </strong>
 
             <br><br>
 
-            Please show this pickup code to the Founder
-            when collecting your item.
+            1. Go to the scheduled place at the scheduled
+            date and time.
 
             <br><br>
 
-            Do not share this code with other students.
+            2. Meet the Founder who found your item.
+
+            <br><br>
+
+            3. Show your secret pickup code to the Founder.
+
+            <br><br>
+
+            4. The Founder will enter the pickup code to
+            complete the handover.
 
         </div>
+
+
+        <!-- -----------------------------------------
+             WARNING
+        ------------------------------------------ -->
 
         <div class="warning">
-            Keep this code safe until the item is handed over.
+
+            🔒 Keep your pickup code private.
+
+            <br>
+
+            Do not share it with other students.
+
+            <br>
+
+            The code should only be shown to the Founder
+            during the physical handover.
+
         </div>
 
-        <br><br>
+
+        <br>
+
 
         <a href="notification-history.html"
            class="back-btn">
+
             Back to Notifications
+
         </a>
+
 
     </div>
 
+
+    <!-- -----------------------------------------
+         ERROR
+    ------------------------------------------ -->
+
     <div id="error"
          class="error">
-        Unable to load your pickup code.
+
+        Unable to load your pickup details.
+
     </div>
 
 </div>
 
 
+
 <script>
 
-    const API_BASE = "";
+    const API_BASE =
+        "";
+
 
     // --------------------------------------------------
     // GET CURRENT USER
     // --------------------------------------------------
 
     const storedUser =
-        sessionStorage.getItem("campusCurrentUser");
+        sessionStorage.getItem(
+            "campusCurrentUser"
+        );
+
 
     if (!storedUser) {
 
-        document.getElementById("loading").style.display =
-            "none";
+        document.getElementById(
+            "loading"
+        ).style.display = "none";
 
-        document.getElementById("error").innerText =
+
+        document.getElementById(
+            "error"
+        ).innerText =
             "Please login again.";
 
-        document.getElementById("error").style.display =
-            "block";
 
-    } else {
+        document.getElementById(
+            "error"
+        ).style.display = "block";
 
-        const currentUser =
-            JSON.parse(storedUser);
+    }
+    else {
 
-        loadPickupCode(currentUser.id);
+        try {
+
+            const currentUser =
+                JSON.parse(storedUser);
+
+
+            if (!currentUser.id) {
+
+                throw new Error(
+                    "User session not found."
+                );
+
+            }
+
+
+            loadPickupDetails(
+                currentUser.id
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "User session error:",
+                error
+            );
+
+
+            document.getElementById(
+                "loading"
+            ).style.display = "none";
+
+
+            document.getElementById(
+                "error"
+            ).innerText =
+                "Invalid user session. Please login again.";
+
+
+            document.getElementById(
+                "error"
+            ).style.display = "block";
+
+        }
+
     }
 
 
+
     // --------------------------------------------------
-    // LOAD PICKUP CODE
+    // LOAD PICKUP DETAILS
     // --------------------------------------------------
 
-    async function loadPickupCode(userId) {
+    async function loadPickupDetails(
+        userId
+    ) {
 
         try {
 
@@ -219,56 +583,162 @@
                     `${API_BASE}/handover/user/${userId}`
                 );
 
+
             const data =
                 await response.json();
 
+
             console.log(
-                "Pickup code response:",
+                "Pickup details response:",
                 data
             );
 
 
-            if (!response.ok || !data.success) {
+            if (
+                !response.ok ||
+                !data.success
+            ) {
 
                 throw new Error(
                     data.error ||
-                    "Failed to load pickup code"
+                    "Failed to load pickup details"
                 );
+
             }
 
 
-            document.getElementById("pickupCode")
-                .innerText =
-                data.handover.pickup_code;
+            const handover =
+                data.handover;
 
-            document.getElementById("loading")
-                .style.display =
+
+            // ------------------------------------------
+            // PICKUP CODE
+            // ------------------------------------------
+
+            document.getElementById(
+                "pickupCode"
+            ).innerText =
+                handover.pickup_code ||
+                "------";
+
+
+            // ------------------------------------------
+            // HANDOVER PLACE
+            // ------------------------------------------
+
+            document.getElementById(
+                "handoverPlace"
+            ).innerText =
+                handover.handover_place ||
+                "Not scheduled";
+
+
+            // ------------------------------------------
+            // HANDOVER DATE
+            // ------------------------------------------
+
+            document.getElementById(
+                "handoverDate"
+            ).innerText =
+                handover.handover_date ||
+                "Not scheduled";
+
+
+            // ------------------------------------------
+            // HANDOVER TIME
+            // ------------------------------------------
+
+            document.getElementById(
+                "handoverTime"
+            ).innerText =
+                handover.handover_time ||
+                "Not scheduled";
+
+
+            // ------------------------------------------
+            // STATUS
+            // ------------------------------------------
+
+            const status =
+                handover.status || "PENDING";
+
+
+            const statusElement =
+                document.getElementById(
+                    "status"
+                );
+
+
+            if (status === "COMPLETED") {
+
+                statusElement.innerText =
+                    "Handover Completed";
+
+                statusElement.style.background =
+                    "#183b1f";
+
+                statusElement.style.color =
+                    "#7cff91";
+
+            }
+            else if (
+                status === "SCHEDULED"
+            ) {
+
+                statusElement.innerText =
+                    "Handover Scheduled";
+
+            }
+            else {
+
+                statusElement.innerText =
+                    "Pickup Code Available";
+
+            }
+
+
+            // ------------------------------------------
+            // SHOW CONTENT
+            // ------------------------------------------
+
+            document.getElementById(
+                "loading"
+            ).style.display =
                 "none";
 
-            document.getElementById("content")
-                .style.display =
+
+            document.getElementById(
+                "content"
+            ).style.display =
                 "block";
 
         }
         catch (error) {
 
             console.error(
-                "Pickup code error:",
+                "Pickup details error:",
                 error
             );
 
-            document.getElementById("loading")
-                .style.display =
+
+            document.getElementById(
+                "loading"
+            ).style.display =
                 "none";
 
-            document.getElementById("error")
-                .innerText =
-                error.message ||
-                "Unable to load your pickup code.";
 
-            document.getElementById("error")
-                .style.display =
+            document.getElementById(
+                "error"
+            ).innerText =
+                error.message ||
+                "Unable to load your pickup details.";
+
+
+            document.getElementById(
+                "error"
+            ).style.display =
                 "block";
+
         }
 
     }

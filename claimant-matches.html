@@ -514,6 +514,81 @@
 
 
         /* =========================
+           CLAIM BUTTON
+        ========================= */
+
+        .claim-section {
+            margin-top: 20px;
+
+            padding-top: 18px;
+
+            border-top: 1px solid #292929;
+        }
+
+
+        .claim-button {
+            width: 100%;
+
+            background: #d4af37;
+
+            border: none;
+
+            color: #111111;
+
+            padding: 13px 18px;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            transition: 0.2s;
+        }
+
+
+        .claim-button:hover {
+            background: #e4c04f;
+
+            transform: translateY(-1px);
+        }
+
+
+        .claim-button:disabled {
+            background: #555555;
+
+            color: #999999;
+
+            cursor: not-allowed;
+
+            transform: none;
+        }
+
+
+        .claimed-message {
+            width: 100%;
+
+            background: #19160c;
+
+            border: 1px solid #66551b;
+
+            color: #d4af37;
+
+            padding: 13px 18px;
+
+            border-radius: 8px;
+
+            text-align: center;
+
+            font-size: 14px;
+
+            font-weight: bold;
+        }
+
+
+        /* =========================
            EMPTY / ERROR
         ========================= */
 
@@ -1010,7 +1085,7 @@
                 document.getElementById(
                     "matchCount"
                 ).textContent =
-                    `${matches.length} POSSIBLE MATCH${matches.length === 1 ? "" : "ES"}`;
+                    `${matches.length} MATCH${matches.length === 1 ? "" : "ES"}`;
 
 
                 if(matches.length === 0)
@@ -1087,7 +1162,9 @@
                 ?
                 `
                     <img
-                        src="${found.image_data}"
+                        src="${escapeHTML(
+                            found.image_data
+                        )}"
                         alt="Found item"
                     >
                 `
@@ -1097,6 +1174,76 @@
                         No Image
                     </div>
                 `;
+
+
+            let claimHTML = "";
+
+
+            if(
+                match.status ===
+                "POSSIBLE_MATCH"
+            )
+            {
+
+                claimHTML = `
+
+                    <div class="claim-section">
+
+                        <button
+                            class="claim-button"
+                            type="button"
+                            onclick="claimItem(
+                                '${escapeHTML(
+                                    match.match_id
+                                )}'
+                            )"
+                        >
+                            Claim This Item
+                        </button>
+
+                    </div>
+
+                `;
+
+            }
+            else if(
+                match.status ===
+                "CLAIMED"
+            )
+            {
+
+                claimHTML = `
+
+                    <div class="claim-section">
+
+                        <div class="claimed-message">
+                            ✓ Item Claimed
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+            else
+            {
+
+                claimHTML = `
+
+                    <div class="claim-section">
+
+                        <div class="claimed-message">
+                            ${escapeHTML(
+                                match.status ||
+                                "Unavailable"
+                            )}
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
 
 
             return `
@@ -1309,11 +1456,119 @@
 
                         </div>
 
+
+                        ${claimHTML}
+
                     </div>
 
                 </div>
 
             `;
+        }
+
+
+
+        /* =========================
+           CLAIM ITEM
+        ========================= */
+
+        async function claimItem(matchId)
+        {
+            if(!currentUser)
+            {
+                alert(
+                    "User session not found."
+                );
+
+                return;
+            }
+
+
+            const confirmed =
+                confirm(
+                    "Are you sure you want to claim this item?"
+                );
+
+
+            if(!confirmed)
+            {
+                return;
+            }
+
+
+            try
+            {
+
+                const response =
+                    await fetch(
+                        "/claim",
+                        {
+                            method:
+                                "POST",
+
+                            headers:
+                                {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                            body:
+                                JSON.stringify(
+                                    {
+                                        match_id:
+                                            matchId,
+
+                                        claimant_user_id:
+                                            currentUser.id
+                                    }
+                                )
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if(
+                    !response.ok ||
+                    !data.success
+                )
+                {
+
+                    alert(
+                        data.message ||
+                        data.error ||
+                        "Failed to claim item."
+                    );
+
+                    return;
+                }
+
+
+                alert(
+                    "Item claimed successfully!"
+                );
+
+
+                await loadMatchesForSelectedReport();
+
+            }
+            catch(error)
+            {
+
+                console.error(
+                    "Claim error:",
+                    error
+                );
+
+
+                alert(
+                    "Unable to claim the item."
+                );
+
+            }
+
         }
 
 
@@ -1365,6 +1620,7 @@
             "DOMContentLoaded",
             async function()
             {
+
                 if(!loadUser())
                 {
                     return;
@@ -1372,6 +1628,7 @@
 
 
                 await loadLostReports();
+
             }
         );
 

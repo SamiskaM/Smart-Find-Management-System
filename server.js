@@ -334,7 +334,57 @@ const matchSchema = new mongoose.Schema(
     }
 );
 
+
+
 const Match = mongoose.model("Match", matchSchema);
+
+
+// ======================================================
+// CLAIM SCHEMA
+// ======================================================
+
+const claimSchema = new mongoose.Schema(
+    {
+        match_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Match",
+            required: true
+        },
+
+        lost_report_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "LostReport",
+            required: true
+        },
+
+        found_report_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "FoundReport",
+            required: true
+        },
+
+        claimant_user_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true
+        },
+
+        status: {
+            type: String,
+            default: "PENDING"
+        },
+
+        created_at: {
+            type: Date,
+            default: Date.now
+        }
+    },
+    {
+        collection: "claims"
+    }
+);
+
+const Claim = mongoose.model("Claim", claimSchema);
 
 
 // ======================================================
@@ -599,6 +649,333 @@ app.get("/db-status", (req, res) => {
     });
 });
 
+
+
+
+
+// ======================================================
+// CLAIM ITEM
+// ======================================================
+
+app.post("/claim", async (req, res) => {
+
+    try {
+
+        const {
+            match_id,
+            claimant_user_id
+        } = req.body;
+
+
+        // ==================================================
+        // CHECK REQUIRED FIELDS
+        // ==================================================
+
+        if (!match_id || !claimant_user_id) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "match_id and claimant_user_id are required"
+
+            });
+
+        }
+
+
+        // ==================================================
+        // FIND MATCH
+        // ==================================================
+
+        const match =
+            await Match.findById(match_id);
+
+        if (!match) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Match not found"
+
+            });
+
+        }
+
+
+        // ==================================================
+        // ONLY POSSIBLE MATCHES CAN BE CLAIMED
+        // ==================================================
+
+        if (
+            match.status !==
+            "POSSIBLE_MATCH"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "This match cannot be claimed"
+
+            });
+
+        }
+
+
+        // ==================================================
+        // FIND LOST REPORT
+        // ==================================================
+
+        const lostReport =
+            await LostReport.findById(
+                match.lost_report_id
+            );
+
+        if (!lostReport) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Lost report not found"
+
+            });
+
+        }
+
+
+        // ==================================================
+        // MAKE SURE CLAIMANT OWNS LOST REPORT
+        // ==================================================
+
+        if (
+            String(lostReport.user_id) !==
+            String(claimant_user_id)
+        ) {
+
+            return res.status(403).json({
+
+                success: false,
+
+                message:
+                    "You cannot claim this item"
+
+            });
+
+        }
+
+
+        // ==================================================
+        // FIND FOUND REPORT
+        //
+        // We need this to identify the Founder.
+        // ==================================================
+
+        const foundReport =
+            await FoundReport.findById(
+                match.found_report_id
+            );
+
+        if (!foundReport) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Found report not found"
+
+            });
+
+        }
+
+
+        // ==================================================
+        // GET FOUNDER USER ID
+        // ==================================================
+
+        const founderUserId =
+            foundReport.user_id;
+
+
+        if (!founderUserId) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Founder information not found"
+
+            });
+
+        }
+
+
+        // ==================================================
+        // CHECK WHETHER THIS MATCH WAS ALREADY CLAIMED
+        // ==================================================
+
+        const existingClaim =
+            await Claim.findOne({
+
+                match_id:
+                    match._id
+
+            });
+
+
+        if (existingClaim) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "This match has already been claimed",
+
+                claim_id:
+                    existingClaim._id
+
+            });
+
+        }
+
+
+        // ==================================================
+        // CREATE CLAIM
+        // ==================================================
+
+        const claim =
+            new Claim({
+
+                match_id:
+                    match._id,
+
+                lost_report_id:
+                    match.lost_report_id,
+
+                found_report_id:
+                    match.found_report_id,
+
+                claimant_user_id:
+                    claimant_user_id,
+
+                status:
+                    "PENDING"
+
+            });
+
+
+        const savedClaim =
+            await claim.save();
+
+
+        // ==================================================
+        // UPDATE MATCH STATUS
+        // ==================================================
+
+        match.status =
+            "CLAIMED";
+
+        await match.save();
+
+
+        // ==================================================
+        // CREATE FOUNDER NOTIFICATION
+        // ==================================================
+
+        const notification =
+            new Notification({
+
+                user_id:
+                    founderUserId,
+
+                type:
+                    "CLAIM",
+
+                title:
+                    "Item Claimed",
+
+                message:
+                    "A Lost User has claimed your found item. Please check the match and start verification if you think it is a genuine match.",
+
+                verification_id:
+                    null,
+
+                match_id:
+                    match._id,
+
+                is_read:
+                    false,
+
+                read_at:
+                    null
+
+            });
+
+
+        await notification.save();
+
+
+        console.log(
+            "🔔 Founder notified about claim:",
+            founderUserId
+        );
+
+
+        // ==================================================
+        // FINAL RESPONSE
+        // ==================================================
+
+        res.json({
+
+            success: true,
+
+            message:
+                "Item claimed successfully",
+
+            claim_id:
+                savedClaim._id,
+
+            match_id:
+                match._id,
+
+            status:
+                "CLAIMED"
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Claim error:",
+            error
+        );
+
+        res.status(500).json({
+
+            success: false,
+
+            message:
+                "Failed to create claim",
+
+            error:
+                error.message
+
+        });
+
+    }
+
+});
 
 // ======================================================
 // SIGNUP
@@ -1209,139 +1586,215 @@ app.put("/users/:id", async (req, res) => {
 });
 
 
+
+
 // ======================================================
-// HELPER - ATTRIBUTE MATCHING
+// ATTRIBUTE MATCHING
 // ======================================================
 
 function compareValue(value1, value2) {
 
-    if (
-        !value1 ||
-        !value2
-    ) {
+    if (!value1 || !value2) {
         return 0;
     }
 
-    const a =
-        String(value1)
-            .trim()
-            .toLowerCase();
+    const a = String(value1)
+        .trim()
+        .toLowerCase();
 
-    const b =
-        String(value2)
-            .trim()
-            .toLowerCase();
+    const b = String(value2)
+        .trim()
+        .toLowerCase();
 
     if (!a || !b) {
         return 0;
     }
 
-    if (a === b) {
-        return 1;
-    }
-
-    return 0;
+    return a === b ? 1 : 0;
 }
 
 
 // ======================================================
-// CALCULATE ATTRIBUTE SCORE
+// CHECK WHETHER BRAND IS APPLICABLE
 // ======================================================
 
-function calculateAttributeScore(
-    lost,
-    found
-) {
+function isBrandApplicable(category) {
 
-    let total = 0;
-    let weight = 0;
+    if (!category) {
+        return false;
+    }
 
-    // Category - 15%
-    if (
-        lost.category &&
-        found.category
-    ) {
+    const c = String(category)
+        .trim()
+        .toLowerCase();
 
-        total +=
+    // Categories where brand is normally meaningful
+    const brandCategories = [
+        "electronics",
+        "books",
+        "wallet",
+        "bag",
+        "clothing",
+        "accessories"
+    ];
+
+    return brandCategories.includes(c);
+}
+
+
+// ======================================================
+// CHECK WHETHER COLOR IS APPLICABLE
+// ======================================================
+
+function isColorApplicable(category) {
+
+    if (!category) {
+        return false;
+    }
+
+    const c = String(category)
+        .trim()
+        .toLowerCase();
+
+    // Documents may not always have a useful color
+    if (c === "documents") {
+        return false;
+    }
+
+    return true;
+}
+
+
+// ======================================================
+// CALCULATE NORMALIZED ATTRIBUTE SCORE
+// ======================================================
+
+function calculateAttributeScore(lost, found) {
+
+    let matchedScore = 0;
+    let possibleScore = 0;
+
+    // --------------------------------------------------
+    // CATEGORY - 15
+    // --------------------------------------------------
+
+    if (lost.category && found.category) {
+
+        possibleScore += 15;
+
+        matchedScore +=
             compareValue(
                 lost.category,
                 found.category
             ) * 15;
-
-        weight += 15;
     }
 
 
-    // Item type - 10%
-    if (
-        lost.item_type &&
-        found.item_type
-    ) {
+    // --------------------------------------------------
+    // ITEM TYPE - 10
+    // --------------------------------------------------
 
-        total +=
+    if (lost.item_type && found.item_type) {
+
+        possibleScore += 10;
+
+        matchedScore +=
             compareValue(
                 lost.item_type,
                 found.item_type
             ) * 10;
-
-        weight += 10;
     }
 
 
-    // Color - 15%
+    // --------------------------------------------------
+    // COLOR - 15
+    // Only when color is meaningful
+    // --------------------------------------------------
+
     if (
-        lost.color &&
-        found.color
+        isColorApplicable(lost.category) &&
+        isColorApplicable(found.category)
     ) {
 
-        total +=
-            compareValue(
-                lost.color,
-                found.color
-            ) * 15;
+        if (lost.color && found.color) {
 
-        weight += 15;
+            possibleScore += 15;
+
+            matchedScore +=
+                compareValue(
+                    lost.color,
+                    found.color
+                ) * 15;
+        }
     }
 
 
-    // Brand - 10%
+    // --------------------------------------------------
+    // BRAND - 10
+    // Only for categories where brand is meaningful
+    // --------------------------------------------------
+
     if (
-        lost.brand &&
-        found.brand
+        isBrandApplicable(lost.category) &&
+        isBrandApplicable(found.category)
     ) {
 
-        total +=
-            compareValue(
-                lost.brand,
-                found.brand
-            ) * 10;
+        // If both users supplied a brand,
+        // compare them.
 
-        weight += 10;
+        if (lost.brand && found.brand) {
+
+            possibleScore += 10;
+
+            matchedScore +=
+                compareValue(
+                    lost.brand,
+                    found.brand
+                ) * 10;
+        }
     }
 
 
-    // Location - 10%
-    if (
-        lost.location &&
-        found.location
-    ) {
+    // --------------------------------------------------
+    // LOCATION - 10
+    // --------------------------------------------------
 
-        total +=
+    if (lost.location && found.location) {
+
+        possibleScore += 10;
+
+        matchedScore +=
             compareValue(
                 lost.location,
                 found.location
             ) * 10;
-
-        weight += 10;
     }
 
 
-    if (weight === 0) {
+    // --------------------------------------------------
+    // NO APPLICABLE ATTRIBUTES
+    // --------------------------------------------------
+
+    if (possibleScore === 0) {
         return 0;
     }
 
-    return (total / weight) * 60;
+
+    // --------------------------------------------------
+    // NORMALIZED SCORE
+    // Always returns 0 - 100
+    // --------------------------------------------------
+
+    const percentage =
+        (matchedScore / possibleScore) * 100;
+
+    return Number(
+        percentage.toFixed(2)
+    );
 }
+
+
+
 
 
 // ======================================================
@@ -2167,46 +2620,193 @@ app.get(
 
         try {
 
+            console.log(
+                "\n🔍 Loading matches for lost report:",
+                req.params.id
+            );
+
+
+            // ------------------------------------------
+            // GET MATCH RECORDS
+            // ------------------------------------------
+
             const matches =
                 await Match.find({
 
                     lost_report_id:
-                        req.params.id
+                        req.params.id,
+
+                    status:
+                        {
+                            $in: [
+                                "POSSIBLE_MATCH",
+                                "CLAIMED"
+                            ]
+                        }
 
                 }).sort({
+
                     match_score: -1
+
                 });
 
+
+            console.log(
+                "Matches found:",
+                matches.length
+            );
+
+
+            // ------------------------------------------
+            // BUILD RESULT
+            // ------------------------------------------
+
+            const result = [];
+
+
+            for (const match of matches) {
+
+                const foundReport =
+                    await FoundReport.findById(
+                        match.found_report_id
+                    );
+
+
+                if (!foundReport) {
+
+                    continue;
+
+                }
+
+
+                // ------------------------------------------
+                // FIND CLAIM
+                // ------------------------------------------
+
+                const claim =
+                    await Claim.findOne({
+
+                        match_id:
+                            match._id
+
+                    });
+
+
+                // ------------------------------------------
+                // ADD MATCH
+                // ------------------------------------------
+
+                result.push({
+
+                    match_id:
+                        match._id,
+
+                    claim_id:
+                        claim
+                            ? claim._id
+                            : null,
+
+
+                    match_score:
+                        match.match_score,
+
+                    description_score:
+                        match.description_score,
+
+                    image_score:
+                        match.image_score,
+
+                    attribute_score:
+                        match.attribute_score,
+
+                    status:
+                        match.status,
+
+
+                    // --------------------------------------
+                    // FOUND REPORT DETAILS
+                    // --------------------------------------
+
+                    found_report: {
+
+                        id:
+                            foundReport._id,
+
+                        category:
+                            foundReport.category,
+
+                        item_type:
+                            foundReport.item_type,
+
+                        color:
+                            foundReport.color,
+
+                        brand:
+                            foundReport.brand,
+
+                        location:
+                            foundReport.location,
+
+                        date_found:
+                            foundReport.date_found,
+
+                        time_found:
+                            foundReport.time_found,
+
+                        description:
+                            foundReport.description,
+
+                        image_data:
+                            foundReport.image_data
+
+                    }
+
+                });
+
+            }
+
+
+            // ------------------------------------------
+            // SEND RESPONSE
+            // ------------------------------------------
 
             res.json({
 
                 success: true,
 
-                matches
+                matches:
+                    result
+
             });
 
-        } catch (error) {
+        }
+        catch (error) {
 
             console.error(
                 "❌ Get lost matches error:",
                 error
             );
 
+
             res.status(500).json({
 
                 success: false,
 
                 error:
-                    "Failed to get matches"
+                    "Failed to get matches",
+
+                details:
+                    error.message
+
             });
+
         }
+
     }
 );
 
 
-// ======================================================
-// VIEW MATCHES FOR A FOUND REPORT
-// ======================================================
+
 
 // ======================================================
 // VIEW MATCHES FOR A FOUND REPORT
@@ -2224,9 +2824,9 @@ app.get(
             );
 
 
-            // ------------------------------------------
+            // ==========================================
             // GET MATCH RECORDS
-            // ------------------------------------------
+            // ==========================================
 
             const matches =
                 await Match.find({
@@ -2234,8 +2834,12 @@ app.get(
                     found_report_id:
                         req.params.id,
 
-                    status:
-                        "POSSIBLE_MATCH"
+                    status: {
+                        $in: [
+                            "POSSIBLE_MATCH",
+                            "CLAIMED"
+                        ]
+                    }
 
                 }).sort({
 
@@ -2245,14 +2849,14 @@ app.get(
 
 
             console.log(
-                "Possible matches found:",
+                "Matches found:",
                 matches.length
             );
 
 
-            // ------------------------------------------
+            // ==========================================
             // GET LOST REPORT DETAILS
-            // ------------------------------------------
+            // ==========================================
 
             const result = [];
 
@@ -2272,14 +2876,51 @@ app.get(
                 }
 
 
-                // --------------------------------------
-                // RETURN ONLY PUBLIC LOST DETAILS
-                // --------------------------------------
+                // ==========================================
+                // FIND CLAIM FOR THIS MATCH
+                // ==========================================
+
+                const claim =
+                    await Claim.findOne({
+
+                        match_id:
+                            match._id
+
+                    });
+
+
+                // ==========================================
+                // ADD MATCH TO RESULT
+                // ==========================================
 
                 result.push({
 
                     match_id:
                         match._id,
+
+
+                    // Claim ID if the Lost User
+                    // has already claimed this match
+
+                    claim_id:
+                        claim
+                            ? claim._id
+                            : null,
+
+
+                    // Claim status
+                    // PENDING / VERIFICATION_STARTED
+                    // or null if there is no claim
+
+                    claim_status:
+                        claim
+                            ? claim.status
+                            : null,
+
+
+                    // ======================================
+                    // MATCH SCORES
+                    // ======================================
 
                     match_score:
                         match.match_score,
@@ -2293,9 +2934,18 @@ app.get(
                     attribute_score:
                         match.attribute_score,
 
+
+                    // ======================================
+                    // MATCH STATUS
+                    // ======================================
+
                     status:
                         match.status,
 
+
+                    // ======================================
+                    // LOST REPORT PUBLIC DETAILS
+                    // ======================================
 
                     lost_report: {
 
@@ -2333,9 +2983,9 @@ app.get(
             }
 
 
-            // ------------------------------------------
+            // ==========================================
             // SEND RESPONSE
-            // ------------------------------------------
+            // ==========================================
 
             res.json({
 
@@ -2347,7 +2997,8 @@ app.get(
             });
 
 
-        } catch (error) {
+        }
+        catch (error) {
 
             console.error(
                 "❌ Get found matches error:",
@@ -2371,9 +3022,6 @@ app.get(
 
     }
 );
-
-
-
 // ======================================================
 // START VERIFICATION
 // ======================================================
@@ -2384,14 +3032,30 @@ app.post(
 
         try {
 
-            const { match_id } = req.body;
+            const {
+                match_id,
+                claim_id
+            } = req.body;
+
+
+            // ==================================================
+            // VALIDATE MATCH ID
+            //
+            // claim_id is OPTIONAL.
+            //
+            // Founder can start verification even when
+            // Lost User has not claimed the item.
+            // ==================================================
 
             if (!match_id) {
 
                 return res.status(400).json({
+
                     success: false,
+
                     error:
                         "Match ID is required"
+
                 });
 
             }
@@ -2407,10 +3071,130 @@ app.post(
             if (!match) {
 
                 return res.status(404).json({
+
                     success: false,
+
                     error:
                         "Match not found"
+
                 });
+
+            }
+
+
+            // ==================================================
+            // FIND CLAIM IF CLAIM ID WAS PROVIDED
+            // ==================================================
+
+            let claim = null;
+
+
+            if (claim_id) {
+
+                claim =
+                    await Claim.findById(
+                        claim_id
+                    );
+
+
+                // ----------------------------------------------
+                // CLAIM ID WAS PROVIDED BUT CLAIM DOES NOT EXIST
+                // ----------------------------------------------
+
+                if (!claim) {
+
+                    return res.status(404).json({
+
+                        success: false,
+
+                        error:
+                            "Claim not found"
+
+                    });
+
+                }
+
+
+                // ----------------------------------------------
+                // CHECK CLAIM BELONGS TO THIS MATCH
+                // ----------------------------------------------
+
+                if (
+                    String(claim.match_id) !==
+                    String(match_id)
+                ) {
+
+                    return res.status(400).json({
+
+                        success: false,
+
+                        error:
+                            "Claim does not belong to this match"
+
+                    });
+
+                }
+
+
+                // ----------------------------------------------
+                // CHECK CLAIM STATUS
+                // ----------------------------------------------
+
+                if (
+                    claim.status !== "PENDING" &&
+                    claim.status !== "VERIFICATION_STARTED"
+                ) {
+
+                    return res.status(400).json({
+
+                        success: false,
+
+                        error:
+                            "This claim cannot start verification"
+
+                    });
+
+                }
+
+            }
+
+
+            // ==================================================
+            // IF CLAIM ID WAS NOT PROVIDED
+            //
+            // CHECK WHETHER A CLAIM ALREADY EXISTS
+            // ==================================================
+
+            else {
+
+                claim =
+                    await Claim.findOne({
+
+                        match_id:
+                            match._id
+
+                    });
+
+
+                if (claim) {
+
+                    console.log(
+                        "ℹ️ Existing claim found:",
+                        claim._id
+                    );
+
+                }
+                else {
+
+                    console.log(
+                        "ℹ️ No claim exists."
+                    );
+
+                    console.log(
+                        "Founder is starting verification directly."
+                    );
+
+                }
 
             }
 
@@ -2427,9 +3211,12 @@ app.post(
             if (!foundReport) {
 
                 return res.status(404).json({
+
                     success: false,
+
                     error:
                         "Found report not found"
+
                 });
 
             }
@@ -2441,10 +3228,20 @@ app.post(
 
             const existingVerification =
                 await Verification.findOne({
-                    match_id: match._id
+
+                    match_id:
+                        match._id
+
                 });
 
+
             if (existingVerification) {
+
+                console.log(
+                    "ℹ️ Verification already exists:",
+                    existingVerification._id
+                );
+
 
                 return res.json({
 
@@ -2456,16 +3253,30 @@ app.post(
                     verification_id:
                         existingVerification._id,
 
+                    claim_id:
+                        claim
+                            ? claim._id
+                            : null,
+
+                    match_id:
+                        match._id,
+
+                    status:
+                        existingVerification.status,
+
                     questions:
                         existingVerification.questions.map(
                             (item, index) => ({
+
                                 question:
                                     item.question,
 
                                 question_number:
                                     index + 1
+
                             })
                         )
+
                 });
 
             }
@@ -2477,6 +3288,7 @@ app.post(
 
             const privateDetails =
                 foundReport.private_details || {};
+
 
             console.log(
                 "\n=========================================="
@@ -2507,6 +3319,7 @@ app.post(
                             value.toString().trim()
                     );
 
+
             if (!hasPrivateDetails) {
 
                 return res.status(400).json({
@@ -2527,6 +3340,7 @@ app.post(
 
             let generatedQuestions = [];
 
+
             try {
 
                 generatedQuestions =
@@ -2535,7 +3349,8 @@ app.post(
                     );
 
             }
-            catch(error) {
+
+            catch (error) {
 
                 console.error(
                     "❌ Qwen question generation failed:",
@@ -2558,6 +3373,7 @@ app.post(
             // ==================================================
 
             const questions = [];
+
 
             generatedQuestions.forEach(
                 item => {
@@ -2592,9 +3408,6 @@ app.post(
 
             // ==================================================
             // SAFE FALLBACK QUESTIONS
-            //
-            // These are used only when Qwen does not
-            // generate enough valid questions.
             // ==================================================
 
             const fallbackQuestions = [
@@ -2652,13 +3465,18 @@ app.post(
                 i++
             ) {
 
-                if (questions.length >= 3) {
+                if (
+                    questions.length >= 3
+                ) {
+
                     break;
+
                 }
 
 
                 const fallback =
                     fallbackQuestions[i];
+
 
                 const answer =
                     privateDetails[
@@ -2677,6 +3495,7 @@ app.post(
                                 question.private_field ===
                                 fallback.field
                         );
+
 
                     if (!alreadyUsed) {
 
@@ -2711,7 +3530,9 @@ app.post(
                 questions.slice(0, 3);
 
 
-            if (finalQuestions.length === 0) {
+            if (
+                finalQuestions.length === 0
+            ) {
 
                 return res.status(400).json({
 
@@ -2762,7 +3583,19 @@ app.post(
                         finalQuestions,
 
                     status:
-                        "PENDING"
+                        "PENDING",
+
+                    verification_score:
+                        0,
+
+                    extra_questions:
+                        [],
+
+                    extra_verification_score:
+                        0,
+
+                    extra_status:
+                        "NOT_STARTED"
 
                 });
 
@@ -2771,20 +3604,47 @@ app.post(
                 await verification.save();
 
 
-            
+            // ==================================================
+            // UPDATE CLAIM STATUS ONLY IF CLAIM EXISTS
+            // ==================================================
+
+            if (claim) {
+
+                if (
+                    claim.status ===
+                    "PENDING"
+                ) {
+
+                    claim.status =
+                        "VERIFICATION_STARTED";
+
+                    await claim.save();
+
+                    console.log(
+                        "✅ Claim status updated to VERIFICATION_STARTED"
+                    );
+
+                }
+
+            }
+            else {
+
+                console.log(
+                    "ℹ️ No claim to update."
+                );
+
+            }
 
 
-            
-                
             // ==================================================
             // FINAL RESPONSE
             //
             // IMPORTANT:
-            // Do NOT send correct_answer or private_field
-            // to the Lost User.
+            // Do NOT send correct_answer
+            // or private_field to Lost User.
             // ==================================================
 
-            res.status(201).json({
+            return res.status(201).json({
 
                 success: true,
 
@@ -2793,6 +3653,17 @@ app.post(
 
                 verification_id:
                     savedVerification._id,
+
+                claim_id:
+                    claim
+                        ? claim._id
+                        : null,
+
+                match_id:
+                    match._id,
+
+                status:
+                    "PENDING",
 
                 questions:
                     finalQuestions.map(
@@ -2818,7 +3689,7 @@ app.post(
                 error
             );
 
-            res.status(500).json({
+            return res.status(500).json({
 
                 success: false,
 
@@ -4010,149 +4881,256 @@ app.post(
 // FOUNDER CONFIRMS OWNERSHIP
 // ======================================================
 
-// ======================================================
-// FOUNDER CONFIRMS OWNERSHIP + GENERATE PICKUP CODE
-// ======================================================
-
 app.post(
     "/verification/:verificationId/confirm",
     async (req, res) => {
+
         try {
 
-            const verificationId = req.params.verificationId;
-            const userId = req.body.user_id;
+            const verificationId =
+                req.params.verificationId;
 
-            console.log("\n==========================================");
-            console.log("✅ FOUNDER OWNERSHIP CONFIRMATION");
-            console.log("==========================================");
-            console.log("Verification ID:", verificationId);
-            console.log("Founder ID:", userId);
+            const userId =
+                req.body.user_id;
 
-            // --------------------------------------------------
-            // 1. CHECK FOUNDER ID
-            // --------------------------------------------------
+
+            // ==================================================
+            // CHECK USER ID
+            // ==================================================
 
             if (!userId) {
+
                 return res.status(400).json({
+
                     success: false,
-                    error: "User ID is required"
+
+                    error:
+                        "User ID is required"
+
                 });
+
             }
 
 
-            // --------------------------------------------------
-            // 2. FIND VERIFICATION
-            // --------------------------------------------------
+            // ==================================================
+            // FIND VERIFICATION
+            // ==================================================
 
             const verification =
-                await Verification.findById(verificationId);
+                await Verification.findById(
+                    verificationId
+                );
+
 
             if (!verification) {
+
                 return res.status(404).json({
+
                     success: false,
-                    error: "Verification not found"
+
+                    error:
+                        "Verification not found"
+
                 });
+
             }
 
 
-            // --------------------------------------------------
-            // 3. CHECK ORIGINAL VERIFICATION
-            // --------------------------------------------------
+            // ==================================================
+            // ORIGINAL VERIFICATION MUST BE ANSWERED
+            // ==================================================
 
-            if (verification.status !== "ANSWERED") {
+            if (
+                verification.status !==
+                "ANSWERED"
+            ) {
 
                 return res.status(400).json({
+
                     success: false,
+
                     error:
-                        "Verification must be answered before confirming ownership"
+                        "Original verification must be answered before confirming ownership"
+
                 });
+
             }
 
 
-            // --------------------------------------------------
-            // 4. FIND FOUND REPORT
-            // --------------------------------------------------
+            // ==================================================
+            // CHECK EXTRA VERIFICATION
+            // ==================================================
+
+            /*
+             * If Founder added extra questions,
+             * Lost User must answer them before
+             * Founder can confirm ownership.
+             */
+
+            if (
+                Array.isArray(
+                    verification.extra_questions
+                ) &&
+                verification.extra_questions.length > 0
+            ) {
+
+                // ----------------------------------------------
+                // EXTRA QUESTIONS ARE WAITING FOR ANSWERS
+                // ----------------------------------------------
+
+                if (
+                    verification.extra_status ===
+                    "SENT"
+                ) {
+
+                    return res.status(400).json({
+
+                        success: false,
+
+                        error:
+                            "Extra verification questions are still waiting for the Lost User to answer"
+
+                    });
+
+                }
+
+
+                // ----------------------------------------------
+                // EXTRA QUESTIONS EXIST BUT NOT ANSWERED
+                // ----------------------------------------------
+
+                if (
+                    verification.extra_status !==
+                    "ANSWERED"
+                ) {
+
+                    return res.status(400).json({
+
+                        success: false,
+
+                        error:
+                            "Extra verification must be completed before confirming ownership"
+
+                    });
+
+                }
+
+            }
+
+
+            // ==================================================
+            // FIND FOUND REPORT
+            // ==================================================
 
             const foundReport =
                 await FoundReport.findById(
                     verification.found_report_id
                 );
 
+
             if (!foundReport) {
 
                 return res.status(404).json({
+
                     success: false,
-                    error: "Found report not found"
+
+                    error:
+                        "Found report not found"
+
                 });
+
             }
 
 
-            // --------------------------------------------------
-            // 5. CHECK FOUNDER AUTHORIZATION
-            // --------------------------------------------------
+            // ==================================================
+            // ONLY FOUNDER CAN CONFIRM
+            // ==================================================
 
             if (
-                foundReport.user_id.toString() !==
-                userId.toString()
+                String(foundReport.user_id) !==
+                String(userId)
             ) {
 
                 return res.status(403).json({
+
                     success: false,
+
                     error:
                         "You are not authorized to confirm this ownership"
+
                 });
+
             }
 
 
-            // --------------------------------------------------
-            // 6. FIND LOST REPORT
-            // --------------------------------------------------
+            // ==================================================
+            // FIND LOST REPORT
+            // ==================================================
 
             const lostReport =
                 await LostReport.findById(
                     verification.lost_report_id
                 );
 
+
             if (!lostReport) {
 
                 return res.status(404).json({
+
                     success: false,
-                    error: "Lost report not found"
+
+                    error:
+                        "Lost report not found"
+
                 });
+
             }
 
 
-            // --------------------------------------------------
-            // 7. CHECK IF HANDOVER ALREADY EXISTS
-            // --------------------------------------------------
+            // ==================================================
+            // CHECK IF PICKUP CODE ALREADY EXISTS
+            // ==================================================
 
             const existingHandover =
                 await Handover.findOne({
-                    verification_id: verification._id
+
+                    verification_id:
+                        verification._id
+
                 });
+
 
             if (existingHandover) {
 
                 return res.json({
+
                     success: true,
+
                     message:
                         "Ownership already confirmed. Pickup code already generated.",
+
                     verification_id:
                         verification._id,
+
                     status:
                         verification.status,
+
                     pickup_code:
                         existingHandover.pickup_code
+
                 });
+
             }
 
 
-            // --------------------------------------------------
-            // 8. GENERATE UNIQUE 6-DIGIT PICKUP CODE
-            // --------------------------------------------------
+            // ==================================================
+            // GENERATE UNIQUE 6-DIGIT PICKUP CODE
+            // ==================================================
 
             let pickupCode;
+
             let codeExists = true;
+
 
             while (codeExists) {
 
@@ -4162,18 +5140,25 @@ app.post(
                         Math.random() * 900000
                     ).toString();
 
-                const existingCode =
+
+                const existing =
                     await Handover.findOne({
-                        pickup_code: pickupCode
+
+                        pickup_code:
+                            pickupCode
+
                     });
 
-                codeExists = !!existingCode;
+
+                codeExists =
+                    !!existing;
+
             }
 
 
-            // --------------------------------------------------
-            // 9. CREATE HANDOVER RECORD
-            // --------------------------------------------------
+            // ==================================================
+            // CREATE HANDOVER
+            // ==================================================
 
             const handover =
                 new Handover({
@@ -4198,24 +5183,27 @@ app.post(
 
                     status:
                         "PENDING"
+
                 });
+
 
             await handover.save();
 
 
-            // --------------------------------------------------
-            // 10. UPDATE VERIFICATION STATUS
-            // --------------------------------------------------
+            // ==================================================
+            // UPDATE VERIFICATION STATUS
+            // ==================================================
 
             verification.status =
                 "FOUNDER_CONFIRMED";
 
+
             await verification.save();
 
 
-            // --------------------------------------------------
-            // 11. SEND PICKUP CODE TO LOST USER
-            // --------------------------------------------------
+            // ==================================================
+            // NOTIFY LOST USER
+            // ==================================================
 
             await Notification.create({
 
@@ -4223,64 +5211,63 @@ app.post(
                     lostReport.user_id,
 
                 type:
-                    "HANDOVER",
+                    "PICKUP_CODE",
 
                 title:
-                    "Ownership Confirmed - Pickup Code",
+                    "Ownership Confirmed",
 
                 message:
-                    `Your ownership has been confirmed. Your pickup code is ${pickupCode}. Please show this code during item handover.`,
+                    "The Founder has confirmed your ownership. Your pickup code is " +
+                    pickupCode,
 
                 verification_id:
                     verification._id,
 
-                is_read:
-                    false,
+                match_id:
+                    verification.match_id,
 
-                created_at:
-                    new Date()
+                is_read:
+                    false
+
             });
 
 
-            // --------------------------------------------------
-            // 12. RESPONSE
-            // --------------------------------------------------
+            // ==================================================
+            // SUCCESS RESPONSE
+            // ==================================================
 
-            console.log("✅ Ownership confirmed");
-            console.log("✅ Pickup code generated:", pickupCode);
-            console.log("✅ Handover created:", handover._id);
-            console.log("✅ Lost User notified");
-
-
-            res.json({
+            return res.json({
 
                 success: true,
 
                 message:
-                    "Ownership confirmed and pickup code generated successfully",
+                    "Ownership confirmed and pickup code generated",
 
                 verification_id:
                     verification._id,
+
+                handover_id:
+                    handover._id,
 
                 status:
                     verification.status,
 
                 pickup_code:
-                    pickupCode,
+                    pickupCode
 
-                handover_id:
-                    handover._id
             });
 
         }
+
         catch (error) {
 
             console.error(
-                "❌ Founder confirmation error:",
+                "❌ Ownership confirmation error:",
                 error
             );
 
-            res.status(500).json({
+
+            return res.status(500).json({
 
                 success: false,
 
@@ -4289,12 +5276,13 @@ app.post(
 
                 details:
                     error.message
+
             });
+
         }
+
     }
 );
-
-
 
 
 // ======================================================
@@ -4322,7 +5310,7 @@ app.get(
 
 
             // ------------------------------------------
-            // FIND HANDOVER
+            // 1. FIND HANDOVER
             // ------------------------------------------
 
             const handover =
@@ -4347,7 +5335,7 @@ app.get(
 
 
             // ------------------------------------------
-            // FIND LOST USER
+            // 2. FIND LOST USER
             // ------------------------------------------
 
             const lostUser =
@@ -4357,17 +5345,17 @@ app.get(
 
 
             // ------------------------------------------
-            // FIND FOUNDER
+            // 3. FIND FOUNDER
             // ------------------------------------------
 
-            const foundUser =
+            const founderUser =
                 await User.findById(
                     handover.founder_user_id
                 );
 
 
             // ------------------------------------------
-            // FIND LOST REPORT
+            // 4. FIND LOST REPORT
             // ------------------------------------------
 
             const lostReport =
@@ -4377,7 +5365,7 @@ app.get(
 
 
             // ------------------------------------------
-            // FIND FOUND REPORT
+            // 5. FIND FOUND REPORT
             // ------------------------------------------
 
             const foundReport =
@@ -4387,7 +5375,7 @@ app.get(
 
 
             // ------------------------------------------
-            // SEND RESPONSE
+            // 6. SEND RESPONSE
             // ------------------------------------------
 
             res.json({
@@ -4400,23 +5388,28 @@ app.get(
                         handover._id,
 
                     handover_place:
-                        handover.handover_place,
+                        handover.handover_place || "",
 
                     handover_date:
-                        handover.handover_date,
+                        handover.handover_date || "",
 
                     handover_time:
-                        handover.handover_time,
+                        handover.handover_time || "",
 
                     status:
                         handover.status,
 
                     handed_over_at:
-                        handover.handed_over_at
+                        handover.handed_over_at || null
 
                 },
 
-                lost_user: lostUser
+
+                // --------------------------------------
+                // FRONTEND COMPATIBLE USER OBJECTS
+                // --------------------------------------
+
+                lostUser: lostUser
                     ? {
 
                         name:
@@ -4432,20 +5425,20 @@ app.get(
                     : null,
 
 
-                founder_user: foundUser
+                founder: founderUser
                     ? {
 
                         name:
-                            foundUser.name,
+                            founderUser.name,
 
                         register_no:
-                            foundUser.register_no
+                            founderUser.register_no
 
                     }
                     : null,
 
 
-                lost_report: lostReport
+                lostReport: lostReport
                     ? {
 
                         category:
@@ -4464,7 +5457,7 @@ app.get(
                     : null,
 
 
-                found_report: foundReport
+                foundReport: foundReport
                     ? {
 
                         category:
@@ -4512,187 +5505,667 @@ app.get(
 
 
 
+// ======================================================
+// SCHEDULE HANDOVER
+// ======================================================
+//
+// Founder chooses:
+//      • Place
+//      • Date
+//      • Time
+//
+// Pickup code is NOT required here.
+//
+// The Lost User is notified about the schedule.
+// ======================================================
+
+app.post(
+    "/handover/:handoverId/schedule",
+    async (req, res) => {
+
+        try {
+
+            console.log("");
+            console.log("==========================================");
+            console.log("📅 SCHEDULE HANDOVER");
+            console.log("==========================================");
+
+
+            const handoverId =
+                req.params.handoverId;
+
+
+            const {
+                user_id,
+                handover_place,
+                handover_date,
+                handover_time
+            } = req.body;
+
+
+            console.log(
+                "Handover ID:",
+                handoverId
+            );
+
+            console.log(
+                "Founder ID:",
+                user_id
+            );
+
+            console.log(
+                "Place:",
+                handover_place
+            );
+
+            console.log(
+                "Date:",
+                handover_date
+            );
+
+            console.log(
+                "Time:",
+                handover_time
+            );
+
+
+            // ------------------------------------------
+            // 1. VALIDATE REQUIRED DATA
+            // ------------------------------------------
+
+            if (
+                !user_id ||
+                !handover_place ||
+                !handover_date ||
+                !handover_time
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Place, date and time are required."
+
+                });
+
+            }
+
+
+            // ------------------------------------------
+            // 2. FIND HANDOVER
+            // ------------------------------------------
+
+            const handover =
+                await Handover.findById(
+                    handoverId
+                );
+
+
+            if (!handover) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "Handover record not found."
+
+                });
+
+            }
+
+
+            // ------------------------------------------
+            // 3. VERIFY FOUNDER
+            // ------------------------------------------
+
+            if (
+                handover.founder_user_id.toString() !==
+                user_id.toString()
+            ) {
+
+                return res.status(403).json({
+
+                    success: false,
+
+                    message:
+                        "You are not authorized to schedule this handover."
+
+                });
+
+            }
+
+
+            // ------------------------------------------
+            // 4. CHECK HANDOVER STATUS
+            // ------------------------------------------
+
+            if (
+                handover.status ===
+                "COMPLETED"
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "This handover has already been completed."
+
+                });
+
+            }
+
+
+            // ------------------------------------------
+            // 5. SAVE SCHEDULE
+            // ------------------------------------------
+
+            handover.handover_place =
+                handover_place.trim();
+
+            handover.handover_date =
+                handover_date;
+
+            handover.handover_time =
+                handover_time;
+
+
+            // Keep the handover pending until
+            // the pickup code is actually verified.
+
+            handover.status =
+                "SCHEDULED";
+
+
+            await handover.save();
+
+
+            // ------------------------------------------
+            // 6. FIND LOST USER
+            // ------------------------------------------
+
+            const lostUser =
+                await User.findById(
+                    handover.lost_user_id
+                );
+
+
+            // ------------------------------------------
+            // 7. NOTIFY LOST USER
+            // ------------------------------------------
+
+            if (lostUser) {
+
+                await Notification.create({
+
+                    user_id:
+                        handover.lost_user_id,
+
+                    type:
+                        "HANDOVER_SCHEDULED",
+
+                    title:
+                        "Handover Scheduled",
+
+                    message:
+                        `The Founder has scheduled the item handover at ` +
+                        `${handover.handover_place} on ` +
+                        `${handover.handover_date} at ` +
+                        `${handover.handover_time}. ` +
+                        `Please meet the Founder at the scheduled place and time ` +
+                        `and show your pickup code.`,
+
+                    verification_id:
+                        handover.verification_id,
+
+                    match_id:
+                        null,
+
+                    is_read:
+                        false,
+
+                    read_at:
+                        null
+
+                });
+
+            }
+
+
+            console.log(
+                "✅ Handover scheduled successfully"
+            );
+
+            console.log(
+                "📍 Place:",
+                handover.handover_place
+            );
+
+            console.log(
+                "📅 Date:",
+                handover.handover_date
+            );
+
+            console.log(
+                "⏰ Time:",
+                handover.handover_time
+            );
+
+            console.log(
+                "🔔 Lost User notified"
+            );
+
+
+            // ------------------------------------------
+            // 8. RESPONSE
+            // ------------------------------------------
+
+            return res.json({
+
+                success: true,
+
+                message:
+                    "Handover scheduled successfully.",
+
+                handover: {
+
+                    id:
+                        handover._id,
+
+                    place:
+                        handover.handover_place,
+
+                    date:
+                        handover.handover_date,
+
+                    time:
+                        handover.handover_time,
+
+                    status:
+                        handover.status
+
+                }
+
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "❌ Schedule handover error:",
+                error
+            );
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Server error while scheduling handover.",
+
+                details:
+                    error.message
+
+            });
+
+        }
+
+    }
+);
+
 
 
 // ======================================================
 // COMPLETE HANDOVER USING PICKUP CODE
 // ======================================================
-app.post("/handover/:handoverId/complete", async (req, res) => {
-    try {
+//
+// IMPORTANT:
+// This route is used ONLY when the Lost User is
+// physically present.
+//
+// Founder enters ONLY the pickup code.
+//
+// Place/date/time are already stored during scheduling.
+// ======================================================
 
-        console.log("\n==========================================");
-        console.log("🏁 COMPLETE HANDOVER");
-        console.log("==========================================");
+app.post(
+    "/handover/:handoverId/complete",
+    async (req, res) => {
 
-        const { handoverId } = req.params;
+        try {
 
-        const {
-            user_id,
-            pickup_code,
-            handover_place,
-            handover_date,
-            handover_time
-        } = req.body;
+            console.log("");
+            console.log("==========================================");
+            console.log("🏁 COMPLETE HANDOVER");
+            console.log("==========================================");
 
-        console.log("Handover ID:", handoverId);
-        console.log("Founder ID:", user_id);
-        console.log("Place:", handover_place);
-        console.log("Date:", handover_date);
-        console.log("Time:", handover_time);
 
-        // ------------------------------------------
-        // 1. Check required fields
-        // ------------------------------------------
+            const {
+                handoverId
+            } = req.params;
 
-        if (
-            !user_id ||
-            !pickup_code ||
-            !handover_place ||
-            !handover_date ||
-            !handover_time
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "Place, date, time and pickup code are required."
-            });
-        }
 
-        // ------------------------------------------
-        // 2. Find handover
-        // ------------------------------------------
+            const {
+                user_id,
+                pickup_code
+            } = req.body;
 
-        const handover = await Handover.findById(handoverId);
 
-        if (!handover) {
-            return res.status(404).json({
-                success: false,
-                message: "Handover record not found."
-            });
-        }
+            console.log(
+                "Handover ID:",
+                handoverId
+            );
 
-        // ------------------------------------------
-        // 3. Check founder
-        // ------------------------------------------
+            console.log(
+                "Founder ID:",
+                user_id
+            );
 
-        if (handover.founder_user_id.toString() !== user_id.toString()) {
 
-            return res.status(403).json({
-                success: false,
-                message: "You are not authorized to complete this handover."
-            });
-        }
+            // ------------------------------------------
+            // 1. CHECK REQUIRED FIELDS
+            // ------------------------------------------
 
-        // ------------------------------------------
-        // 4. Check current status
-        // ------------------------------------------
+            if (
+                !user_id ||
+                !pickup_code
+            ) {
 
-        if (handover.status === "COMPLETED") {
+                return res.status(400).json({
 
-            return res.status(400).json({
-                success: false,
-                message: "This handover has already been completed."
-            });
-        }
+                    success: false,
 
-        // ------------------------------------------
-        // 5. Verify pickup code
-        // ------------------------------------------
+                    message:
+                        "Founder ID and pickup code are required."
 
-        if (String(pickup_code).trim() !== String(handover.pickup_code).trim()) {
+                });
 
-            console.log("❌ Wrong pickup code");
-
-            return res.status(400).json({
-                success: false,
-                message: "Invalid pickup code."
-            });
-        }
-
-        // ------------------------------------------
-        // 6. Save place/date/time
-        // ------------------------------------------
-
-        handover.handover_place = handover_place.trim();
-        handover.handover_date = handover_date;
-        handover.handover_time = handover_time;
-
-        // ------------------------------------------
-        // 7. Complete handover
-        // ------------------------------------------
-
-        handover.status = "COMPLETED";
-        handover.handed_over_at = new Date();
-
-        await handover.save();
-
-        // ------------------------------------------
-        // 8. Update Lost Report
-        // ------------------------------------------
-
-        await LostReport.findByIdAndUpdate(
-            handover.lost_report_id,
-            {
-                status: "HANDED_OVER"
             }
-        );
 
-        // ------------------------------------------
-        // 9. Update Found Report
-        // ------------------------------------------
 
-        await FoundReport.findByIdAndUpdate(
-            handover.found_report_id,
-            {
-                status: "HANDED_OVER"
+            // ------------------------------------------
+            // 2. FIND HANDOVER
+            // ------------------------------------------
+
+            const handover =
+                await Handover.findById(
+                    handoverId
+                );
+
+
+            if (!handover) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "Handover record not found."
+
+                });
+
             }
-        );
 
-        // ------------------------------------------
-        // 10. Notify Lost User
-        // ------------------------------------------
 
-        await Notification.create({
-            user_id: handover.lost_user_id,
-            type: "HANDOVER_COMPLETED",
-            title: "Item Handover Completed",
-            message:
-                `Your lost item has been successfully handed over at ` +
-                `${handover_place} on ${handover_date} at ${handover_time}.`,
-            related_id: handover._id
-        });
+            // ------------------------------------------
+            // 3. CHECK FOUNDER
+            // ------------------------------------------
 
-        console.log("✅ Pickup code verified");
-        console.log("✅ Handover completed");
-        console.log("✅ Place:", handover_place);
-        console.log("✅ Date:", handover_date);
-        console.log("✅ Time:", handover_time);
+            if (
+                handover.founder_user_id.toString() !==
+                user_id.toString()
+            ) {
 
-        return res.json({
-            success: true,
-            message: "Handover completed successfully.",
+                return res.status(403).json({
 
-            handover: {
-                id: handover._id,
-                place: handover.handover_place,
-                date: handover.handover_date,
-                time: handover.handover_time,
-                status: handover.status,
-                handed_over_at: handover.handed_over_at
+                    success: false,
+
+                    message:
+                        "You are not authorized to complete this handover."
+
+                });
+
             }
-        });
 
-    } catch (error) {
 
-        console.error("❌ Complete handover error:", error);
+            // ------------------------------------------
+            // 4. CHECK CURRENT STATUS
+            // ------------------------------------------
 
-        return res.status(500).json({
-            success: false,
-            message: "Server error while completing handover."
-        });
+            if (
+                handover.status ===
+                "COMPLETED"
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "This handover has already been completed."
+
+                });
+
+            }
+
+
+            // ------------------------------------------
+            // 5. CHECK WHETHER HANDOVER WAS SCHEDULED
+            // ------------------------------------------
+
+            if (
+                !handover.handover_place ||
+                !handover.handover_date ||
+                !handover.handover_time
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Handover has not been scheduled yet."
+
+                });
+
+            }
+
+
+            // ------------------------------------------
+            // 6. VERIFY PICKUP CODE
+            // ------------------------------------------
+
+            if (
+                String(pickup_code).trim() !==
+                String(handover.pickup_code).trim()
+            ) {
+
+                console.log(
+                    "❌ Wrong pickup code"
+                );
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Invalid pickup code. Handover cannot be completed."
+
+                });
+
+            }
+
+
+            console.log(
+                "✅ Pickup code verified"
+            );
+
+
+            // ------------------------------------------
+            // 7. COMPLETE HANDOVER
+            // ------------------------------------------
+
+            handover.status =
+                "COMPLETED";
+
+            handover.handed_over_at =
+                new Date();
+
+
+            await handover.save();
+
+
+            // ------------------------------------------
+            // 8. UPDATE LOST REPORT
+            // ------------------------------------------
+
+            await LostReport.findByIdAndUpdate(
+
+                handover.lost_report_id,
+
+                {
+                    status:
+                        "HANDED_OVER"
+                }
+
+            );
+
+
+            // ------------------------------------------
+            // 9. UPDATE FOUND REPORT
+            // ------------------------------------------
+
+            await FoundReport.findByIdAndUpdate(
+
+                handover.found_report_id,
+
+                {
+                    status:
+                        "HANDED_OVER"
+                }
+
+            );
+
+
+            // ------------------------------------------
+            // 10. NOTIFY LOST USER
+            // ------------------------------------------
+
+            await Notification.create({
+
+                user_id:
+                    handover.lost_user_id,
+
+                type:
+                    "HANDOVER_COMPLETED",
+
+                title:
+                    "Item Handover Completed",
+
+                message:
+                    `Your lost item has been successfully handed over at ` +
+                    `${handover.handover_place} on ` +
+                    `${handover.handover_date} at ` +
+                    `${handover.handover_time}.`,
+
+                verification_id:
+                    handover.verification_id,
+
+                match_id:
+                    null,
+
+                is_read:
+                    false,
+
+                read_at:
+                    null
+
+            });
+
+
+            console.log(
+                "✅ Handover completed"
+            );
+
+            console.log(
+                "📍 Place:",
+                handover.handover_place
+            );
+
+            console.log(
+                "📅 Date:",
+                handover.handover_date
+            );
+
+            console.log(
+                "⏰ Time:",
+                handover.handover_time
+            );
+
+
+            // ------------------------------------------
+            // 11. RESPONSE
+            // ------------------------------------------
+
+            return res.json({
+
+                success: true,
+
+                message:
+                    "Handover completed successfully.",
+
+                handover: {
+
+                    id:
+                        handover._id,
+
+                    handover_place:
+                        handover.handover_place,
+
+                    handover_date:
+                        handover.handover_date,
+
+                    handover_time:
+                        handover.handover_time,
+
+                    status:
+                        handover.status,
+
+                    handed_over_at:
+                        handover.handed_over_at
+
+                }
+
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "❌ Complete handover error:",
+                error
+            );
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Server error while completing handover.",
+
+                details:
+                    error.message
+
+            });
+
+        }
+
     }
-});
-
-
+);
 
 
 // ======================================================
@@ -4717,8 +6190,12 @@ app.get(
             if (!userId) {
 
                 return res.status(400).json({
+
                     success: false,
-                    error: "User ID is required"
+
+                    error:
+                        "User ID is required"
+
                 });
 
             }
@@ -4747,6 +6224,32 @@ app.get(
             }
 
 
+            console.log(
+                "✓ Handover found:",
+                handover._id
+            );
+
+            console.log(
+                "✓ Pickup Code:",
+                handover.pickup_code
+            );
+
+            console.log(
+                "✓ Handover Place:",
+                handover.handover_place
+            );
+
+            console.log(
+                "✓ Handover Date:",
+                handover.handover_date
+            );
+
+            console.log(
+                "✓ Handover Time:",
+                handover.handover_time
+            );
+
+
             res.json({
 
                 success: true,
@@ -4765,6 +6268,15 @@ app.get(
                     status:
                         handover.status,
 
+                    handover_place:
+                        handover.handover_place || "",
+
+                    handover_date:
+                        handover.handover_date || "",
+
+                    handover_time:
+                        handover.handover_time || "",
+
                     created_at:
                         handover.created_at
 
@@ -4776,7 +6288,7 @@ app.get(
         catch (error) {
 
             console.error(
-                "❌ Pickup code loading error:",
+                "❌ Pickup details loading error:",
                 error
             );
 
@@ -4785,7 +6297,7 @@ app.get(
                 success: false,
 
                 error:
-                    "Failed to load pickup code",
+                    "Failed to load pickup details",
 
                 details:
                     error.message
@@ -4796,6 +6308,191 @@ app.get(
 
     }
 );
+
+
+
+// ======================================================
+// GET ALL HANDOVERS FOR FOUNDER
+// ======================================================
+
+app.get(
+    "/handovers/founder/:founderUserId",
+    async (req, res) => {
+        try
+        {
+            const founderUserId =
+                req.params.founderUserId;
+
+            if(!founderUserId)
+            {
+                return res.status(400).json({
+                    success: false,
+                    error: "Founder user ID is required"
+                });
+            }
+
+            const handovers =
+                await Handover.find({
+                    founder_user_id: founderUserId
+                })
+                .sort({
+                    created_at: -1
+                });
+
+            const result =
+                await Promise.all(
+                    handovers.map(
+                        async (handover) => {
+
+                            const lostUser =
+                                await User.findById(
+                                    handover.lost_user_id
+                                );
+
+                            const founderUser =
+                                await User.findById(
+                                    handover.founder_user_id
+                                );
+
+                            const lostReport =
+                                await LostReport.findById(
+                                    handover.lost_report_id
+                                );
+
+                            const foundReport =
+                                await FoundReport.findById(
+                                    handover.found_report_id
+                                );
+
+                            return {
+                                id: handover._id,
+                                verification_id:
+                                    handover.verification_id,
+
+                                lost_report_id:
+                                    handover.lost_report_id,
+
+                                found_report_id:
+                                    handover.found_report_id,
+
+                                lost_user_id:
+                                    handover.lost_user_id,
+
+                                founder_user_id:
+                                    handover.founder_user_id,
+
+                                status:
+                                    handover.status,
+
+                                handover_place:
+                                    handover.handover_place || "",
+
+                                handover_date:
+                                    handover.handover_date || "",
+
+                                handover_time:
+                                    handover.handover_time || "",
+
+                                created_at:
+                                    handover.created_at,
+
+                                handed_over_at:
+                                    handover.handed_over_at,
+
+                                lostUser: lostUser
+                                    ? {
+                                        id: lostUser._id,
+                                        name: lostUser.name,
+                                        register_no:
+                                            lostUser.register_no,
+                                        email: lostUser.email
+                                    }
+                                    : null,
+
+                                founderUser: founderUser
+                                    ? {
+                                        id: founderUser._id,
+                                        name: founderUser.name,
+                                        register_no:
+                                            founderUser.register_no,
+                                        email: founderUser.email
+                                    }
+                                    : null,
+
+                                lostReport: lostReport
+                                    ? {
+                                        id: lostReport._id,
+                                        category:
+                                            lostReport.category,
+                                        item_type:
+                                            lostReport.item_type,
+                                        color:
+                                            lostReport.color,
+                                        brand:
+                                            lostReport.brand,
+                                        location:
+                                            lostReport.location,
+                                        date_lost:
+                                            lostReport.date_lost,
+                                        time_lost:
+                                            lostReport.time_lost,
+                                        description:
+                                            lostReport.description
+                                    }
+                                    : null,
+
+                                foundReport: foundReport
+                                    ? {
+                                        id: foundReport._id,
+                                        category:
+                                            foundReport.category,
+                                        item_type:
+                                            foundReport.item_type,
+                                        color:
+                                            foundReport.color,
+                                        brand:
+                                            foundReport.brand,
+                                        location:
+                                            foundReport.location,
+                                        date_found:
+                                            foundReport.date_found,
+                                        time_found:
+                                            foundReport.time_found,
+                                        description:
+                                            foundReport.description
+                                    }
+                                    : null
+                            };
+                        }
+                    )
+                );
+
+            res.json({
+                success: true,
+                count: result.length,
+                handovers: result
+            });
+        }
+        catch(error)
+        {
+            console.error(
+                "❌ Founder handover list error:",
+                error
+            );
+
+            res.status(500).json({
+                success: false,
+                error:
+                    "Failed to load founder handovers",
+                details:
+                    error.message
+            });
+        }
+    }
+);
+
+
+
 
 // ======================================================
 // GET USER NOTIFICATIONS
@@ -5086,103 +6783,515 @@ app.get(
 );
 
 
+
 // ======================================================
 // SUBMIT VERIFICATION ANSWERS
 // ======================================================
 
-app.post("/verification/:verificationId/submit", async (req, res) => {
-    try {
-        const { verificationId } = req.params;
-        const { user_id, answers, round } = req.body;
+app.post(
+    "/verification/:verificationId/submit",
+    async (req, res) => {
 
-        console.log("📝 Verification submission");
-        console.log("Verification ID:", verificationId);
-        console.log("User ID:", user_id);
-        console.log("Round:", round);
-        console.log("Answers:", answers);
+        try {
 
-        if (!user_id) {
-            return res.status(400).json({
-                success: false,
-                message: "User ID is required"
-            });
-        }
+            const { verificationId } =
+                req.params;
 
-        if (!Array.isArray(answers)) {
-            return res.status(400).json({
-                success: false,
-                message: "Answers must be an array"
-            });
-        }
+            const {
+                user_id,
+                answers,
+                round
+            } = req.body;
 
-        const verification =
-            await Verification.findById(verificationId);
 
-        if (!verification) {
-            return res.status(404).json({
-                success: false,
-                message: "Verification not found"
-            });
-        }
-
-        // =====================================================
-        // CHECK THAT THIS IS THE LOST USER
-        // =====================================================
-
-        const lostReport =
-            await LostReport.findById(
-                verification.lost_report_id
+            console.log(
+                "📝 Verification submission"
             );
 
-        if (!lostReport) {
-            return res.status(404).json({
-                success: false,
-                message: "Lost report not found"
-            });
-        }
+            console.log(
+                "Verification ID:",
+                verificationId
+            );
 
-        if (
-            String(lostReport.user_id) !==
-            String(user_id)
-        ) {
-            return res.status(403).json({
-                success: false,
-                message: "Only the Lost User can answer these questions"
-            });
-        }
+            console.log(
+                "User ID:",
+                user_id
+            );
 
+            console.log(
+                "Round:",
+                round
+            );
 
-        // =====================================================
-        // EXTRA QUESTION ROUND
-        // =====================================================
-
-        if (round === "EXTRA") {
-
-            console.log("🟣 EXTRA QUESTION ANSWERS RECEIVED");
+            console.log(
+                "Answers:",
+                answers
+            );
 
 
-            if (
-                !Array.isArray(verification.extra_questions) ||
-                verification.extra_questions.length === 0
-            ) {
+            // ==================================================
+            // CHECK USER
+            // ==================================================
+
+            if (!user_id) {
+
                 return res.status(400).json({
+
                     success: false,
-                    message: "No extra questions found"
+
+                    message:
+                        "User ID is required"
+
                 });
+
             }
 
+
+            // ==================================================
+            // CHECK ANSWERS
+            // ==================================================
+
+            if (!Array.isArray(answers)) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Answers must be an array"
+
+                });
+
+            }
+
+
+            // ==================================================
+            // FIND VERIFICATION
+            // ==================================================
+
+            const verification =
+                await Verification.findById(
+                    verificationId
+                );
+
+            if (!verification) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "Verification not found"
+
+                });
+
+            }
+
+
+            // ==================================================
+            // FIND LOST REPORT
+            // ==================================================
+
+            const lostReport =
+                await LostReport.findById(
+                    verification.lost_report_id
+                );
+
+            if (!lostReport) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "Lost report not found"
+
+                });
+
+            }
+
+
+            // ==================================================
+            // VERIFY THIS IS THE LOST USER
+            // ==================================================
+
+            if (
+                String(lostReport.user_id) !==
+                String(user_id)
+            ) {
+
+                return res.status(403).json({
+
+                    success: false,
+
+                    message:
+                        "Only the Lost User can answer these questions"
+
+                });
+
+            }
+
+
+            // ==================================================
+            // EXTRA QUESTION ROUND
+            // ==================================================
+
+            if (round === "EXTRA") {
+
+                console.log(
+                    "🟣 EXTRA QUESTION ANSWERS RECEIVED"
+                );
+
+
+                // ----------------------------------------------
+                // CHECK EXTRA QUESTIONS
+                // ----------------------------------------------
+
+                if (
+                    !Array.isArray(
+                        verification.extra_questions
+                    ) ||
+                    verification.extra_questions.length === 0
+                ) {
+
+                    return res.status(400).json({
+
+                        success: false,
+
+                        message:
+                            "No extra questions found"
+
+                    });
+
+                }
+
+
+                // ----------------------------------------------
+                // CHECK EXTRA STATUS
+                // ----------------------------------------------
+
+                if (
+                    verification.extra_status !==
+                    "SENT"
+                ) {
+
+                    return res.status(400).json({
+
+                        success: false,
+
+                        message:
+                            "Extra questions are not currently waiting for answers"
+
+                    });
+
+                }
+
+
+                // ----------------------------------------------
+                // CHECK ANSWER COUNT
+                // ----------------------------------------------
+
+                if (
+                    answers.length !==
+                    verification.extra_questions.length
+                ) {
+
+                    return res.status(400).json({
+
+                        success: false,
+
+                        message:
+                            "Number of answers does not match the number of extra questions"
+
+                    });
+
+                }
+
+
+                // ----------------------------------------------
+                // NORMALIZE ANSWERS
+                // ----------------------------------------------
+
+                const normalize = (value) => {
+
+                    return String(value || "")
+                        .toLowerCase()
+                        .replace(
+                            /[^a-z0-9\s]/g,
+                            ""
+                        )
+                        .replace(
+                            /\s+/g,
+                            " "
+                        )
+                        .trim();
+
+                };
+
+
+                // ----------------------------------------------
+                // CHECK EXTRA ANSWERS
+                // ----------------------------------------------
+
+                let correctCount = 0;
+
+
+                verification.extra_questions =
+                    verification.extra_questions.map(
+                        (question, index) => {
+
+                            const userAnswer =
+                                String(
+                                    answers[index] || ""
+                                ).trim();
+
+
+                            const correctAnswer =
+                                String(
+                                    question.correct_answer || ""
+                                ).trim();
+
+
+                            // Save Lost User answer
+                            question.user_answer =
+                                userAnswer;
+
+
+                            // Compare answers
+                            if (
+                                normalize(userAnswer) ===
+                                normalize(correctAnswer)
+                            ) {
+
+                                correctCount++;
+
+                            }
+
+
+                            return question;
+
+                        }
+                    );
+
+
+                // ----------------------------------------------
+                // CALCULATE EXTRA SCORE
+                // ----------------------------------------------
+
+                const totalQuestions =
+                    verification.extra_questions.length;
+
+
+                const extraScore =
+                    totalQuestions > 0
+                        ? Math.round(
+                            (
+                                correctCount /
+                                totalQuestions
+                            ) * 100
+                        )
+                        : 0;
+
+
+                // ----------------------------------------------
+                // SAVE EXTRA SCORE
+                // ----------------------------------------------
+
+                verification.extra_verification_score =
+                    extraScore;
+
+
+                // IMPORTANT:
+                // Original verification remains unchanged.
+
+                verification.extra_status =
+                    "ANSWERED";
+
+
+                await verification.save();
+
+
+                console.log(
+                    "🟣 Extra verification score:",
+                    extraScore
+                );
+
+                console.log(
+                    "🟣 Extra verification status:",
+                    verification.extra_status
+                );
+
+
+                // ----------------------------------------------
+                // NOTIFY FOUNDER
+                // ----------------------------------------------
+
+                const foundReport =
+                    await FoundReport.findById(
+                        verification.found_report_id
+                    );
+
+
+                if (foundReport) {
+
+                    await Notification.create({
+
+                        user_id:
+                            foundReport.user_id,
+
+                        type:
+                            "VERIFICATION_RESULT",
+
+                        title:
+                            "Extra Verification Answers Received",
+
+                        message:
+                            "The Lost User has answered the additional ownership questions. Please review the answers.",
+
+                        verification_id:
+                            verification._id,
+
+                        match_id:
+                            verification.match_id,
+
+                        is_read:
+                            false
+
+                    });
+
+                }
+
+
+                // ----------------------------------------------
+                // EXTRA RESPONSE
+                // ----------------------------------------------
+
+                return res.json({
+
+                    success: true,
+
+                    message:
+                        "Extra verification answers submitted successfully",
+
+                    round:
+                        "EXTRA",
+
+                    extra_verification_score:
+                        extraScore,
+
+                    extra_status:
+                        verification.extra_status
+
+                });
+
+            }
+
+
+            // ==================================================
+            // ORIGINAL QUESTION ROUND
+            // ==================================================
+
+            // IMPORTANT:
+            // Original verification can be answered only once.
+
+            if (
+                verification.status ===
+                "ANSWERED"
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Original verification has already been answered"
+
+                });
+
+            }
+
+
+            // ----------------------------------------------
+            // CHECK ORIGINAL QUESTIONS
+            // ----------------------------------------------
+
+            if (
+                !Array.isArray(
+                    verification.questions
+                ) ||
+                verification.questions.length === 0
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "No original verification questions found"
+
+                });
+
+            }
+
+
+            // ----------------------------------------------
+            // CHECK ANSWER COUNT
+            // ----------------------------------------------
+
+            if (
+                answers.length !==
+                verification.questions.length
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Number of answers does not match the number of original questions"
+
+                });
+
+            }
+
+
+            // ----------------------------------------------
+            // NORMALIZE ANSWERS
+            // ----------------------------------------------
+
+            const normalize = (value) => {
+
+                return String(value || "")
+                    .toLowerCase()
+                    .replace(
+                        /[^a-z0-9\s]/g,
+                        ""
+                    )
+                    .replace(
+                        /\s+/g,
+                        " "
+                    )
+                    .trim();
+
+            };
+
+
+            // ----------------------------------------------
+            // CHECK ORIGINAL ANSWERS
+            // ----------------------------------------------
 
             let correctCount = 0;
 
 
-            verification.extra_questions =
-                verification.extra_questions.map(
+            verification.questions =
+                verification.questions.map(
                     (question, index) => {
 
                         const userAnswer =
                             String(
                                 answers[index] || ""
                             ).trim();
+
 
                         const correctAnswer =
                             String(
@@ -5196,38 +7305,31 @@ app.post("/verification/:verificationId/submit", async (req, res) => {
 
 
                         // Compare answers
-                        const normalize = (value) =>
-                            value
-                                .toLowerCase()
-                                .replace(
-                                    /[^a-z0-9\s]/g,
-                                    ""
-                                )
-                                .replace(
-                                    /\s+/g,
-                                    " "
-                                )
-                                .trim();
-
-
                         if (
                             normalize(userAnswer) ===
                             normalize(correctAnswer)
                         ) {
+
                             correctCount++;
+
                         }
 
 
                         return question;
+
                     }
                 );
 
 
+            // ----------------------------------------------
+            // CALCULATE ORIGINAL SCORE
+            // ----------------------------------------------
+
             const totalQuestions =
-                verification.extra_questions.length;
+                verification.questions.length;
 
 
-            const extraScore =
+            const score =
                 totalQuestions > 0
                     ? Math.round(
                         (
@@ -5238,13 +7340,15 @@ app.post("/verification/:verificationId/submit", async (req, res) => {
                     : 0;
 
 
-            // Save EXTRA score separately
-            verification.extra_verification_score =
-                extraScore;
+            // ----------------------------------------------
+            // SAVE ORIGINAL SCORE
+            // ----------------------------------------------
+
+            verification.verification_score =
+                score;
 
 
-            // Original status is NOT changed
-            verification.extra_status =
+            verification.status =
                 "ANSWERED";
 
 
@@ -5252,19 +7356,14 @@ app.post("/verification/:verificationId/submit", async (req, res) => {
 
 
             console.log(
-                "🟣 Extra verification score:",
-                extraScore
-            );
-
-            console.log(
-                "🟣 Extra verification status:",
-                verification.extra_status
+                "🟢 Original verification score:",
+                score
             );
 
 
-            // =================================================
+            // ----------------------------------------------
             // NOTIFY FOUNDER
-            // =================================================
+            // ----------------------------------------------
 
             const foundReport =
                 await FoundReport.findById(
@@ -5275,6 +7374,7 @@ app.post("/verification/:verificationId/submit", async (req, res) => {
             if (foundReport) {
 
                 await Notification.create({
+
                     user_id:
                         foundReport.user_id,
 
@@ -5282,10 +7382,10 @@ app.post("/verification/:verificationId/submit", async (req, res) => {
                         "VERIFICATION_RESULT",
 
                     title:
-                        "Extra Verification Answers Received",
+                        "Verification Answers Received",
 
                     message:
-                        "The Lost User has answered the additional ownership questions. Please review the answers.",
+                        "The Lost User has answered the ownership verification questions. Please review the answers.",
 
                     verification_id:
                         verification._id,
@@ -5295,194 +7395,61 @@ app.post("/verification/:verificationId/submit", async (req, res) => {
 
                     is_read:
                         false
+
                 });
 
             }
 
 
+            // ----------------------------------------------
+            // ORIGINAL RESPONSE
+            // ----------------------------------------------
+
             return res.json({
+
                 success: true,
 
                 message:
-                    "Extra verification answers submitted successfully",
+                    "Verification answers submitted successfully",
 
                 round:
-                    "EXTRA",
+                    "ORIGINAL",
 
-                extra_verification_score:
-                    extraScore,
+                verification_score:
+                    score,
 
-                extra_status:
-                    verification.extra_status
+                status:
+                    verification.status
+
             });
+
         }
 
+        catch (error) {
 
-        // =====================================================
-        // ORIGINAL QUESTION ROUND
-        // =====================================================
+            console.error(
+                "❌ Verification submission error:",
+                error
+            );
 
-        if (
-            !Array.isArray(verification.questions) ||
-            verification.questions.length === 0
-        ) {
-            return res.status(400).json({
+
+            return res.status(500).json({
+
                 success: false,
-                message: "No original verification questions found"
-            });
-        }
-
-
-        let correctCount = 0;
-
-
-        verification.questions =
-            verification.questions.map(
-                (question, index) => {
-
-                    const userAnswer =
-                        String(
-                            answers[index] || ""
-                        ).trim();
-
-                    const correctAnswer =
-                        String(
-                            question.correct_answer || ""
-                        ).trim();
-
-
-                    question.user_answer =
-                        userAnswer;
-
-
-                    const normalize = (value) =>
-                        value
-                            .toLowerCase()
-                            .replace(
-                                /[^a-z0-9\s]/g,
-                                ""
-                            )
-                            .replace(
-                                /\s+/g,
-                                " "
-                            )
-                            .trim();
-
-
-                    if (
-                        normalize(userAnswer) ===
-                        normalize(correctAnswer)
-                    ) {
-                        correctCount++;
-                    }
-
-
-                    return question;
-                }
-            );
-
-
-        const totalQuestions =
-            verification.questions.length;
-
-
-        const score =
-            totalQuestions > 0
-                ? Math.round(
-                    (
-                        correctCount /
-                        totalQuestions
-                    ) * 100
-                )
-                : 0;
-
-
-        verification.verification_score =
-            score;
-
-
-        verification.status =
-            "ANSWERED";
-
-
-        await verification.save();
-
-
-        console.log(
-            "🟢 Original verification score:",
-            score
-        );
-
-
-        // =====================================================
-        // NOTIFY FOUNDER
-        // =====================================================
-
-        const foundReport =
-            await FoundReport.findById(
-                verification.found_report_id
-            );
-
-
-        if (foundReport) {
-
-            await Notification.create({
-                user_id:
-                    foundReport.user_id,
-
-                type:
-                    "VERIFICATION_RESULT",
-
-                title:
-                    "Verification Answers Received",
 
                 message:
-                    "The Lost User has answered the ownership verification questions. Please review the answers.",
+                    "Failed to submit verification answers",
 
-                verification_id:
-                    verification._id,
+                error:
+                    error.message
 
-                match_id:
-                    verification.match_id,
-
-                is_read:
-                    false
             });
 
         }
 
-
-        return res.json({
-            success: true,
-
-            message:
-                "Verification answers submitted successfully",
-
-            round:
-                "ORIGINAL",
-
-            verification_score:
-                score,
-
-            status:
-                verification.status
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            "❌ Verification submission error:",
-            error
-        );
-
-        return res.status(500).json({
-            success: false,
-            message:
-                "Failed to submit verification answers"
-        });
     }
-});
+);
+
 
 // ======================================================
 // GET LOST REPORTS FOR ONE USER

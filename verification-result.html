@@ -2,12 +2,18 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Verification Result | Campus Lost & Found</title>
 
     <style>
+
         * {
             box-sizing: border-box;
         }
@@ -15,19 +21,27 @@
         body {
             margin: 0;
             min-height: 100vh;
-            font-family: Arial, Helvetica, sans-serif;
 
-            background: radial-gradient(
-                circle at top,
-                #182131 0%,
-                #0a0e14 55%,
-                #06080c 100%
-            );
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top,
+                    #182131 0%,
+                    #0a0e14 55%,
+                    #06080c 100%
+                );
 
             color: #f3ead0;
         }
 
-        /* TOP BAR */
+
+        /* ==========================================
+           TOP BAR
+        ========================================== */
 
         .topbar {
             min-height: 70px;
@@ -37,42 +51,55 @@
             justify-content: space-between;
 
             gap: 15px;
-            padding: 15px 35px;
+
+            padding:
+                15px 35px;
 
             border-bottom:
-                1px solid rgba(232,196,104,.18);
+                1px solid
+                rgba(232,196,104,.18);
 
             background:
                 rgba(8,12,18,.92);
         }
 
+
         .brand {
             color: #e8c468;
+
             font-size: 18px;
+
             font-weight: 700;
         }
 
+
         .subtitle {
             color: #8f9aaa;
+
             font-size: 12px;
+
             margin-top: 4px;
         }
 
+
         .back-btn {
             border:
-                1px solid rgba(232,196,104,.35);
+                1px solid
+                rgba(232,196,104,.35);
 
             background:
                 rgba(232,196,104,.08);
 
             color: #e8c468;
 
-            padding: 10px 16px;
+            padding:
+                10px 16px;
 
             border-radius: 8px;
 
             cursor: pointer;
         }
+
 
         .back-btn:hover {
             background:
@@ -80,93 +107,130 @@
         }
 
 
-        /* MAIN */
+        /* ==========================================
+           MAIN
+        ========================================== */
 
         .container {
-            width: min(850px, 92%);
-            margin: 50px auto;
+            width:
+                min(850px, 92%);
+
+            margin:
+                50px auto;
         }
+
 
         .title {
             font-size: 28px;
+
             margin-bottom: 10px;
         }
 
+
         .description {
             color: #8f9aaa;
+
             font-size: 14px;
+
             line-height: 1.6;
+
             margin-bottom: 30px;
         }
 
 
-        /* RESULT CARD */
+        /* ==========================================
+           RESULT CARD
+        ========================================== */
 
         .result-card {
             background:
                 rgba(14,21,32,.88);
 
             border:
-                1px solid rgba(232,196,104,.22);
+                1px solid
+                rgba(232,196,104,.22);
 
             border-radius: 16px;
 
             padding: 30px;
 
             box-shadow:
-                0 18px 45px rgba(0,0,0,.35);
+                0 18px 45px
+                rgba(0,0,0,.35);
         }
 
 
-        /* USER */
+        /* ==========================================
+           USER
+        ========================================== */
 
         .user-section {
             padding-bottom: 25px;
+
             margin-bottom: 25px;
 
             border-bottom:
-                1px solid rgba(255,255,255,.08);
+                1px solid
+                rgba(255,255,255,.08);
         }
+
 
         .section-title {
             color: #e8c468;
+
             font-size: 13px;
+
             margin-bottom: 12px;
+
             font-weight: 700;
         }
+
 
         .user-name {
             font-size: 20px;
+
             font-weight: 700;
         }
 
+
         .user-email {
             color: #8f9aaa;
+
             font-size: 13px;
+
             margin-top: 5px;
         }
 
 
-        /* VERIFICATION ROUND */
+        /* ==========================================
+           VERIFICATION ROUND
+        ========================================== */
 
         .verification-round {
             margin-top: 30px;
+
             padding-top: 25px;
 
             border-top:
-                1px solid rgba(255,255,255,.08);
+                1px solid
+                rgba(255,255,255,.08);
         }
+
 
         .round-title {
             color: #e8c468;
+
             font-size: 19px;
+
             font-weight: 700;
 
             margin-bottom: 8px;
         }
 
+
         .round-description {
             color: #8f9aaa;
+
             font-size: 13px;
 
             margin-bottom: 20px;
@@ -175,7 +239,9 @@
         }
 
 
-        /* SCORE */
+        /* ==========================================
+           SCORE
+        ========================================== */
 
         .score-section {
             text-align: center;
@@ -190,20 +256,28 @@
                 rgba(232,196,104,.06);
 
             border:
-                1px solid rgba(232,196,104,.18);
+                1px solid
+                rgba(232,196,104,.18);
         }
+
 
         .score-label {
             color: #8f9aaa;
+
             font-size: 13px;
+
             margin-bottom: 10px;
         }
 
+
         .score {
             color: #e8c468;
+
             font-size: 42px;
+
             font-weight: 700;
         }
+
 
         .status {
             margin-top: 10px;
@@ -214,24 +288,32 @@
         }
 
 
-        /* QUESTIONS */
+        /* ==========================================
+           QUESTIONS
+        ========================================== */
 
         .question {
             padding: 18px 0;
 
             border-bottom:
-                1px solid rgba(255,255,255,.07);
+                1px solid
+                rgba(255,255,255,.07);
         }
+
 
         .question:last-child {
             border-bottom: none;
         }
 
+
         .question-number {
             color: #e8c468;
+
             font-size: 12px;
+
             margin-bottom: 7px;
         }
+
 
         .question-text {
             font-size: 15px;
@@ -240,17 +322,23 @@
 
             margin-bottom: 10px;
 
-            overflow-wrap: anywhere;
+            overflow-wrap:
+                anywhere;
         }
+
 
         .answer-label {
             color: #8f9aaa;
+
             font-size: 12px;
+
             margin-bottom: 5px;
         }
 
+
         .answer {
-            padding: 10px 12px;
+            padding:
+                10px 12px;
 
             border-radius: 7px;
 
@@ -258,17 +346,21 @@
                 rgba(255,255,255,.04);
 
             border:
-                1px solid rgba(255,255,255,.08);
+                1px solid
+                rgba(255,255,255,.08);
 
             color: #f3ead0;
 
             font-size: 14px;
 
-            overflow-wrap: anywhere;
+            overflow-wrap:
+                anywhere;
         }
 
 
-        /* EXTRA STATUS */
+        /* ==========================================
+           EXTRA STATUS
+        ========================================== */
 
         .extra-pending {
             padding: 20px;
@@ -279,7 +371,8 @@
                 rgba(232,196,104,.05);
 
             border:
-                1px solid rgba(232,196,104,.15);
+                1px solid
+                rgba(232,196,104,.15);
 
             color: #b8bec9;
 
@@ -287,6 +380,29 @@
 
             font-size: 14px;
         }
+
+
+        .extra-completed {
+            padding: 20px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(232,196,104,.05);
+
+            border:
+                1px solid
+                rgba(232,196,104,.15);
+
+            color: #b8bec9;
+
+            line-height: 1.6;
+
+            font-size: 14px;
+
+            margin-bottom: 15px;
+        }
+
 
         .extra-not-started {
             padding: 20px;
@@ -297,7 +413,8 @@
                 rgba(255,255,255,.03);
 
             border:
-                1px solid rgba(255,255,255,.07);
+                1px solid
+                rgba(255,255,255,.07);
 
             color: #8f9aaa;
 
@@ -307,7 +424,37 @@
         }
 
 
-        /* BUTTONS */
+        /* ==========================================
+           WAITING MESSAGE
+        ========================================== */
+
+        .waiting-message {
+            padding: 18px;
+
+            margin-top: 15px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(255,255,255,.03);
+
+            border:
+                1px solid
+                rgba(255,255,255,.08);
+
+            color: #8f9aaa;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+            text-align: center;
+        }
+
+
+        /* ==========================================
+           BUTTONS
+        ========================================== */
 
         .confirm-btn,
         .extra-btn {
@@ -326,6 +473,7 @@
             cursor: pointer;
         }
 
+
         .confirm-btn {
             margin-top: 30px;
 
@@ -341,22 +489,38 @@
             color: #160f04;
         }
 
+
         .confirm-btn:hover {
-            transform: translateY(-1px);
+            transform:
+                translateY(-1px);
 
             box-shadow:
                 0 8px 20px
                 rgba(232,196,104,.15);
         }
 
+
+        .confirm-btn:disabled {
+            opacity: 0.6;
+
+            cursor: not-allowed;
+
+            transform: none;
+
+            box-shadow: none;
+        }
+
+
         .extra-btn {
             border:
                 1px solid #e8c468;
 
-            background: transparent;
+            background:
+                transparent;
 
             color: #e8c468;
         }
+
 
         .extra-btn:hover {
             background:
@@ -364,7 +528,16 @@
         }
 
 
-        /* MESSAGE */
+        .extra-btn:disabled {
+            opacity: .5;
+
+            cursor: not-allowed;
+        }
+
+
+        /* ==========================================
+           MESSAGE
+        ========================================== */
 
         .message {
             text-align: center;
@@ -377,29 +550,38 @@
         }
 
 
-        /* MOBILE */
+        /* ==========================================
+           MOBILE
+        ========================================== */
 
         @media (max-width: 600px) {
 
             .topbar {
-                padding: 15px 18px;
+                padding:
+                    15px 18px;
             }
 
+
             .container {
-                margin: 30px auto;
+                margin:
+                    30px auto;
             }
+
 
             .result-card {
                 padding: 20px;
             }
 
+
             .title {
                 font-size: 24px;
             }
 
+
             .score {
                 font-size: 36px;
             }
+
         }
 
     </style>
@@ -432,7 +614,8 @@
         <button
             class="back-btn"
             type="button"
-            onclick="goBack()">
+            onclick="goBack()"
+        >
 
             ← Back
 
@@ -464,7 +647,8 @@
 
         <div
             class="result-card"
-            id="resultCard">
+            id="resultCard"
+        >
 
             <div class="message">
                 Loading verification result...
@@ -493,24 +677,38 @@
         function escapeHTML(value)
         {
             return String(value ?? "")
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+                .replace(
+                    /&/g,
+                    "&amp;"
+                )
+                .replace(
+                    /</g,
+                    "&lt;"
+                )
+                .replace(
+                    />/g,
+                    "&gt;"
+                )
+                .replace(
+                    /"/g,
+                    "&quot;"
+                )
+                .replace(
+                    /'/g,
+                    "&#039;"
+                );
         }
 
 
 
         /* ==========================================
-           BACK
+           BACK TO FOUNDER MATCHES
         ========================================== */
 
         function goBack()
         {
             window.location.href =
-                "founder-handover.html?verification_id=" +
-                encodeURIComponent(verificationId);
+                "founder-matches.html";
         }
 
 
@@ -521,6 +719,7 @@
 
         async function loadVerificationResult()
         {
+
             const resultCard =
                 document.getElementById(
                     "resultCard"
@@ -529,6 +728,7 @@
 
             try
             {
+
                 const params =
                     new URLSearchParams(
                         window.location.search
@@ -543,6 +743,7 @@
 
                 if(!verificationId)
                 {
+
                     resultCard.innerHTML = `
 
                         <div class="message">
@@ -558,7 +759,9 @@
 
 
 
-                /* GET CURRENT USER */
+                /* ======================================
+                   GET CURRENT USER
+                ====================================== */
 
                 currentUser =
                     JSON.parse(
@@ -570,13 +773,14 @@
 
                 if(!currentUser.id)
                 {
+
                     resultCard.innerHTML = `
 
                         <div class="message">
 
                             User information not found.
 
-                            <br>
+                            <br><br>
 
                             Please log in again.
 
@@ -589,7 +793,9 @@
 
 
 
-                /* CALL BACKEND */
+                /* ======================================
+                   CALL BACKEND
+                ====================================== */
 
                 const response =
                     await fetch(
@@ -607,12 +813,12 @@
                     await response.json();
 
 
-
                 if(
                     !response.ok ||
                     !data.success
                 )
                 {
+
                     resultCard.innerHTML = `
 
                         <div class="message">
@@ -636,17 +842,16 @@
 
 
 
-                /*
-                 * Original verification must
-                 * be answered before Founder
-                 * can review the result.
-                 */
+                /* ======================================
+                   ORIGINAL VERIFICATION MUST BE ANSWERED
+                ====================================== */
 
                 if(
                     data.status !==
                     "ANSWERED"
                 )
                 {
+
                     resultCard.innerHTML = `
 
                         <div class="message">
@@ -672,6 +877,7 @@
             }
             catch(error)
             {
+
                 console.error(
                     "Verification result error:",
                     error
@@ -692,7 +898,9 @@
                     </div>
 
                 `;
+
             }
+
         }
 
 
@@ -703,6 +911,7 @@
 
         function renderResult(data)
         {
+
             let html = "";
 
 
@@ -713,6 +922,7 @@
 
             if(data.lost_user)
             {
+
                 html += `
 
                     <div class="user-section">
@@ -744,6 +954,7 @@
                     </div>
 
                 `;
+
             }
 
 
@@ -802,7 +1013,9 @@
 
 
 
-            /* ORIGINAL QUESTIONS */
+            /* ======================================
+               ORIGINAL QUESTIONS
+            ====================================== */
 
             if(
                 Array.isArray(
@@ -811,6 +1024,7 @@
                 data.questions.length > 0
             )
             {
+
                 html += `
 
                     <div class="section-title">
@@ -825,6 +1039,7 @@
                 data.questions.forEach(
                     (item, index) =>
                     {
+
                         html += `
 
                             <div class="question">
@@ -865,9 +1080,13 @@
                             </div>
 
                         `;
+
                     }
+
                 );
+
             }
+
 
 
             html += `
@@ -920,7 +1139,16 @@
                 "ANSWERED"
             )
             {
+
                 html += `
+
+                    <div class="extra-completed">
+
+                        Additional verification has been
+                        completed.
+
+                    </div>
+
 
                     <div class="score-section">
 
@@ -960,6 +1188,7 @@
                     data.extra_questions.length > 0
                 )
                 {
+
                     html += `
 
                         <div class="section-title">
@@ -974,6 +1203,7 @@
                     data.extra_questions.forEach(
                         (item, index) =>
                         {
+
                             html += `
 
                                 <div class="question">
@@ -1015,9 +1245,13 @@
                                 </div>
 
                             `;
+
                         }
+
                     );
+
                 }
+
             }
 
 
@@ -1031,6 +1265,7 @@
                 "SENT"
             )
             {
+
                 html += `
 
                     <div class="extra-pending">
@@ -1045,7 +1280,17 @@
 
                     </div>
 
+
+                    <div class="waiting-message">
+
+                        Confirm Ownership is unavailable
+                        until the Lost User completes the
+                        additional verification round.
+
+                    </div>
+
                 `;
+
             }
 
 
@@ -1056,6 +1301,7 @@
 
             else
             {
+
                 html += `
 
                     <div class="extra-not-started">
@@ -1072,6 +1318,7 @@
                     </div>
 
                 `;
+
             }
 
 
@@ -1085,51 +1332,98 @@
 
 
             /* ======================================
-               CONFIRM OWNERSHIP
+               BUTTONS
             ====================================== */
 
-            html += `
+            /*
+             * Confirm is allowed when:
+             *
+             * 1. No extra questions exist
+             * OR
+             * 2. Extra questions were answered
+             *
+             * Confirm is NOT allowed when
+             * extra_status is SENT.
+             */
 
-                <button
-                    type="button"
-                    class="confirm-btn"
-                    id="confirmButton"
-                    onclick="confirmOwnership()">
+            if(
+                extraStatus ===
+                "SENT"
+            )
+            {
 
-                    Confirm Ownership
+                html += `
 
-                </button>
+                    <button
+                        type="button"
+                        class="confirm-btn"
+                        id="confirmButton"
+                        disabled
+                    >
 
-            `;
+                        Waiting for Additional Answers
+
+                    </button>
+
+                `;
+
+            }
+            else
+            {
+
+                html += `
+
+                    <button
+                        type="button"
+                        class="confirm-btn"
+                        id="confirmButton"
+                        onclick="confirmOwnership()"
+                    >
+
+                        Confirm Ownership
+
+                    </button>
+
+                `;
+
+            }
 
 
 
             /* ======================================
                ADD EXTRA QUESTIONS
-               
-               IMPORTANT:
-               BUTTON IS ALWAYS SHOWN
             ====================================== */
 
-            html += `
+            if(
+                extraStatus !==
+                "ANSWERED"
+            )
+            {
 
-                <button
-                    type="button"
-                    class="extra-btn"
-                    id="extraButton"
-                    onclick="addExtraQuestions()">
+                html += `
 
-                    Add Extra Questions
+                    <button
+                        type="button"
+                        class="extra-btn"
+                        id="extraButton"
+                        onclick="addExtraQuestions()"
+                    >
 
-                </button>
+                        Add Extra Questions
 
-            `;
+                    </button>
+
+                `;
+
+            }
 
 
 
             document.getElementById(
                 "resultCard"
-            ).innerHTML = html;
+            ).innerHTML =
+                html;
+
         }
 
 
@@ -1140,13 +1434,16 @@
 
         function addExtraQuestions()
         {
+
             if(!verificationId)
             {
+
                 alert(
                     "Verification ID not found."
                 );
 
                 return;
+
             }
 
 
@@ -1155,6 +1452,7 @@
                 encodeURIComponent(
                     verificationId
                 );
+
         }
 
 
@@ -1165,16 +1463,42 @@
 
         async function confirmOwnership()
         {
+
             if(
                 !verificationId ||
                 !currentUser?.id
             )
             {
+
                 alert(
                     "Verification or user information is missing."
                 );
 
                 return;
+
+            }
+
+
+
+            /*
+             * Frontend safety check.
+             *
+             * The backend also performs this check.
+             */
+
+            if(
+                verificationData &&
+                verificationData.extra_status ===
+                "SENT"
+            )
+            {
+
+                alert(
+                    "Please wait for the Lost User to answer the additional verification questions."
+                );
+
+                return;
+
             }
 
 
@@ -1202,17 +1526,24 @@
 
             if(button)
             {
+
                 button.disabled =
                     true;
 
                 button.textContent =
                     "Confirming...";
+
             }
 
 
 
             try
             {
+
+                /* ======================================
+                   CONFIRM OWNERSHIP
+                ====================================== */
+
                 const response =
                     await fetch(
 
@@ -1237,6 +1568,7 @@
                                         currentUser.id
 
                                 })
+
                         }
 
                     );
@@ -1252,12 +1584,14 @@
                     !data.success
                 )
                 {
+
                     throw new Error(
 
                         data.error ||
                         "Unable to confirm ownership."
 
                     );
+
                 }
 
 
@@ -1265,18 +1599,26 @@
                 alert(
 
                     data.message ||
-                    "Ownership confirmation submitted successfully."
+                    "Ownership confirmed successfully. Pickup code generated."
 
                 );
 
 
 
+                /* ======================================
+                   FINAL FOUNDER FLOW
+                ====================================== */
+
                 window.location.href =
-                    "founder-matches.html";
+                    "founder-handover.html?verification_id=" +
+                    encodeURIComponent(
+                        verificationId
+                    );
 
             }
             catch(error)
             {
+
                 console.error(
                     "Confirm ownership error:",
                     error
@@ -1291,13 +1633,17 @@
 
                 if(button)
                 {
+
                     button.disabled =
                         false;
 
                     button.textContent =
                         "Confirm Ownership";
+
                 }
+
             }
+
         }
 
 

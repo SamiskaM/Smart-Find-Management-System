@@ -643,7 +643,6 @@
             notification
         )
         {
-
             if(!notification)
             {
                 return;
@@ -660,7 +659,6 @@
 
             if(!currentUser.id)
             {
-
                 alert(
                     "Please login again."
                 );
@@ -679,10 +677,8 @@
                 notification.id
             )
             {
-
                 try
                 {
-
                     const response =
                         await fetch(
                             `/notifications/${notification.id}/read`,
@@ -697,10 +693,8 @@
 
                                 body:
                                     JSON.stringify({
-
                                         user_id:
                                             currentUser.id
-
                                     })
                             }
                         );
@@ -714,18 +708,45 @@
                         "🔔 History read response:",
                         data
                     );
-
                 }
                 catch(error)
                 {
-
                     console.error(
                         "❌ Unable to mark notification as read:",
                         error
                     );
+                }
+            }
 
+
+
+            // ======================================
+            // CLAIM NOTIFICATION
+            // Founder opens possible match
+            // ======================================
+
+            if(
+                notification.type ===
+                "CLAIM"
+            )
+            {
+                if(!notification.match_id)
+                {
+                    alert(
+                        "Match ID not found."
+                    );
+
+                    return;
                 }
 
+
+                window.location.href =
+                    "founder-matches.html?match_id=" +
+                    encodeURIComponent(
+                        notification.match_id
+                    );
+
+                return;
             }
 
 
@@ -739,13 +760,23 @@
                 "VERIFICATION"
             )
             {
+                if(!notification.verification_id)
+                {
+                    alert(
+                        "Verification ID not found."
+                    );
+
+                    return;
+                }
+
 
                 window.location.href =
                     "verification.html?verification_id=" +
-                    notification.verification_id;
+                    encodeURIComponent(
+                        notification.verification_id
+                    );
 
                 return;
-
             }
 
 
@@ -759,19 +790,47 @@
                 "VERIFICATION_RESULT"
             )
             {
+                if(!notification.verification_id)
+                {
+                    alert(
+                        "Verification ID not found."
+                    );
+
+                    return;
+                }
+
 
                 window.location.href =
                     "verification-result.html?verification_id=" +
-                    notification.verification_id;
+                    encodeURIComponent(
+                        notification.verification_id
+                    );
 
                 return;
-
             }
 
 
 
             // ======================================
-            // OPEN PICKUP CODE
+            // PICKUP CODE
+            // Founder confirmed ownership
+            // ======================================
+
+            if(
+                notification.type ===
+                "PICKUP_CODE"
+            )
+            {
+                window.location.href =
+                    "pickup-code.html";
+
+                return;
+            }
+
+
+
+            // ======================================
+            // OLD HANDOVER NOTIFICATION
             // ======================================
 
             if(
@@ -779,12 +838,44 @@
                 "HANDOVER"
             )
             {
-
                 window.location.href =
                     "pickup-code.html";
 
                 return;
+            }
 
+
+
+            // ======================================
+            // HANDOVER SCHEDULED
+            // ======================================
+
+            if(
+                notification.type ===
+                "HANDOVER_SCHEDULED"
+            )
+            {
+                window.location.href =
+                    "pickup-code.html";
+
+                return;
+            }
+
+
+
+            // ======================================
+            // HANDOVER COMPLETED
+            // ======================================
+
+            if(
+                notification.type ===
+                "HANDOVER_COMPLETED"
+            )
+            {
+                window.location.href =
+                    "pickup-code.html";
+
+                return;
             }
 
 
@@ -793,10 +884,15 @@
             // UNKNOWN NOTIFICATION
             // ======================================
 
+            console.warn(
+                "⚠️ Unknown notification type:",
+                notification.type
+            );
+
+
             alert(
                 "No page is available for this notification."
             );
-
         }
 
 
@@ -809,7 +905,6 @@
             notification
         )
         {
-
             const card =
                 document.createElement(
                     "div"
@@ -857,13 +952,21 @@
 
             if(
                 notification.type ===
+                "CLAIM"
+            )
+            {
+                buttonText =
+                    "View Possible Match →";
+            }
+
+
+            if(
+                notification.type ===
                 "VERIFICATION"
             )
             {
-
                 buttonText =
                     "View Verification →";
-
             }
 
 
@@ -872,10 +975,18 @@
                 "VERIFICATION_RESULT"
             )
             {
-
                 buttonText =
                     "View Verification Result →";
+            }
 
+
+            if(
+                notification.type ===
+                "PICKUP_CODE"
+            )
+            {
+                buttonText =
+                    "View Pickup Code →";
             }
 
 
@@ -884,10 +995,28 @@
                 "HANDOVER"
             )
             {
-
                 buttonText =
                     "View Pickup Code →";
+            }
 
+
+            if(
+                notification.type ===
+                "HANDOVER_SCHEDULED"
+            )
+            {
+                buttonText =
+                    "View Handover Details →";
+            }
+
+
+            if(
+                notification.type ===
+                "HANDOVER_COMPLETED"
+            )
+            {
+                buttonText =
+                    "View Handover Details →";
             }
 
 
@@ -990,17 +1119,14 @@
                 "click",
                 function()
                 {
-
                     openNotification(
                         notification
                     );
-
                 }
             );
 
 
             return card;
-
         }
 
 
@@ -1011,7 +1137,6 @@
 
         async function loadNotificationHistory()
         {
-
             const list =
                 document.getElementById(
                     "notificationList"
@@ -1020,7 +1145,6 @@
 
             try
             {
-
                 const currentUser =
                     JSON.parse(
                         sessionStorage.getItem(
@@ -1029,10 +1153,8 @@
                     );
 
 
-
                 if(!currentUser.id)
                 {
-
                     list.innerHTML =
                         `
                         <div class="empty error">
@@ -1041,9 +1163,7 @@
                         `;
 
                     return;
-
                 }
-
 
 
                 console.log(
@@ -1052,17 +1172,14 @@
                 );
 
 
-
                 const response =
                     await fetch(
                         `/notifications/user/${currentUser.id}`
                     );
 
 
-
                 const data =
                     await response.json();
-
 
 
                 console.log(
@@ -1071,25 +1188,20 @@
                 );
 
 
-
                 if(
                     !response.ok ||
                     !data.success
                 )
                 {
-
                     throw new Error(
                         data.error ||
                         "Unable to load notifications"
                     );
-
                 }
-
 
 
                 const notifications =
                     data.notifications || [];
-
 
 
                 // ==================================
@@ -1111,7 +1223,6 @@
                     total - unread;
 
 
-
                 document.getElementById(
                     "totalCount"
                 ).textContent =
@@ -1130,7 +1241,6 @@
                     read;
 
 
-
                 // ==================================
                 // EMPTY
                 // ==================================
@@ -1139,7 +1249,6 @@
                     notifications.length === 0
                 )
                 {
-
                     list.innerHTML =
                         `
                         <div class="empty">
@@ -1148,9 +1257,7 @@
                         `;
 
                     return;
-
                 }
-
 
 
                 // ==================================
@@ -1163,7 +1270,6 @@
                 notifications.forEach(
                     notification =>
                     {
-
                         const card =
                             createNotificationCard(
                                 notification
@@ -1173,14 +1279,11 @@
                         list.appendChild(
                             card
                         );
-
                     }
                 );
-
             }
             catch(error)
             {
-
                 console.error(
                     "❌ Notification history error:",
                     error
@@ -1193,9 +1296,7 @@
                         Unable to load notification history.
                     </div>
                     `;
-
             }
-
         }
 
 
@@ -1208,9 +1309,7 @@
             "DOMContentLoaded",
             function()
             {
-
                 loadNotificationHistory();
-
             }
         );
 

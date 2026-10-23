@@ -5,9 +5,12 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Complete Handover</title>
+    <title>Handover | Campus Lost & Found</title>
 
     <style>
 
@@ -18,19 +21,25 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: #0b0b0b;
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(212,175,55,0.10),
+                    transparent 35%
+                ),
+                #0b0b0b;
             color: white;
         }
 
         .container {
             width: 90%;
             max-width: 850px;
-            margin: 40px auto;
+            margin: 40px auto 70px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .header h1 {
@@ -40,12 +49,52 @@
 
         .header p {
             color: #aaa;
+            line-height: 1.5;
+        }
+
+        /* ==========================================
+           NAVIGATION
+        ========================================== */
+
+        .navigation {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 13px 16px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #1b1b1b;
+            color: #ddd;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .nav-btn:hover {
+            background: #292929;
+            border-color: #d4af37;
+            color: #d4af37;
+        }
+
+        .nav-btn.primary {
+            background: #d4af37;
+            color: #111;
+            border-color: #d4af37;
+        }
+
+        .nav-btn.primary:hover {
+            background: #e6c65c;
+            color: #111;
         }
 
         .card {
             background: #151515;
             border: 1px solid #333;
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 25px;
             margin-bottom: 25px;
         }
@@ -53,6 +102,7 @@
         .card h2 {
             color: #d4af37;
             margin-top: 0;
+            margin-bottom: 20px;
         }
 
         .details {
@@ -77,6 +127,25 @@
         .detail-box span {
             color: white;
             font-weight: bold;
+        }
+
+        .step {
+            margin-bottom: 18px;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #d4af37;
+            color: #111;
+            width: 27px;
+            height: 27px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 27px;
+            font-weight: bold;
+            margin-right: 8px;
         }
 
         .form-group {
@@ -126,45 +195,23 @@
             cursor: not-allowed;
         }
 
-        .step {
-            margin-bottom: 10px;
-            color: #aaa;
-            font-size: 14px;
+        .secondary-btn {
+            background: #292929;
+            color: #ddd;
+            border: 1px solid #444;
+            margin-top: 10px;
         }
 
-        .step-number {
-            display: inline-block;
-            background: #d4af37;
-            color: #111;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 25px;
-            font-weight: bold;
-            margin-right: 8px;
-        }
-
-        #codeSection {
-            display: none;
-        }
-
-        #successSection {
-            display: none;
-        }
-
-        .pickup-input {
-            text-align: center;
-            font-size: 28px !important;
-            letter-spacing: 10px;
-            font-weight: bold;
+        .secondary-btn:hover {
+            background: #353535;
         }
 
         .message {
-            padding: 12px;
+            padding: 13px;
             border-radius: 7px;
             margin-bottom: 20px;
             display: none;
+            line-height: 1.5;
         }
 
         .error {
@@ -177,6 +224,45 @@
             background: #153a1f;
             border: 1px solid #318b4b;
             color: #8cffaa;
+        }
+
+        .info {
+            background: #292511;
+            border: 1px solid rgba(212,175,55,0.35);
+            color: #e8d994;
+        }
+
+        .schedule-box {
+            background: #1e1e1e;
+            border: 1px solid rgba(212,175,55,0.25);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .schedule-box p {
+            margin: 10px 0;
+        }
+
+        .schedule-box strong {
+            color: #d4af37;
+        }
+
+        .instruction {
+            background: #111;
+            border-left: 4px solid #d4af37;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #bbb;
+            line-height: 1.6;
+            border-radius: 5px;
+        }
+
+        .pickup-input {
+            text-align: center;
+            font-size: 28px !important;
+            letter-spacing: 10px;
+            font-weight: bold;
         }
 
         .completion-box {
@@ -209,10 +295,28 @@
             color: #d4af37;
         }
 
-        @media(max-width: 600px) {
+        #pickupSection,
+        #successSection {
+            display: none;
+        }
+
+        @media(max-width:600px) {
 
             .details {
                 grid-template-columns: 1fr;
+            }
+
+            .container {
+                width: 94%;
+                margin-top: 25px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .navigation {
+                flex-direction: column;
             }
 
         }
@@ -225,16 +329,51 @@
 
 <div class="container">
 
+    <!-- ========================================== -->
+    <!-- HEADER -->
+    <!-- ========================================== -->
+
     <div class="header">
 
-        <h1>Complete Item Handover</h1>
+        <h1>Item Handover</h1>
 
-        <p>Enter the handover details and verify the pickup code.</p>
+        <p>
+            Schedule the handover first.
+            Verify the pickup code only when the Lost User
+            arrives for collection.
+        </p>
 
     </div>
 
 
+    <!-- ========================================== -->
+    <!-- NAVIGATION -->
+    <!-- ========================================== -->
+
+    <div class="navigation">
+
+        <button
+            type="button"
+            class="nav-btn"
+            onclick="goToVerificationResult()"
+        >
+            ← Back to Verification Result
+        </button>
+
+        <button
+            type="button"
+            class="nav-btn"
+            onclick="goToDashboard()"
+        >
+            🏠 Back to Dashboard
+        </button>
+
+    </div>
+
+
+    <!-- ========================================== -->
     <!-- ITEM DETAILS -->
+    <!-- ========================================== -->
 
     <div class="card">
 
@@ -252,6 +391,7 @@
 
             </div>
 
+
             <div class="detail-box">
 
                 <label>Founder</label>
@@ -262,6 +402,7 @@
 
             </div>
 
+
             <div class="detail-box">
 
                 <label>Category</label>
@@ -271,6 +412,7 @@
                 </span>
 
             </div>
+
 
             <div class="detail-box">
 
@@ -287,23 +429,49 @@
     </div>
 
 
-    <!-- STEP 1 -->
+    <!-- ========================================== -->
+    <!-- STAGE 1 : SCHEDULE HANDOVER -->
+    <!-- ========================================== -->
 
-    <div class="card" id="detailsSection">
+    <div
+        class="card"
+        id="scheduleSection"
+    >
 
         <div class="step">
 
-            <span class="step-number">1</span>
+            <span class="step-number">
+                1
+            </span>
 
-            Enter Handover Details
+            Schedule Handover
 
         </div>
 
-        <h2>Handover Place & Time</h2>
 
-        <div id="detailsError"
-             class="message error">
+        <h2>
+            Choose Handover Place & Time
+        </h2>
+
+
+        <div class="instruction">
+
+            Set a convenient place, date and time where
+            you will meet the Lost User and hand over the item.
+
+            <br><br>
+
+            <strong>
+                The pickup code is NOT required at this stage.
+            </strong>
+
         </div>
+
+
+        <div
+            id="scheduleMessage"
+            class="message"
+        ></div>
 
 
         <div class="form-group">
@@ -351,45 +519,134 @@
 
         <button
             class="btn"
-            onclick="proceedToCode()">
-
-            Proceed to Verify Pickup Code →
-
+            id="scheduleButton"
+            onclick="scheduleHandover()"
+        >
+            Schedule Handover
         </button>
 
     </div>
 
 
-    <!-- STEP 2 -->
+    <!-- ========================================== -->
+    <!-- SCHEDULED HANDOVER -->
+    <!-- ========================================== -->
 
-    <div class="card" id="codeSection">
+    <div
+        class="card"
+        id="scheduledSection"
+        style="display:none;"
+    >
 
         <div class="step">
 
-            <span class="step-number">2</span>
+            <span class="step-number">
+                ✓
+            </span>
 
+            Handover Scheduled
+
+        </div>
+
+
+        <h2>
+            Handover Appointment
+        </h2>
+
+
+        <div class="schedule-box">
+
+            <p>
+                <strong>Place:</strong>
+                <span id="scheduledPlace">-</span>
+            </p>
+
+            <p>
+                <strong>Date:</strong>
+                <span id="scheduledDate">-</span>
+            </p>
+
+            <p>
+                <strong>Time:</strong>
+                <span id="scheduledTime">-</span>
+            </p>
+
+        </div>
+
+
+        <div class="message success" style="display:block;">
+
+            ✓ Handover has been scheduled.
+
+            The Lost User has been notified with
+            the place, date and time.
+
+        </div>
+
+
+        <div class="instruction">
+
+            When the Lost User physically arrives,
+            ask them for their <strong>6-digit pickup code</strong>.
+
+            <br><br>
+
+            Then use the verification section below
+            to complete the handover.
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- STAGE 2 : VERIFY PICKUP CODE -->
+    <!-- ========================================== -->
+
+    <div
+        class="card"
+        id="pickupSection"
+    >
+
+        <div class="step">
+
+            <span class="step-number">
+                2
+            </span>
+
+            Complete Physical Handover
+
+        </div>
+
+
+        <h2>
             Verify Pickup Code
+        </h2>
+
+
+        <div class="instruction">
+
+            The Lost User should be physically present
+            before you complete this step.
+
+            <br><br>
+
+            Ask the Lost User to show you their
+            <strong>6-digit pickup code</strong>.
 
         </div>
 
-        <h2>Enter Pickup Code</h2>
 
-        <p style="color:#aaa;">
-
-            Ask the Lost User for the 6-digit pickup code.
-
-        </p>
-
-
-        <div id="codeError"
-             class="message error">
-        </div>
+        <div
+            id="codeMessage"
+            class="message"
+        ></div>
 
 
         <div class="form-group">
 
             <label for="pickupCode">
-                6-Digit Pickup Code
+                Enter Pickup Code
             </label>
 
             <input
@@ -398,6 +655,7 @@
                 class="pickup-input"
                 maxlength="6"
                 inputmode="numeric"
+                autocomplete="off"
                 placeholder="------"
             >
 
@@ -407,18 +665,22 @@
         <button
             class="btn"
             id="completeButton"
-            onclick="completeHandover()">
-
-            Verify & Complete Handover
-
+            onclick="completeHandover()"
+        >
+            Verify Code & Complete Handover
         </button>
 
     </div>
 
 
+    <!-- ========================================== -->
     <!-- SUCCESS -->
+    <!-- ========================================== -->
 
-    <div class="card" id="successSection">
+    <div
+        class="card"
+        id="successSection"
+    >
 
         <div class="completion-box">
 
@@ -426,12 +688,15 @@
                 ✅
             </div>
 
+
             <h2>
                 Handover Completed Successfully
             </h2>
 
+
             <p style="color:#aaa;">
-                The item has been successfully handed over.
+                The item has been successfully handed over
+                to the Lost User.
             </p>
 
 
@@ -442,24 +707,39 @@
                     <span id="completedPlace"></span>
                 </p>
 
+
                 <p>
                     <strong>Date:</strong>
                     <span id="completedDate"></span>
                 </p>
+
 
                 <p>
                     <strong>Time:</strong>
                     <span id="completedTime"></span>
                 </p>
 
+
                 <p>
                     <strong>Status:</strong>
+
                     <span style="color:#8cffaa;">
                         COMPLETED
                     </span>
+
                 </p>
 
             </div>
+
+
+            <button
+                type="button"
+                class="nav-btn primary"
+                style="margin-top:20px;"
+                onclick="goToDashboard()"
+            >
+                🏠 Back to Dashboard
+            </button>
 
         </div>
 
@@ -470,7 +750,9 @@
 
 <script>
 
-    const API = "";
+    const API =
+        "";
+
 
     let verificationId = null;
 
@@ -484,7 +766,10 @@
     // ==========================================
 
     const params =
-        new URLSearchParams(window.location.search);
+        new URLSearchParams(
+            window.location.search
+        );
+
 
     verificationId =
         params.get("verification_id");
@@ -498,28 +783,79 @@
 
         currentUser =
             JSON.parse(
-                sessionStorage.getItem("campusCurrentUser")
+                sessionStorage.getItem(
+                    "campusCurrentUser"
+                )
             );
 
-    } catch (error) {
+    }
+    catch(error) {
 
-        console.error("User session error:", error);
+        console.error(
+            "User session error:",
+            error
+        );
 
     }
 
 
-    if (!currentUser || !currentUser.id) {
+    if(
+        !currentUser ||
+        !currentUser.id
+    ) {
 
-        alert("Please login again.");
+        alert(
+            "Please login again."
+        );
 
-        window.location.href = "login.html";
+        window.location.href =
+            "login.html";
 
     }
 
 
-    if (!verificationId) {
+    if(!verificationId) {
 
-        alert("Verification ID is missing.");
+        alert(
+            "Verification ID is missing."
+        );
+
+    }
+
+
+    // ==========================================
+    // NAVIGATION
+    // ==========================================
+
+    function goToVerificationResult()
+    {
+
+        if(!verificationId)
+        {
+
+            alert(
+                "Verification ID is missing."
+            );
+
+            return;
+
+        }
+
+
+        window.location.href =
+            "verification-result.html?verification_id=" +
+            encodeURIComponent(
+                verificationId
+            );
+
+    }
+
+
+    function goToDashboard()
+    {
+
+        window.location.href =
+            "profileview.html#dashboard";
 
     }
 
@@ -528,85 +864,115 @@
     // LOAD HANDOVER
     // ==========================================
 
-    async function loadHandover() {
+    async function loadHandover()
+    {
 
         try {
 
-            const response = await fetch(
-                `${API}/handover/verification/${verificationId}`
-            );
+            const response =
+                await fetch(
+                    `${API}/handover/verification/${verificationId}`
+                );
 
-            const data = await response.json();
+
+            const data =
+                await response.json();
 
 
-            if (!response.ok || !data.success) {
+            if(
+                !response.ok ||
+                !data.success
+            ) {
 
                 throw new Error(
                     data.message ||
+                    data.error ||
                     "Failed to load handover."
                 );
 
             }
 
 
-            console.log("Handover data:", data);
+            console.log(
+                "Handover data:",
+                data
+            );
 
-
-            // Handover ID
 
             handoverId =
                 data.handover.id;
 
 
-            // Item information
+            // ==================================
+            // ITEM INFORMATION
+            // ==================================
 
-            if (data.lostUser) {
+            if(data.lostUser) {
 
-                document.getElementById("lostUser")
-                    .textContent =
-                    data.lostUser.name || "Unknown";
-
-            }
-
-
-            if (data.founder) {
-
-                document.getElementById("founderUser")
-                    .textContent =
-                    data.founder.name || "Unknown";
+                document.getElementById(
+                    "lostUser"
+                ).textContent =
+                    data.lostUser.name ||
+                    "Unknown";
 
             }
 
 
-            if (data.lostReport) {
+            if(data.founder) {
 
-                document.getElementById("category")
-                    .textContent =
-                    data.lostReport.category || "-";
+                document.getElementById(
+                    "founderUser"
+                ).textContent =
+                    data.founder.name ||
+                    "Unknown";
 
-                document.getElementById("itemType")
-                    .textContent =
-                    data.lostReport.item_type || "-";
+            }
+
+
+            if(data.lostReport) {
+
+                document.getElementById(
+                    "category"
+                ).textContent =
+                    data.lostReport.category ||
+                    "-";
+
+
+                document.getElementById(
+                    "itemType"
+                ).textContent =
+                    data.lostReport.item_type ||
+                    "-";
 
             }
 
 
             // ==================================
-            // IF ALREADY COMPLETED
+            // IF HANDOVER ALREADY COMPLETED
             // ==================================
 
-            if (
+            if(
                 data.handover.status ===
                 "COMPLETED"
             ) {
 
                 document.getElementById(
-                    "detailsSection"
-                ).style.display = "none";
+                    "scheduleSection"
+                ).style.display =
+                    "none";
+
 
                 document.getElementById(
-                    "codeSection"
-                ).style.display = "none";
+                    "scheduledSection"
+                ).style.display =
+                    "none";
+
+
+                document.getElementById(
+                    "pickupSection"
+                ).style.display =
+                    "none";
+
 
                 showSuccess(
                     data.handover.handover_place,
@@ -614,13 +980,54 @@
                     data.handover.handover_time
                 );
 
+
+                return;
+
             }
 
-        } catch (error) {
+
+            // ==================================
+            // CHECK WHETHER ALREADY SCHEDULED
+            // ==================================
+
+            const place =
+                data.handover.handover_place;
+
+
+            const date =
+                data.handover.handover_date;
+
+
+            const time =
+                data.handover.handover_time;
+
+
+            if(
+                place &&
+                date &&
+                time
+            ) {
+
+                showScheduledDetails(
+                    place,
+                    date,
+                    time
+                );
+
+            }
+
+        }
+        catch(error) {
 
             console.error(error);
 
-            alert(error.message);
+            showMessage(
+                document.getElementById(
+                    "scheduleMessage"
+                ),
+                error.message,
+                "error"
+            );
 
         }
 
@@ -628,20 +1035,24 @@
 
 
     // ==========================================
-    // STEP 1
+    // STAGE 1
+    // SCHEDULE HANDOVER
     // ==========================================
 
-    function proceedToCode() {
+    async function scheduleHandover()
+    {
 
         const place =
             document.getElementById(
                 "handoverPlace"
             ).value.trim();
 
+
         const date =
             document.getElementById(
                 "handoverDate"
             ).value;
+
 
         const time =
             document.getElementById(
@@ -649,26 +1060,22 @@
             ).value;
 
 
-        const errorBox =
+        const messageBox =
             document.getElementById(
-                "detailsError"
+                "scheduleMessage"
             );
 
 
-        // Clear previous error
-
-        errorBox.style.display = "none";
-
-        errorBox.textContent = "";
+        messageBox.style.display =
+            "none";
 
 
-        // Validate
+        if(!place) {
 
-        if (!place) {
-
-            showError(
-                errorBox,
-                "Please enter the handover place."
+            showMessage(
+                messageBox,
+                "Please enter the handover place.",
+                "error"
             );
 
             return;
@@ -676,11 +1083,12 @@
         }
 
 
-        if (!date) {
+        if(!date) {
 
-            showError(
-                errorBox,
-                "Please select the handover date."
+            showMessage(
+                messageBox,
+                "Please select the handover date.",
+                "error"
             );
 
             return;
@@ -688,11 +1096,12 @@
         }
 
 
-        if (!time) {
+        if(!time) {
 
-            showError(
-                errorBox,
-                "Please select the handover time."
+            showMessage(
+                messageBox,
+                "Please select the handover time.",
+                "error"
             );
 
             return;
@@ -700,34 +1109,167 @@
         }
 
 
-        // Hide Step 1
-
-        document.getElementById(
-            "detailsSection"
-        ).style.display = "none";
-
-
-        // Show Step 2
-
-        document.getElementById(
-            "codeSection"
-        ).style.display = "block";
+        const button =
+            document.getElementById(
+                "scheduleButton"
+            );
 
 
-        // Focus code
+        button.disabled = true;
 
-        document.getElementById(
-            "pickupCode"
-        ).focus();
+        button.textContent =
+            "Scheduling...";
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API}/handover/${handoverId}/schedule`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            user_id:
+                                currentUser.id,
+
+                            handover_place:
+                                place,
+
+                            handover_date:
+                                date,
+
+                            handover_time:
+                                time
+
+                        })
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if(
+                !response.ok ||
+                !data.success
+            ) {
+
+                throw new Error(
+                    data.message ||
+                    data.error ||
+                    "Failed to schedule handover."
+                );
+
+            }
+
+
+            console.log(
+                "Handover scheduled:",
+                data
+            );
+
+
+            showScheduledDetails(
+                place,
+                date,
+                time
+            );
+
+
+            showMessage(
+                messageBox,
+                "Handover scheduled successfully. The Lost User has been notified.",
+                "success"
+            );
+
+        }
+        catch(error) {
+
+            console.error(error);
+
+            showMessage(
+                messageBox,
+                error.message ||
+                "Unable to schedule handover.",
+                "error"
+            );
+
+
+            button.disabled = false;
+
+            button.textContent =
+                "Schedule Handover";
+
+        }
 
     }
 
 
     // ==========================================
-    // STEP 2
+    // SHOW SCHEDULED DETAILS
     // ==========================================
 
-    async function completeHandover() {
+    function showScheduledDetails(
+        place,
+        date,
+        time
+    )
+    {
+
+        document.getElementById(
+            "scheduledPlace"
+        ).textContent =
+            place || "-";
+
+
+        document.getElementById(
+            "scheduledDate"
+        ).textContent =
+            formatDate(date);
+
+
+        document.getElementById(
+            "scheduledTime"
+        ).textContent =
+            formatTime(time);
+
+
+        document.getElementById(
+            "scheduleSection"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "scheduledSection"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "pickupSection"
+        ).style.display =
+            "block";
+
+    }
+
+
+    // ==========================================
+    // STAGE 2
+    // VERIFY PICKUP CODE
+    // ==========================================
+
+    async function completeHandover()
+    {
 
         const pickupCode =
             document.getElementById(
@@ -735,38 +1277,22 @@
             ).value.trim();
 
 
-        const place =
+        const messageBox =
             document.getElementById(
-                "handoverPlace"
-            ).value.trim();
-
-        const date =
-            document.getElementById(
-                "handoverDate"
-            ).value;
-
-        const time =
-            document.getElementById(
-                "handoverTime"
-            ).value;
-
-
-        const errorBox =
-            document.getElementById(
-                "codeError"
+                "codeMessage"
             );
 
 
-        errorBox.style.display = "none";
+        messageBox.style.display =
+            "none";
 
 
-        // Validate code
+        if(!/^\d{6}$/.test(pickupCode)) {
 
-        if (!/^\d{6}$/.test(pickupCode)) {
-
-            showError(
-                errorBox,
-                "Please enter a valid 6-digit pickup code."
+            showMessage(
+                messageBox,
+                "Please enter a valid 6-digit pickup code.",
+                "error"
             );
 
             return;
@@ -774,17 +1300,16 @@
         }
 
 
-        // Disable button
-
         const button =
             document.getElementById(
                 "completeButton"
             );
 
+
         button.disabled = true;
 
         button.textContent =
-            "Verifying...";
+            "Verifying Pickup Code...";
 
 
         try {
@@ -806,16 +1331,7 @@
                                 currentUser.id,
 
                             pickup_code:
-                                pickupCode,
-
-                            handover_place:
-                                place,
-
-                            handover_date:
-                                date,
-
-                            handover_time:
-                                time
+                                pickupCode
 
                         })
 
@@ -827,12 +1343,15 @@
                 await response.json();
 
 
-            if (!response.ok ||
-                !data.success) {
+            if(
+                !response.ok ||
+                !data.success
+            ) {
 
                 throw new Error(
                     data.message ||
-                    "Failed to complete handover."
+                    data.error ||
+                    "Invalid pickup code."
                 );
 
             }
@@ -844,36 +1363,41 @@
             );
 
 
-            // Hide code section
+            document.getElementById(
+                "scheduledSection"
+            ).style.display =
+                "none";
+
 
             document.getElementById(
-                "codeSection"
-            ).style.display = "none";
+                "pickupSection"
+            ).style.display =
+                "none";
 
-
-            // Show success
 
             showSuccess(
-                place,
-                date,
-                time
+                data.handover?.handover_place,
+                data.handover?.handover_date,
+                data.handover?.handover_time
             );
 
-
-        } catch (error) {
+        }
+        catch(error) {
 
             console.error(error);
 
-            showError(
-                errorBox,
-                error.message
+            showMessage(
+                messageBox,
+                error.message ||
+                "Invalid pickup code.",
+                "error"
             );
 
 
             button.disabled = false;
 
             button.textContent =
-                "Verify & Complete Handover";
+                "Verify Code & Complete Handover";
 
         }
 
@@ -881,14 +1405,26 @@
 
 
     // ==========================================
-    // SHOW ERROR
+    // SHOW MESSAGE
     // ==========================================
 
-    function showError(element, message) {
+    function showMessage(
+        element,
+        text,
+        type
+    )
+    {
 
-        element.textContent = message;
+        element.textContent =
+            text;
 
-        element.style.display = "block";
+
+        element.className =
+            "message " + type;
+
+
+        element.style.display =
+            "block";
 
     }
 
@@ -901,7 +1437,8 @@
         place,
         date,
         time
-    ) {
+    )
+    {
 
         document.getElementById(
             "completedPlace"
@@ -933,12 +1470,18 @@
     // FORMAT DATE
     // ==========================================
 
-    function formatDate(date) {
+    function formatDate(date)
+    {
 
-        if (!date) return "-";
+        if(!date)
+            return "-";
+
 
         const d =
-            new Date(date + "T00:00:00");
+            new Date(
+                date + "T00:00:00"
+            );
+
 
         return d.toLocaleDateString(
             "en-IN",
@@ -956,24 +1499,34 @@
     // FORMAT TIME
     // ==========================================
 
-    function formatTime(time) {
+    function formatTime(time)
+    {
 
-        if (!time) return "-";
+        if(!time)
+            return "-";
+
 
         const parts =
             time.split(":");
 
+
         let hour =
             parseInt(parts[0]);
+
 
         const minute =
             parts[1];
 
+
         const ampm =
-            hour >= 12 ? "PM" : "AM";
+            hour >= 12
+                ? "PM"
+                : "AM";
+
 
         hour =
             hour % 12 || 12;
+
 
         return `${hour}:${minute} ${ampm}`;
 

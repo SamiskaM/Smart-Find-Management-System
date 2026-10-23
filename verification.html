@@ -10,15 +10,13 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Ownership Verification</title>
-
+    <title>Ownership Verification | Campus Lost & Found</title>
 
     <style>
 
         * {
             box-sizing: border-box;
         }
-
 
         body {
             margin: 0;
@@ -41,18 +39,21 @@
         }
 
 
-        /* =========================================
+        /* ==========================================
            TOP BAR
-           ========================================= */
+        ========================================== */
 
         .topbar {
-            height: 70px;
+            min-height: 70px;
 
             display: flex;
             align-items: center;
             justify-content: space-between;
 
-            padding: 0 35px;
+            gap: 15px;
+
+            padding:
+                15px 35px;
 
             border-bottom:
                 1px solid
@@ -67,6 +68,7 @@
             color: #e8c468;
 
             font-size: 18px;
+
             font-weight: 700;
         }
 
@@ -80,10 +82,6 @@
         }
 
 
-        /* =========================================
-           BACK BUTTON
-           ========================================= */
-
         .back-btn {
             border:
                 1px solid
@@ -94,7 +92,8 @@
 
             color: #e8c468;
 
-            padding: 10px 16px;
+            padding:
+                10px 16px;
 
             border-radius: 8px;
 
@@ -108,14 +107,16 @@
         }
 
 
-        /* =========================================
-           MAIN CONTAINER
-           ========================================= */
+        /* ==========================================
+           MAIN
+        ========================================== */
 
         .container {
-            width: min(850px, 92%);
+            width:
+                min(850px, 92%);
 
-            margin: 50px auto;
+            margin:
+                50px auto;
         }
 
 
@@ -137,9 +138,9 @@
         }
 
 
-        /* =========================================
-           VERIFICATION CARD
-           ========================================= */
+        /* ==========================================
+           CARD
+        ========================================== */
 
         .verification-card {
             background:
@@ -151,7 +152,7 @@
 
             border-radius: 16px;
 
-            padding: 28px;
+            padding: 30px;
 
             box-shadow:
                 0 18px 45px
@@ -159,12 +160,73 @@
         }
 
 
-        /* =========================================
+        /* ==========================================
+           ROUND
+        ========================================== */
+
+        .round-title {
+            color: #e8c468;
+
+            font-size: 21px;
+
+            font-weight: 700;
+
+            margin-bottom: 8px;
+        }
+
+
+        .round-description {
+            color: #8f9aaa;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+            margin-bottom: 25px;
+        }
+
+
+        /* ==========================================
+           INFO
+        ========================================== */
+
+        .info-box {
+            padding: 16px;
+
+            margin-bottom: 25px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(232,196,104,.05);
+
+            border:
+                1px solid
+                rgba(232,196,104,.15);
+
+            color: #b8bec9;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+        }
+
+
+        /* ==========================================
            QUESTION
-           ========================================= */
+        ========================================== */
 
         .question {
-            margin-bottom: 25px;
+            padding: 20px 0;
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,.08);
+        }
+
+
+        .question:last-child {
+            border-bottom: none;
         }
 
 
@@ -173,6 +235,8 @@
 
             font-size: 12px;
 
+            font-weight: 700;
+
             margin-bottom: 8px;
         }
 
@@ -180,20 +244,22 @@
         .question-text {
             font-size: 15px;
 
-            line-height: 1.5;
+            line-height: 1.6;
 
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+
+            overflow-wrap:
+                anywhere;
         }
 
-
-        /* =========================================
-           ANSWER INPUT
-           ========================================= */
 
         .answer-input {
             width: 100%;
 
-            padding: 12px 14px;
+            min-height: 48px;
+
+            padding:
+                12px 14px;
 
             border-radius: 8px;
 
@@ -204,33 +270,40 @@
             background:
                 rgba(255,255,255,.04);
 
-            color: white;
+            color: #f3ead0;
 
             outline: none;
+
+            font-size: 14px;
+
+            resize: vertical;
         }
 
 
         .answer-input:focus {
             border-color:
-                rgba(232,196,104,.65);
+                rgba(232,196,104,.55);
+
+            background:
+                rgba(255,255,255,.06);
         }
 
 
         .answer-input::placeholder {
-            color: #707887;
+            color: #687180;
         }
 
 
-        /* =========================================
-           SUBMIT BUTTON
-           ========================================= */
+        /* ==========================================
+           SUBMIT
+        ========================================== */
 
         .submit-btn {
-            margin-top: 10px;
-
             width: 100%;
 
-            padding: 13px;
+            margin-top: 30px;
+
+            padding: 14px;
 
             border: none;
 
@@ -245,6 +318,8 @@
 
             color: #160f04;
 
+            font-size: 15px;
+
             font-weight: 700;
 
             cursor: pointer;
@@ -252,7 +327,8 @@
 
 
         .submit-btn:hover {
-            transform: translateY(-1px);
+            transform:
+                translateY(-1px);
 
             box-shadow:
                 0 8px 20px
@@ -261,7 +337,7 @@
 
 
         .submit-btn:disabled {
-            opacity: 0.6;
+            opacity: .6;
 
             cursor: not-allowed;
 
@@ -269,58 +345,45 @@
         }
 
 
-        /* =========================================
+        /* ==========================================
            MESSAGE
-           ========================================= */
+        ========================================== */
 
         .message {
             text-align: center;
 
             color: #8f9aaa;
 
-            padding: 30px;
+            padding: 35px;
+
+            line-height: 1.7;
         }
 
 
-        /* =========================================
-           STATUS
-           ========================================= */
+        .success-message {
+            text-align: center;
 
-        .verification-status {
-            margin-bottom: 25px;
+            padding: 30px;
 
-            padding: 12px 15px;
-
-            border-radius: 8px;
+            border-radius: 12px;
 
             background:
-                rgba(232,196,104,.06);
+                rgba(232,196,104,.05);
 
             border:
                 1px solid
-                rgba(232,196,104,.15);
+                rgba(232,196,104,.18);
 
             color: #b8bec9;
 
-            font-size: 12px;
+            line-height: 1.7;
         }
 
 
-        .verification-status span {
+        .success-title {
             color: #e8c468;
 
-            font-weight: 600;
-        }
-
-
-        /* =========================================
-           EXTRA QUESTION HEADER
-           ========================================= */
-
-        .extra-heading {
-            color: #e8c468;
-
-            font-size: 20px;
+            font-size: 22px;
 
             font-weight: 700;
 
@@ -328,14 +391,38 @@
         }
 
 
-        .extra-description {
-            color: #8f9aaa;
+        /* ==========================================
+           MOBILE
+        ========================================== */
 
-            font-size: 13px;
+        @media (max-width: 600px) {
 
-            line-height: 1.6;
+            .topbar {
+                padding:
+                    15px 18px;
+            }
 
-            margin-bottom: 25px;
+
+            .container {
+                margin:
+                    30px auto;
+            }
+
+
+            .verification-card {
+                padding: 20px;
+            }
+
+
+            .title {
+                font-size: 24px;
+            }
+
+
+            .round-title {
+                font-size: 19px;
+            }
+
         }
 
     </style>
@@ -346,11 +433,11 @@
 <body>
 
 
-    <!-- =========================================
+    <!-- ==========================================
          TOP BAR
-         ========================================= -->
+    ========================================== -->
 
-    <div class="topbar">
+    <header class="topbar">
 
         <div>
 
@@ -373,41 +460,29 @@
             ← Back
         </button>
 
-    </div>
+    </header>
 
 
 
-    <!-- =========================================
-         MAIN CONTENT
-         ========================================= -->
+    <!-- ==========================================
+         MAIN
+    ========================================== -->
 
-    <div class="container">
-
+    <main class="container">
 
         <div class="title">
             Ownership Verification
         </div>
 
 
-        <div
-            class="description"
-            id="pageDescription"
-        >
-            Please answer the following questions
-            about your lost item.
+        <div class="description">
 
-            <br>
+            Please answer the questions provided by the
+            Founder to prove that you are the rightful owner
+            of the lost item.
 
-            These questions are based on
-            private identifying details provided
-            by the person who found the item.
         </div>
 
-
-
-        <!-- =====================================
-             VERIFICATION CARD
-             ===================================== -->
 
         <div
             class="verification-card"
@@ -420,17 +495,56 @@
 
         </div>
 
-
-    </div>
+    </main>
 
 
 
     <script>
 
+        let verificationId = null;
 
-        /* =========================================
-           BACK TO DASHBOARD
-           ========================================= */
+        let currentUser = null;
+
+        let verificationData = null;
+
+        let currentRound = null;
+
+
+
+        /* ==========================================
+           ESCAPE HTML
+        ========================================== */
+
+        function escapeHTML(value)
+        {
+            return String(value ?? "")
+                .replace(
+                    /&/g,
+                    "&amp;"
+                )
+                .replace(
+                    /</g,
+                    "&lt;"
+                )
+                .replace(
+                    />/g,
+                    "&gt;"
+                )
+                .replace(
+                    /"/g,
+                    "&quot;"
+                )
+                .replace(
+                    /'/g,
+                    "&#039;"
+                );
+        }
+
+
+
+        /* ==========================================
+           BACK
+        ========================================== */
 
         function goBack()
         {
@@ -440,35 +554,25 @@
 
 
 
-        /* =========================================
-           ESCAPE HTML
-           ========================================= */
-
-        function escapeHTML(value)
-        {
-            return String(value || "")
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-
-
-        /* =========================================
+        /* ==========================================
            LOAD VERIFICATION
-           ========================================= */
+        ========================================== */
 
         async function loadVerification()
         {
 
+            const card =
+                document.getElementById(
+                    "verificationCard"
+                );
+
+
             try
             {
 
-                /* ---------------------------------
+                /* ======================================
                    GET VERIFICATION ID
-                   --------------------------------- */
+                ====================================== */
 
                 const params =
                     new URLSearchParams(
@@ -476,35 +580,23 @@
                     );
 
 
-                const verificationId =
+                verificationId =
                     params.get(
                         "verification_id"
                     );
 
 
-                console.log(
-                    "🔎 Verification ID:",
-                    verificationId
-                );
-
-
                 if(!verificationId)
                 {
 
-                    document.getElementById(
-                        "verificationCard"
-                    ).innerHTML =
-                    `
+                    card.innerHTML = `
+
                         <div class="message">
 
                             Verification ID not found.
 
-                            <br><br>
-
-                            Please open the verification
-                            from your notification.
-
                         </div>
+
                     `;
 
                     return;
@@ -512,28 +604,49 @@
 
 
 
-                /* ---------------------------------
-                   LOADING
-                   --------------------------------- */
+                /* ======================================
+                   GET CURRENT USER
+                ====================================== */
 
-                document.getElementById(
-                    "verificationCard"
-                ).innerHTML =
-                `
-                    <div class="message">
-                        Loading verification...
-                    </div>
-                `;
+                currentUser =
+                    JSON.parse(
+                        sessionStorage.getItem(
+                            "campusCurrentUser"
+                        ) || "{}"
+                    );
 
 
+                if(!currentUser.id)
+                {
 
-                /* ---------------------------------
-                   BACKEND REQUEST
-                   --------------------------------- */
+                    card.innerHTML = `
+
+                        <div class="message">
+
+                            User information not found.
+
+                            <br><br>
+
+                            Please log in again.
+
+                        </div>
+
+                    `;
+
+                    return;
+                }
+
+
+
+                /* ======================================
+                   GET VERIFICATION FROM BACKEND
+                ====================================== */
 
                 const response =
                     await fetch(
-                        `/verification/${verificationId}`
+                        `/verification/${encodeURIComponent(
+                            verificationId
+                        )}`
                     );
 
 
@@ -541,224 +654,177 @@
                     await response.json();
 
 
-                console.log(
-                    "🔎 Verification response:",
-                    data
-                );
-
-
-
-                /* ---------------------------------
-                   CHECK RESPONSE
-                   --------------------------------- */
-
                 if(
                     !response.ok ||
                     !data.success
                 )
                 {
 
-                    document.getElementById(
-                        "verificationCard"
-                    ).innerHTML =
-                    `
-                        <div class="message">
+                    throw new Error(
+                        data.error ||
+                        "Unable to load verification."
+                    );
 
-                            ${
-                                escapeHTML(
-                                    data.error ||
-                                    data.message ||
-                                    "Unable to load verification."
-                                )
-                            }
+                }
 
-                        </div>
-                    `;
+
+                verificationData =
+                    data;
+
+
+
+                /* ======================================
+                   DETERMINE ROUND
+                ====================================== */
+
+                /*
+                 * ORIGINAL ROUND:
+                 *
+                 * status is not ANSWERED
+                 *
+                 * EXTRA ROUND:
+                 *
+                 * original is already ANSWERED
+                 * and extra_status is SENT
+                 */
+
+                if(
+                    data.status !==
+                    "ANSWERED"
+                )
+                {
+
+                    if(
+                        !Array.isArray(
+                            data.questions
+                        ) ||
+                        data.questions.length === 0
+                    )
+                    {
+
+                        card.innerHTML = `
+
+                            <div class="message">
+
+                                No verification questions
+                                are available.
+
+                            </div>
+
+                        `;
+
+                        return;
+                    }
+
+
+                    currentRound =
+                        "ORIGINAL";
+
+
+                    renderOriginalQuestions(
+                        data.questions
+                    );
 
                     return;
                 }
 
 
 
-                /* =================================================
-                   IMPORTANT:
-                   EXTRA ROUND IS CHECKED FIRST
-                   ================================================= */
+                /* ======================================
+                   EXTRA ROUND
+                ====================================== */
 
                 if(
-                    data.extra_status === "SENT" &&
-                    Array.isArray(data.extra_questions) &&
-                    data.extra_questions.length > 0
+                    data.extra_status ===
+                    "SENT"
                 )
                 {
 
-                    console.log(
-                        "🟡 EXTRA VERIFICATION ROUND"
-                    );
+                    if(
+                        !Array.isArray(
+                            data.extra_questions
+                        ) ||
+                        data.extra_questions.length === 0
+                    )
+                    {
+
+                        card.innerHTML = `
+
+                            <div class="message">
+
+                                No additional questions
+                                are available.
+
+                            </div>
+
+                        `;
+
+                        return;
+                    }
 
 
-                    displayExtraQuestions(
+                    currentRound =
+                        "EXTRA";
+
+
+                    renderExtraQuestions(
                         data.extra_questions
                     );
 
-
                     return;
                 }
 
 
 
-                /* ================================================
-                   EXTRA ROUND ALREADY ANSWERED
-                   ================================================ */
+                /* ======================================
+                   EVERYTHING ALREADY COMPLETED
+                ====================================== */
 
-                if(
-                    data.extra_status === "ANSWERED"
-                )
-                {
+                card.innerHTML = `
 
-                    document.getElementById(
-                        "verificationCard"
-                    ).innerHTML =
-                    `
-                        <div class="message">
+                    <div class="success-message">
 
-                            <h2
-                                style="
-                                    color:#e8c468;
-                                    margin-bottom:15px;
-                                "
-                            >
-                                Additional Verification Submitted
-                            </h2>
-
-
-                            <p>
-                                Your additional ownership
-                                answers have already been submitted.
-                            </p>
-
-
-                            <p
-                                style="
-                                    margin-top:12px;
-                                "
-                            >
-                                Please wait for the Founder
-                                to review your answers.
-                            </p>
-
+                        <div class="success-title">
+                            Verification Completed
                         </div>
-                    `;
 
-                    return;
-                }
+                        Your ownership verification
+                        answers have already been submitted.
 
+                        <br><br>
 
+                        Please wait for the Founder
+                        to review your answers.
 
-                /* ================================================
-                   ORIGINAL VERIFICATION ALREADY ANSWERED
-                   ================================================ */
+                    </div>
 
-                if(
-                    data.status === "ANSWERED"
-                )
-                {
-
-                    document.getElementById(
-                        "verificationCard"
-                    ).innerHTML =
-                    `
-                        <div class="message">
-
-                            <h2
-                                style="
-                                    color:#e8c468;
-                                    margin-bottom:15px;
-                                "
-                            >
-                                Original Verification Completed
-                            </h2>
-
-
-                            <p>
-                                Your original verification
-                                answers have already been submitted.
-                            </p>
-
-
-                            <p
-                                style="
-                                    margin-top:12px;
-                                "
-                            >
-                                Please wait for the Founder
-                                to review them or send
-                                additional questions.
-                            </p>
-
-                        </div>
-                    `;
-
-                    return;
-                }
-
-
-
-                /* ================================================
-                   ORIGINAL QUESTIONS
-                   ================================================ */
-
-                if(
-                    !Array.isArray(data.questions) ||
-                    data.questions.length === 0
-                )
-                {
-
-                    document.getElementById(
-                        "verificationCard"
-                    ).innerHTML =
-                    `
-                        <div class="message">
-
-                            No verification questions found.
-
-                        </div>
-                    `;
-
-                    return;
-                }
-
-
-
-                displayOriginalQuestions(
-                    data.questions,
-                    data.status
-                );
+                `;
 
             }
             catch(error)
             {
 
                 console.error(
-                    "❌ Verification loading error:",
+                    "Verification loading error:",
                     error
                 );
 
 
-                document.getElementById(
-                    "verificationCard"
-                ).innerHTML =
-                `
+                card.innerHTML = `
+
                     <div class="message">
 
-                        Unable to load verification
-                        questions.
+                        Unable to load verification.
 
                         <br><br>
 
-                        Please try again.
+                        ${escapeHTML(
+                            error.message ||
+                            "Please try again."
+                        )}
 
                     </div>
+
                 `;
 
             }
@@ -767,65 +833,62 @@
 
 
 
-        /* =========================================
-           DISPLAY ORIGINAL QUESTIONS
-           ========================================= */
+        /* ==========================================
+           ORIGINAL QUESTIONS
+        ========================================== */
 
-        function displayOriginalQuestions(
-            questions,
-            status
+        function renderOriginalQuestions(
+            questions
         )
         {
 
-            /* Change page description */
-
-            document.getElementById(
-                "pageDescription"
-            ).innerHTML =
-            `
-                Please answer the following questions
-                about your lost item.
-
-                <br>
-
-                These questions are based on
-                private identifying details provided
-                by the person who found the item.
-            `;
+            const card =
+                document.getElementById(
+                    "verificationCard"
+                );
 
 
-            let questionsHTML = "";
+            let html = `
 
+                <div class="round-title">
 
-            /* ---------------------------------
-               STATUS
-               --------------------------------- */
-
-            questionsHTML +=
-            `
-                <div class="verification-status">
-
-                    Verification Status:
-
-                    <span>
-                        ${escapeHTML(status || "PENDING")}
-                    </span>
+                    Ownership Verification
 
                 </div>
+
+
+                <div class="round-description">
+
+                    The Founder has started ownership
+                    verification for your claimed item.
+
+                    <br><br>
+
+                    Answer all questions as accurately
+                    as possible.
+
+                </div>
+
+
+                <div class="info-box">
+
+                    These questions are based on private
+                    information provided by the Founder.
+                    Your answers will be checked against
+                    the original verification answers.
+
+                </div>
+
             `;
 
 
-
-            /* ---------------------------------
-               QUESTIONS
-               --------------------------------- */
 
             questions.forEach(
                 (item, index) =>
                 {
 
-                    questionsHTML +=
-                    `
+                    html += `
+
                         <div class="question">
 
                             <div class="question-number">
@@ -838,20 +901,22 @@
                             <div class="question-text">
 
                                 ${escapeHTML(
-                                    item.question
+                                    item.question ||
+                                    ""
                                 )}
 
                             </div>
 
 
-                            <input
-                                type="text"
-                                class="answer-input original-answer-input"
+                            <textarea
+                                class="answer-input"
                                 id="answer-${index}"
                                 placeholder="Enter your answer"
-                            >
+                                rows="2"
+                            ></textarea>
 
                         </div>
+
                     `;
 
                 }
@@ -859,116 +924,102 @@
 
 
 
-            /* ---------------------------------
-               SUBMIT
-               --------------------------------- */
+            html += `
 
-            questionsHTML +=
-            `
                 <button
                     type="button"
                     class="submit-btn"
-                    onclick="submitOriginalVerification()"
+                    id="submitButton"
+                    onclick="submitAnswers()"
                 >
-                    Submit Verification
+
+                    Submit Verification Answers
+
                 </button>
+
             `;
 
 
-
-            document.getElementById(
-                "verificationCard"
-            ).innerHTML =
-                questionsHTML;
+            card.innerHTML =
+                html;
 
         }
 
 
 
-        /* =========================================
-           DISPLAY EXTRA QUESTIONS ONLY
-           ========================================= */
+        /* ==========================================
+           EXTRA QUESTIONS
+        ========================================== */
 
-        function displayExtraQuestions(
-            extraQuestions
+        function renderExtraQuestions(
+            questions
         )
         {
 
-            /* Change page description */
-
-            document.getElementById(
-                "pageDescription"
-            ).innerHTML =
-            `
-                The Founder has requested
-                additional information to verify
-                ownership.
-
-                <br>
-
-                Please answer <strong>only these
-                additional questions</strong>.
-            `;
+            const card =
+                document.getElementById(
+                    "verificationCard"
+                );
 
 
-            let questionsHTML = "";
+            let html = `
 
+                <div class="round-title">
 
-            /* ---------------------------------
-               EXTRA HEADER
-               --------------------------------- */
-
-            questionsHTML +=
-            `
-                <div class="verification-status">
-
-                    Verification Status:
-
-                    <span>
-                        ADDITIONAL QUESTIONS
-                    </span>
+                    Additional Verification
 
                 </div>
 
 
-                <div class="extra-heading">
+                <div class="round-description">
 
-                    Additional Ownership Questions
+                    The Founder needs some additional
+                    proof of ownership.
+
+                    <br><br>
+
+                    Please answer only the new questions
+                    shown below.
+
+                </div>
+
+
+                <div class="info-box">
+
+                    <strong>
+                        Additional Verification Round
+                    </strong>
+
+                    <br><br>
+
+                    Your original verification questions
+                    have already been completed.
+
+                    They are not shown again.
+
+                    <br><br>
+
+                    Only the new questions below will
+                    be evaluated in this round.
 
                 </div>
 
-
-                <div class="extra-description">
-
-                    These questions were added by
-                    the Founder after your original
-                    verification.
-
-                    <br>
-
-                    Your original answers and original
-                    verification score will remain unchanged.
-
-                </div>
             `;
 
 
 
-            /* ---------------------------------
-               EXTRA QUESTIONS
-               --------------------------------- */
-
-            extraQuestions.forEach(
+            questions.forEach(
                 (item, index) =>
                 {
 
-                    questionsHTML +=
-                    `
+                    html += `
+
                         <div class="question">
 
                             <div class="question-number">
 
-                                EXTRA QUESTION ${index + 1}
+                                ADDITIONAL QUESTION
+                                ${index + 1}
 
                             </div>
 
@@ -976,20 +1027,22 @@
                             <div class="question-text">
 
                                 ${escapeHTML(
-                                    item.question
+                                    item.question ||
+                                    ""
                                 )}
 
                             </div>
 
 
-                            <input
-                                type="text"
-                                class="answer-input extra-answer-input"
-                                id="extra-answer-${index}"
+                            <textarea
+                                class="answer-input"
+                                id="answer-${index}"
                                 placeholder="Enter your answer"
-                            >
+                                rows="2"
+                            ></textarea>
 
                         </div>
+
                     `;
 
                 }
@@ -997,470 +1050,198 @@
 
 
 
-            /* ---------------------------------
-               EXTRA SUBMIT BUTTON
-               --------------------------------- */
+            html += `
 
-            questionsHTML +=
-            `
                 <button
                     type="button"
                     class="submit-btn"
-                    onclick="submitExtraVerification()"
+                    id="submitButton"
+                    onclick="submitAnswers()"
                 >
+
                     Submit Additional Answers
+
                 </button>
+
             `;
 
 
-
-            document.getElementById(
-                "verificationCard"
-            ).innerHTML =
-                questionsHTML;
+            card.innerHTML =
+                html;
 
         }
 
 
 
-        /* =========================================
-           SUBMIT ORIGINAL VERIFICATION
-           ========================================= */
+        /* ==========================================
+           SUBMIT ANSWERS
+        ========================================== */
 
-        async function submitOriginalVerification()
+        async function submitAnswers()
         {
 
-            try
+            if(
+                !verificationId ||
+                !currentUser ||
+                !currentUser.id
+            )
             {
-
-                /* ---------------------------------
-                   GET VERIFICATION ID
-                   --------------------------------- */
-
-                const params =
-                    new URLSearchParams(
-                        window.location.search
-                    );
-
-
-                const verificationId =
-                    params.get(
-                        "verification_id"
-                    );
-
-
-                if(!verificationId)
-                {
-                    alert(
-                        "Verification ID not found."
-                    );
-
-                    return;
-                }
-
-
-
-                /* ---------------------------------
-                   CURRENT USER
-                   --------------------------------- */
-
-                const currentUser =
-                    JSON.parse(
-                        sessionStorage.getItem(
-                            "campusCurrentUser"
-                        ) || "{}"
-                    );
-
-
-                if(!currentUser.id)
-                {
-                    alert(
-                        "User information not found. Please login again."
-                    );
-
-                    return;
-                }
-
-
-
-                /* ---------------------------------
-                   GET ORIGINAL ANSWERS ONLY
-                   --------------------------------- */
-
-                const answerInputs =
-                    document.querySelectorAll(
-                        ".original-answer-input"
-                    );
-
-
-                const answers = [];
-
-
-                answerInputs.forEach(
-                    input =>
-                    {
-
-                        answers.push(
-                        {
-                            answer:
-                                input.value.trim()
-                        });
-
-                    }
-                );
-
-
-
-                /* ---------------------------------
-                   CHECK ANSWERS
-                   --------------------------------- */
-
-                for(
-                    let i = 0;
-                    i < answers.length;
-                    i++
-                )
-                {
-
-                    if(
-                        !answers[i].answer
-                    )
-                    {
-
-                        alert(
-                            "Please answer Question " +
-                            (i + 1)
-                        );
-
-                        return;
-                    }
-
-                }
-
-
-
-                /* ---------------------------------
-                   BUTTON
-                   --------------------------------- */
-
-                const submitButton =
-                    document.querySelector(
-                        ".submit-btn"
-                    );
-
-
-                if(submitButton)
-                {
-
-                    submitButton.disabled =
-                        true;
-
-                    submitButton.textContent =
-                        "Submitting...";
-
-                }
-
-
-
-                /* ---------------------------------
-                   ORIGINAL BACKEND ROUTE
-                   --------------------------------- */
-
-                const response =
-                    await fetch(
-                        `/verification/${verificationId}/submit`,
-                        {
-                            method: "POST",
-
-                            headers:
-                            {
-                                "Content-Type":
-                                    "application/json"
-                            },
-
-                            body:
-                                JSON.stringify(
-                                {
-                                    user_id:
-                                        currentUser.id,
-
-                                    answers:
-                                        answers
-                                })
-                        }
-                    );
-
-
-                const data =
-                    await response.json();
-
-
-                console.log(
-                    "Original verification response:",
-                    data
-                );
-
-
-
-                /* ---------------------------------
-                   CHECK RESPONSE
-                   --------------------------------- */
-
-                if(
-                    !response.ok ||
-                    !data.success
-                )
-                {
-
-                    alert(
-                        data.error ||
-                        data.message ||
-                        "Failed to submit verification."
-                    );
-
-
-                    if(submitButton)
-                    {
-
-                        submitButton.disabled =
-                            false;
-
-                        submitButton.textContent =
-                            "Submit Verification";
-
-                    }
-
-                    return;
-                }
-
-
-
-                /* ---------------------------------
-                   SUCCESS
-                   --------------------------------- */
-
-                document.getElementById(
-                    "verificationCard"
-                ).innerHTML =
-                `
-                    <div class="message">
-
-                        <h2
-                            style="
-                                color:#e8c468;
-                                margin-bottom:15px;
-                            "
-                        >
-                            Verification Submitted
-                        </h2>
-
-
-                        <p>
-                            Your original verification
-                            answers have been submitted successfully.
-                        </p>
-
-
-                        <p
-                            style="
-                                margin-top:12px;
-                            "
-                        >
-                            The Founder will review
-                            your verification.
-                        </p>
-
-                    </div>
-                `;
-
-            }
-            catch(error)
-            {
-
-                console.error(
-                    "❌ Original verification submission error:",
-                    error
-                );
-
 
                 alert(
-                    "Unable to submit verification."
+                    "Verification or user information is missing."
                 );
 
+                return;
+            }
 
-                const submitButton =
-                    document.querySelector(
-                        ".submit-btn"
+
+
+            if(
+                !verificationData
+            )
+            {
+
+                alert(
+                    "Verification data is not loaded."
+                );
+
+                return;
+            }
+
+
+
+            const questions =
+                currentRound === "EXTRA"
+                    ? (
+                        verificationData.extra_questions ||
+                        []
+                    )
+                    : (
+                        verificationData.questions ||
+                        []
                     );
 
 
-                if(submitButton)
+
+            if(
+                questions.length === 0
+            )
+            {
+
+                alert(
+                    "No questions are available."
+                );
+
+                return;
+            }
+
+
+
+            /* ======================================
+               COLLECT ANSWERS
+            ====================================== */
+
+            const answers = [];
+
+
+            for(
+                let i = 0;
+                i < questions.length;
+                i++
+            )
+            {
+
+                const input =
+                    document.getElementById(
+                        `answer-${i}`
+                    );
+
+
+                const answer =
+                    input
+                        ? input.value.trim()
+                        : "";
+
+
+                if(!answer)
                 {
 
-                    submitButton.disabled =
-                        false;
+                    alert(
+                        `Please answer Question ${i + 1}.`
+                    );
 
-                    submitButton.textContent =
-                        "Submit Verification";
 
+                    if(input)
+                    {
+                        input.focus();
+                    }
+
+
+                    return;
                 }
+
+
+                answers.push(
+                    answer
+                );
 
             }
 
-        }
+
+
+            /* ======================================
+               CONFIRM SUBMISSION
+            ====================================== */
+
+            const confirmed =
+                window.confirm(
+                    currentRound === "EXTRA"
+                        ? "Submit your additional verification answers?"
+                        : "Submit your verification answers?"
+                );
+
+
+            if(!confirmed)
+            {
+                return;
+            }
 
 
 
-        /* =========================================
-           SUBMIT EXTRA VERIFICATION
-           ========================================= */
+            const button =
+                document.getElementById(
+                    "submitButton"
+                );
 
-        async function submitExtraVerification()
-        {
+
+            if(button)
+            {
+
+                button.disabled =
+                    true;
+
+                button.textContent =
+                    "Submitting...";
+
+            }
+
+
 
             try
             {
 
-                /* ---------------------------------
-                   GET VERIFICATION ID
-                   --------------------------------- */
-
-                const params =
-                    new URLSearchParams(
-                        window.location.search
-                    );
-
-
-                const verificationId =
-                    params.get(
-                        "verification_id"
-                    );
-
-
-                if(!verificationId)
-                {
-
-                    alert(
-                        "Verification ID not found."
-                    );
-
-                    return;
-                }
-
-
-
-                /* ---------------------------------
-                   CURRENT USER
-                   --------------------------------- */
-
-                const currentUser =
-                    JSON.parse(
-                        sessionStorage.getItem(
-                            "campusCurrentUser"
-                        ) || "{}"
-                    );
-
-
-                if(!currentUser.id)
-                {
-
-                    alert(
-                        "User information not found. Please login again."
-                    );
-
-                    return;
-                }
-
-
-
-                /* ---------------------------------
-                   GET EXTRA ANSWERS ONLY
-                   --------------------------------- */
-
-                const answerInputs =
-                    document.querySelectorAll(
-                        ".extra-answer-input"
-                    );
-
-
-                const answers = [];
-
-
-                answerInputs.forEach(
-                    input =>
-                    {
-
-                        answers.push(
-                        {
-                            answer:
-                                input.value.trim()
-                        });
-
-                    }
-                );
-
-
-
-                /* ---------------------------------
-                   CHECK EXTRA ANSWERS
-                   --------------------------------- */
-
-                for(
-                    let i = 0;
-                    i < answers.length;
-                    i++
-                )
-                {
-
-                    if(
-                        !answers[i].answer
-                    )
-                    {
-
-                        alert(
-                            "Please answer Extra Question " +
-                            (i + 1)
-                        );
-
-                        return;
-                    }
-
-                }
-
-
-
-                /* ---------------------------------
-                   BUTTON
-                   --------------------------------- */
-
-                const submitButton =
-                    document.querySelector(
-                        ".submit-btn"
-                    );
-
-
-                if(submitButton)
-                {
-
-                    submitButton.disabled =
-                        true;
-
-                    submitButton.textContent =
-                        "Submitting...";
-
-                }
-
-
-
-                /* ---------------------------------
-                   EXTRA BACKEND ROUTE
-                   --------------------------------- */
+                /* ======================================
+                   BACKEND SUBMISSION
+                ====================================== */
 
                 const response =
                     await fetch(
-                        `/verification/${verificationId}/extra-submit`,
+                        `/verification/${encodeURIComponent(
+                            verificationId
+                        )}/submit`,
                         {
-                            method: "POST",
+                            method:
+                                "POST",
 
                             headers:
                             {
@@ -1469,14 +1250,19 @@
                             },
 
                             body:
-                                JSON.stringify(
-                                {
+                                JSON.stringify({
+
                                     user_id:
                                         currentUser.id,
 
                                     answers:
-                                        answers
+                                        answers,
+
+                                    round:
+                                        currentRound
+
                                 })
+
                         }
                     );
 
@@ -1485,82 +1271,106 @@
                     await response.json();
 
 
-                console.log(
-                    "Extra verification response:",
-                    data
-                );
-
-
-
-                /* ---------------------------------
-                   CHECK RESPONSE
-                   --------------------------------- */
-
                 if(
                     !response.ok ||
                     !data.success
                 )
                 {
 
-                    alert(
-                        data.error ||
+                    throw new Error(
                         data.message ||
-                        "Failed to submit additional answers."
+                        data.error ||
+                        "Unable to submit answers."
                     );
 
+                }
 
-                    if(submitButton)
-                    {
 
-                        submitButton.disabled =
-                            false;
 
-                        submitButton.textContent =
-                            "Submit Additional Answers";
+                /* ======================================
+                   ORIGINAL ROUND SUCCESS
+                ====================================== */
 
-                    }
+                if(
+                    currentRound ===
+                    "ORIGINAL"
+                )
+                {
+
+                    document.getElementById(
+                        "verificationCard"
+                    ).innerHTML = `
+
+                        <div class="success-message">
+
+                            <div class="success-title">
+
+                                Verification Submitted
+
+                            </div>
+
+                            Your ownership verification
+                            answers have been submitted
+                            successfully.
+
+                            <br><br>
+
+                            Your answers are now being
+                            reviewed by the Founder.
+
+                            <br><br>
+
+                            Please wait for the Founder
+                            to decide whether ownership
+                            should be confirmed or whether
+                            additional questions are needed.
+
+                        </div>
+
+                    `;
 
                     return;
                 }
 
 
 
-                /* ---------------------------------
-                   SUCCESS
-                   --------------------------------- */
+                /* ======================================
+                   EXTRA ROUND SUCCESS
+                ====================================== */
 
                 document.getElementById(
                     "verificationCard"
-                ).innerHTML =
-                `
-                    <div class="message">
+                ).innerHTML = `
 
-                        <h2
-                            style="
-                                color:#e8c468;
-                                margin-bottom:15px;
-                            "
-                        >
+                    <div class="success-message">
+
+                        <div class="success-title">
+
                             Additional Verification Submitted
-                        </h2>
 
+                        </div>
 
-                        <p>
-                            Your additional answers
-                            have been submitted successfully.
-                        </p>
+                        Your additional verification
+                        answers have been submitted
+                        successfully.
 
+                        <br><br>
 
-                        <p
-                            style="
-                                margin-top:12px;
-                            "
-                        >
-                            The Founder will review
-                            your additional answers.
-                        </p>
+                        Only the new additional questions
+                        were evaluated in this round.
+
+                        <br><br>
+
+                        Your original verification
+                        answers and score remain unchanged.
+
+                        <br><br>
+
+                        Please wait for the Founder
+                        to review the additional answers.
 
                     </div>
+
                 `;
 
             }
@@ -1568,30 +1378,27 @@
             {
 
                 console.error(
-                    "❌ Extra verification submission error:",
+                    "Verification submission error:",
                     error
                 );
 
 
                 alert(
-                    "Unable to submit additional verification."
+                    error.message ||
+                    "Unable to submit verification answers."
                 );
 
 
-                const submitButton =
-                    document.querySelector(
-                        ".submit-btn"
-                    );
-
-
-                if(submitButton)
+                if(button)
                 {
 
-                    submitButton.disabled =
+                    button.disabled =
                         false;
 
-                    submitButton.textContent =
-                        "Submit Additional Answers";
+                    button.textContent =
+                        currentRound === "EXTRA"
+                            ? "Submit Additional Answers"
+                            : "Submit Verification Answers";
 
                 }
 
@@ -1601,14 +1408,13 @@
 
 
 
-        /* =========================================
+        /* ==========================================
            START
-           ========================================= */
+        ========================================== */
 
         loadVerification();
 
     </script>
-
 
 </body>
 

@@ -1101,6 +1101,7 @@
             
             <button class="dash-btn" type="button" onclick="window.location.href='possibleview.html'"> Possible Matches </button>
             <button class="dash-btn" type="button" onclick="window.location.href='view-reports.html'" > View Reports </button>
+            <button class="dash-btn" type="button" onclick="window.location.href='handover-list.html'"> Handover </button>
           </div>
         </div>
         <div class="dash-card">
@@ -1664,19 +1665,23 @@ async function loadNotifications()
                             class="view-notification-btn"
                             onclick="viewNotification(
                                 '${notification.id}',
-                                '${notification.verification_id}',
-                                '${notification.type}'
+                                '${notification.verification_id || ''}',
+                                '${notification.type}',
+                                '${notification.match_id || ''}'
                             )"
                         >
                             ${
-    notification.type ===
-    "VERIFICATION_RESULT"
-        ? "View Verification Result →"
-        : notification.type ===
-          "HANDOVER"
-            ? "View Pickup Code →"
-            : "View Verification →"
-}
+                                notification.type ===
+                                "CLAIM"
+                                    ? "View Possible Match →"
+                                    : notification.type ===
+                                      "VERIFICATION_RESULT"
+                                        ? "View Verification Result →"
+                                        : notification.type ===
+                                          "HANDOVER"
+                                            ? "View Pickup Code →"
+                                            : "View Verification →"
+                            }
                         </button>
 
                     </div>
@@ -1717,18 +1722,10 @@ async function loadNotifications()
 async function viewNotification(
     notificationId,
     verificationId,
-    notificationType
+    notificationType,
+    matchId
 )
 {
-    if(!verificationId)
-    {
-        alert(
-            "Verification ID not found."
-        );
-
-        return;
-    }
-
     try
     {
         const currentUser =
@@ -1746,6 +1743,7 @@ async function viewNotification(
 
             return;
         }
+
 
         // ==========================================
         // MARK NOTIFICATION AS READ
@@ -1781,12 +1779,44 @@ async function viewNotification(
                 data
             );
 
-            if(!response.ok || !data.success)
+            if(
+                !response.ok ||
+                !data.success
+            )
             {
                 console.error(
                     "❌ Failed to mark notification as read"
                 );
             }
+        }
+
+
+        // ==========================================
+        // CLAIM NOTIFICATION
+        // Founder receives this notification
+        // ==========================================
+
+        if(
+            notificationType ===
+            "CLAIM"
+        )
+        {
+            if(!matchId)
+            {
+                alert(
+                    "Match ID not found."
+                );
+
+                return;
+            }
+
+            window.location.href =
+                "founder-matches.html?match_id=" +
+                encodeURIComponent(
+                    matchId
+                );
+
+            return;
         }
 
 
@@ -1799,9 +1829,20 @@ async function viewNotification(
             "VERIFICATION"
         )
         {
+            if(!verificationId)
+            {
+                alert(
+                    "Verification ID not found."
+                );
+
+                return;
+            }
+
             window.location.href =
                 "verification.html?verification_id=" +
-                verificationId;
+                encodeURIComponent(
+                    verificationId
+                );
 
             return;
         }
@@ -1811,93 +1852,224 @@ async function viewNotification(
         // FOUNDER VERIFICATION RESULT
         // ==========================================
 
+        if(
+            notificationType ===
+            "VERIFICATION_RESULT"
+        )
+        {
+            if(!verificationId)
+            {
+                alert(
+                    "Verification ID not found."
+                );
+
+                return;
+            }
+
+            window.location.href =
+                "verification-result.html?verification_id=" +
+                encodeURIComponent(
+                    verificationId
+                );
+
+            return;
+        }
+
+
         // ==========================================
-// FOUNDER VERIFICATION RESULT
-// ==========================================
+        // PICKUP CODE
+        // Lost User receives this after Founder
+        // confirms ownership.
+        // ==========================================
 
-if(
-    notificationType ===
-    "VERIFICATION_RESULT"
-)
-{
-    window.location.href =
-        "verification-result.html?verification_id=" +
-        verificationId;
+        if(
+            notificationType ===
+            "PICKUP_CODE"
+        )
+        {
+            window.location.href =
+                "pickup-code.html";
 
-    return;
-}
-
-
-// ==========================================
-// LOST USER PICKUP CODE
-// ==========================================
-
-if(
-    notificationType ===
-    "HANDOVER"
-)
-{
-    window.location.href =
-        "pickup-code.html";
-
-    return;
-}
+            return;
+        }
 
 
-// ==========================================
-// UNKNOWN NOTIFICATION TYPE
-// ==========================================
+        // ==========================================
+        // OLD HANDOVER NOTIFICATION
+        // ==========================================
 
-alert(
-    "Unknown notification type."
-); 
+        if(
+            notificationType ===
+            "HANDOVER"
+        )
+        {
+            window.location.href =
+                "pickup-code.html";
+
+            return;
+        }
+
+
+        // ==========================================
+        // HANDOVER SCHEDULED
+        // Lost User receives this after Founder
+        // schedules the handover.
+        // ==========================================
+
+        if(
+            notificationType ===
+            "HANDOVER_SCHEDULED"
+        )
+        {
+            window.location.href =
+                "pickup-code.html";
+
+            return;
+        }
+
+
+        // ==========================================
+        // HANDOVER COMPLETED
+        // Lost User receives this after the physical
+        // handover has been completed.
+        // ==========================================
+
+        if(
+            notificationType ===
+            "HANDOVER_COMPLETED"
+        )
+        {
+            window.location.href =
+                "pickup-code.html";
+
+            return;
+        }
+
+
+        // ==========================================
+        // UNKNOWN NOTIFICATION TYPE
+        // ==========================================
+
+        console.warn(
+            "⚠️ Unknown notification type:",
+            notificationType
+        );
+
+        alert(
+            "Unknown notification type: " +
+            notificationType
+        );
     }
     catch(error)
     {
         console.error(
-            "❌ Notification read error:",
+            "❌ Notification read/navigation error:",
             error
         );
 
-        // Even if marking as read fails,
-        // still allow the user to open the notification.
+
+        // ==========================================
+        // NAVIGATION FALLBACK
+        // ==========================================
+
+        if(
+            notificationType ===
+            "CLAIM"
+        )
+        {
+            if(matchId)
+            {
+                window.location.href =
+                    "founder-matches.html?match_id=" +
+                    encodeURIComponent(
+                        matchId
+                    );
+            }
+            else
+            {
+                alert(
+                    "Match ID not found."
+                );
+            }
+
+            return;
+        }
+
 
         if(
             notificationType ===
             "VERIFICATION"
         )
         {
-            window.location.href =
-                "verification.html?verification_id=" +
-                verificationId;
+            if(verificationId)
+            {
+                window.location.href =
+                    "verification.html?verification_id=" +
+                    encodeURIComponent(
+                        verificationId
+                    );
+            }
+            else
+            {
+                alert(
+                    "Verification ID not found."
+                );
+            }
 
             return;
         }
+
 
         if(
             notificationType ===
             "VERIFICATION_RESULT"
         )
         {
-            window.location.href =
-                "verification-result.html?verification_id=" +
-                verificationId;
+            if(verificationId)
+            {
+                window.location.href =
+                    "verification-result.html?verification_id=" +
+                    encodeURIComponent(
+                        verificationId
+                    );
+            }
+            else
+            {
+                alert(
+                    "Verification ID not found."
+                );
+            }
 
             return;
         }
-        if(
-    notificationType ===
-    "HANDOVER"
-)
-{
-    window.location.href =
-        "pickup-code.html";
 
-    return;
-}
+
+        // ==========================================
+        // PICKUP / HANDOVER FALLBACK
+        // ==========================================
+
+        if(
+            notificationType ===
+            "PICKUP_CODE" ||
+            notificationType ===
+            "HANDOVER" ||
+            notificationType ===
+            "HANDOVER_SCHEDULED" ||
+            notificationType ===
+            "HANDOVER_COMPLETED"
+        )
+        {
+            window.location.href =
+                "pickup-code.html";
+
+            return;
+        }
     }
 }
-  function escapeHTML(value) {
+
+
+
+function escapeHTML(value) {
 
       return String(value ?? '')
           .replace(/&/g, '&amp;')

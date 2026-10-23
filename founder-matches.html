@@ -190,6 +190,38 @@
 
 
         /* =========================
+           CLAIM MESSAGE
+        ========================= */
+
+        .claim-message {
+            display: none;
+
+            background: #19160c;
+
+            border: 1px solid #8f741f;
+
+            color: #d4af37;
+
+            border-radius: 10px;
+
+            padding: 14px 18px;
+
+            margin-bottom: 25px;
+
+            text-align: center;
+
+            font-size: 13px;
+
+            line-height: 1.5;
+        }
+
+
+        .claim-message strong {
+            color: #e5c04a;
+        }
+
+
+        /* =========================
            REPORT SELECT
         ========================= */
 
@@ -279,6 +311,36 @@
             border-color: #8f741f;
 
             transform: translateY(-3px);
+        }
+
+
+        /* =========================
+           CLAIMED MATCH HIGHLIGHT
+        ========================= */
+
+        .match-card.claimed-match {
+            border: 2px solid #d4af37;
+
+            box-shadow:
+                0 0 0 1px #66551b,
+                0 0 20px rgba(212, 175, 55, 0.12);
+        }
+
+
+        .claimed-match-label {
+            background: #19160c;
+
+            border-bottom: 1px solid #66551b;
+
+            color: #d4af37;
+
+            padding: 10px 15px;
+
+            text-align: center;
+
+            font-size: 12px;
+
+            font-weight: bold;
         }
 
 
@@ -499,6 +561,52 @@
 
 
         /* =========================
+           CLAIM STATUS
+        ========================= */
+
+        .claim-status {
+            margin-top: 15px;
+
+            padding: 11px;
+
+            border-radius: 7px;
+
+            background: #111111;
+
+            border: 1px solid #333333;
+
+            color: #aaaaaa;
+
+            font-size: 12px;
+
+            text-align: center;
+        }
+
+
+        .claim-status.claimed {
+            border-color: #66551b;
+
+            color: #d4af37;
+
+            background: #19160c;
+        }
+
+
+        .claim-status.verification-started {
+            border-color: #66551b;
+
+            color: #e5c04a;
+
+            background: #19160c;
+        }
+
+
+        .claim-status.not-claimed {
+            color: #888888;
+        }
+
+
+        /* =========================
            VERIFY BUTTON
         ========================= */
 
@@ -546,6 +654,8 @@
             padding: 40px;
 
             text-align: center;
+
+            grid-column: 1 / -1;
         }
 
 
@@ -692,6 +802,26 @@
         </section>
 
 
+        <!-- =========================
+             CLAIM NOTIFICATION MESSAGE
+        ========================= -->
+
+        <div
+            id="claimMessage"
+            class="claim-message"
+        >
+            <strong>
+                🔔 Claim Notification
+            </strong>
+
+            <br>
+
+            A Lost User has claimed the highlighted
+            possible match. Please review the match
+            and decide whether to start verification.
+        </div>
+
+
 
         <!-- =========================
              FOUND REPORT SELECTOR
@@ -759,6 +889,8 @@
         let currentUser = null;
 
         let foundReports = [];
+
+        let selectedMatchId = null;
 
 
 
@@ -847,6 +979,22 @@
 
 
             return true;
+        }
+
+
+
+        /* =========================
+           GET MATCH ID FROM URL
+        ========================= */
+
+        function getMatchIdFromURL()
+        {
+            const params =
+                new URLSearchParams(
+                    window.location.search
+                );
+
+            return params.get("match_id");
         }
 
 
@@ -965,7 +1113,25 @@
                 );
 
 
-                await loadMatchesForSelectedReport();
+                /*
+                 * If this page was opened from
+                 * a CLAIM notification, find
+                 * which found report contains
+                 * that match.
+                 */
+
+                selectedMatchId =
+                    getMatchIdFromURL();
+
+
+                if(selectedMatchId)
+                {
+                    await selectFoundReportForMatch();
+                }
+                else
+                {
+                    await loadMatchesForSelectedReport();
+                }
 
             }
             catch(error)
@@ -984,6 +1150,140 @@
                     "Unable to Load Reports",
                     error.message
                 );
+            }
+        }
+
+
+
+        /* =========================
+           SELECT FOUND REPORT
+           FOR CLAIMED MATCH
+        ========================= */
+
+        async function selectFoundReportForMatch()
+        {
+            try
+            {
+                /*
+                 * The match ID tells us which
+                 * match was claimed.
+                 *
+                 * We need to find its found
+                 * report.
+                 */
+
+                let foundReportId = null;
+
+
+                for(
+                    const report of foundReports
+                )
+                {
+                    const response =
+                        await fetch(
+                            `/matches/found/${report._id}`
+                        );
+
+
+                    if(!response.ok)
+                    {
+                        continue;
+                    }
+
+
+                    const data =
+                        await response.json();
+
+
+                    if(
+                        !data.success ||
+                        !Array.isArray(
+                            data.matches
+                        )
+                    )
+                    {
+                        continue;
+                    }
+
+
+                    const foundMatch =
+                        data.matches.find(
+                            function(match)
+                            {
+                                return String(
+                                    match.match_id
+                                ) === String(
+                                    selectedMatchId
+                                );
+                            }
+                        );
+
+
+                    if(foundMatch)
+                    {
+                        foundReportId =
+                            report._id;
+
+                        break;
+                    }
+                }
+
+
+                /*
+                 * If the match was found,
+                 * select that found report.
+                 */
+
+                if(foundReportId)
+                {
+                    const select =
+                        document.getElementById(
+                            "reportSelect"
+                        );
+
+
+                    select.value =
+                        foundReportId;
+
+
+                    const claimMessage =
+                        document.getElementById(
+                            "claimMessage"
+                        );
+
+
+                    claimMessage.style.display =
+                        "block";
+
+
+                    await loadMatchesForSelectedReport();
+
+                    return;
+                }
+
+
+                /*
+                 * Match ID could not be found.
+                 */
+
+                console.warn(
+                    "⚠️ Could not find found report for match:",
+                    selectedMatchId
+                );
+
+
+                await loadMatchesForSelectedReport();
+
+            }
+            catch(error)
+            {
+                console.error(
+                    "❌ Failed to select found report:",
+                    error
+                );
+
+
+                await loadMatchesForSelectedReport();
             }
         }
 
@@ -1101,15 +1401,6 @@
 
         function createMatchCard(match)
         {
-            /*
-             * /matches/found/:id currently
-             * returns Match documents.
-             *
-             * Therefore we use the lost
-             * report information when
-             * available.
-             */
-
             const lost =
                 match.lost_report ||
                 match.lostReport ||
@@ -1140,9 +1431,96 @@
                 );
 
 
+            const claimId =
+                match.claim_id ||
+                "";
+
+
+            const claimStatus =
+                match.claim_status ||
+                "";
+
+
+            /*
+             * Check whether this is
+             * the match from the CLAIM
+             * notification.
+             */
+
+            const isSelectedMatch =
+                selectedMatchId &&
+                String(
+                    match.match_id
+                ) === String(
+                    selectedMatchId
+                );
+
+
+            let claimStatusHTML = "";
+
+
+            if(claimStatus === "PENDING")
+            {
+                claimStatusHTML = `
+
+                    <div class="claim-status claimed">
+
+                        ✓ Claimed by Lost User
+
+                        <br>
+
+                        <span>
+                            Waiting for Founder decision
+                        </span>
+
+                    </div>
+
+                `;
+            }
+            else if(
+                claimStatus ===
+                "VERIFICATION_STARTED"
+            )
+            {
+                claimStatusHTML = `
+
+                    <div class="claim-status verification-started">
+
+                        ✓ Verification Started
+
+                    </div>
+
+                `;
+            }
+            else
+            {
+                claimStatusHTML = `
+
+                    <div class="claim-status not-claimed">
+
+                        No claim yet
+
+                    </div>
+
+                `;
+            }
+
+
             return `
 
-                <div class="match-card">
+                <div
+                    class="match-card ${isSelectedMatch ? "claimed-match" : ""}"
+                >
+
+                    ${
+                        isSelectedMatch
+                            ? `
+                                <div class="claimed-match-label">
+                                    🔔 This match was claimed by a Lost User
+                                </div>
+                              `
+                            : ""
+                    }
 
 
                     <div class="item-image">
@@ -1361,15 +1739,28 @@
 
 
                         <!-- =====================
-                             VERIFY BUTTON
+                             CLAIM STATUS
+                        ====================== -->
+
+                        ${claimStatusHTML}
+
+
+
+                        <!-- =====================
+                             START VERIFICATION
                         ====================== -->
 
                         <button
                             class="verify-button"
                             type="button"
-                            onclick="startVerification('${match.match_id}')"
+                            onclick="startVerification(
+                                '${match.match_id}',
+                                '${claimId}'
+                            )"
                         >
+
                             Start Verification
+
                         </button>
 
 
@@ -1386,108 +1777,139 @@
            START VERIFICATION
         ========================= */
 
-        
-        
-        async function startVerification(matchId)
-{
-    try
-    {
-        console.log(
-            "Starting verification for:",
-            matchId
-        );
+        async function startVerification(
+            matchId,
+            claimId
+        )
+        {
+            try
+            {
+                console.log(
+                    "Starting verification..."
+                );
 
 
-        const response =
-            await fetch(
-                "/verification/start",
+                console.log(
+                    "Match ID:",
+                    matchId
+                );
+
+
+                console.log(
+                    "Claim ID:",
+                    claimId
+                );
+
+
+                const requestBody =
                 {
-                    method: "POST",
+                    match_id:
+                        matchId
+                };
 
-                    headers:
-                    {
-                        "Content-Type":
-                            "application/json"
-                    },
 
-                    body:
-                        JSON.stringify(
-                            {
-                                match_id:
-                                    matchId
-                            }
-                        )
+                /*
+                 * claim_id is optional.
+                 *
+                 * If the Lost User has already
+                 * claimed the item, send the claim ID.
+                 *
+                 * If there is no claim yet, do not
+                 * send a claim ID.
+                 */
+
+                if(claimId)
+                {
+                    requestBody.claim_id =
+                        claimId;
                 }
-            );
 
 
-        const data =
-            await response.json();
+                const response =
+                    await fetch(
+                        "/verification/start",
+                        {
+                            method: "POST",
+
+                            headers:
+                            {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify(
+                                    requestBody
+                                )
+                        }
+                    );
 
 
-        console.log(
-            "Verification response:",
-            data
-        );
+                const data =
+                    await response.json();
 
 
-        if(!response.ok)
-        {
-            alert(
-                data.error ||
-                "Failed to start verification"
-            );
+                console.log(
+                    "Verification response:",
+                    data
+                );
 
-            return;
+
+                if(!response.ok)
+                {
+                    alert(
+                        data.error ||
+                        data.message ||
+                        "Failed to start verification"
+                    );
+
+                    return;
+                }
+
+
+                if(!data.success)
+                {
+                    alert(
+                        data.error ||
+                        data.message ||
+                        "Failed to start verification"
+                    );
+
+                    return;
+                }
+
+
+                window.location.href =
+                    "founder-question-review.html?verification_id=" +
+                    encodeURIComponent(
+                        data.verification_id
+                    );
+
+            }
+            catch(error)
+            {
+                console.error(
+                    "Start verification error:",
+                    error
+                );
+
+
+                alert(
+                    "Unable to start verification."
+                );
+            }
         }
 
 
-        if(!data.success)
-        {
-            alert(
-                data.error ||
-                "Failed to start verification"
-            );
-
-            return;
-        }
-
-
-        /*
-         * Verification has been created
-         * and automatic questions have
-         * been generated.
-         *
-         * Now send the Founder to the
-         * question review page.
-         */
-
-        window.location.href =
-            "founder-question-review.html?verification_id=" +
-            encodeURIComponent(
-                data.verification_id
-            );
-
-    }
-    catch(error)
-    {
-        console.error(
-            "Start verification error:",
-            error
-        );
-
-
-        alert(
-            "Unable to start verification."
-        );
-    }
-}
 
         /* =========================
            MESSAGE
         ========================= */
 
-        function showMessage(title, message)
+        function showMessage(
+            title,
+            message
+        )
         {
             document.getElementById(
                 "matchesContainer"
