@@ -191,6 +191,12 @@
             background: #0d1b13;
         }
 
+        .status.other {
+            color: #ccc;
+            border: 1px solid #555;
+            background: #171717;
+        }
+
         .info-row {
             display: flex;
             gap: 12px;
@@ -334,68 +340,56 @@
 </div>
 
 <script>
-
     let allHandovers = [];
     let currentFilter = "ALL";
+    let currentUser = null;
 
-    const currentUser =
-        JSON.parse(
+    // Read the logged-in user safely.
+    try {
+        currentUser = JSON.parse(
             sessionStorage.getItem("campusCurrentUser")
         );
+    } catch (error) {
+        console.error("Invalid user session:", error);
+    }
 
-    document.addEventListener("DOMContentLoaded", function()
-    {
-        if(!currentUser || !currentUser.id)
-        {
+    document.addEventListener("DOMContentLoaded", function () {
+        if (!currentUser || !currentUser.id) {
             document.getElementById("content").innerHTML =
                 '<div class="error">Please login again to view handovers.</div>';
-
             return;
         }
 
         loadHandovers();
     });
 
-    async function loadHandovers()
-    {
-        const content =
-            document.getElementById("content");
+    async function loadHandovers() {
+        const content = document.getElementById("content");
 
         content.innerHTML =
             '<div class="loading">Loading handovers...</div>';
 
-        try
-        {
-            const response =
-                await fetch(
-                    `/handovers/founder/${currentUser.id}`
-                );
+        try {
+            const response = await fetch(
+                `/handovers/founder/${encodeURIComponent(currentUser.id)}`
+            );
 
-            const data =
-                await response.json();
+            const data = await response.json();
 
-            if(!response.ok || !data.success)
-            {
+            if (!response.ok || !data.success) {
                 throw new Error(
-                    data.error ||
-                    "Failed to load handovers"
+                    data.error || "Failed to load handovers"
                 );
             }
 
-            allHandovers =
-                Array.isArray(data.handovers)
-                    ? data.handovers
-                    : [];
+            allHandovers = Array.isArray(data.handovers)
+                ? data.handovers
+                : [];
 
             updateSummary();
             renderHandovers();
-        }
-        catch(error)
-        {
-            console.error(
-                "Load handovers error:",
-                error
-            );
+        } catch (error) {
+            console.error("Load handovers error:", error);
 
             content.innerHTML =
                 `<div class="error">
@@ -405,22 +399,18 @@
         }
     }
 
-    function updateSummary()
-    {
-        const pending =
-            allHandovers.filter(
-                h => normalizeStatus(h.status) === "PENDING"
-            ).length;
+    function updateSummary() {
+        const pending = allHandovers.filter(
+            h => normalizeStatus(h.status) === "PENDING"
+        ).length;
 
-        const scheduled =
-            allHandovers.filter(
-                h => normalizeStatus(h.status) === "SCHEDULED"
-            ).length;
+        const scheduled = allHandovers.filter(
+            h => normalizeStatus(h.status) === "SCHEDULED"
+        ).length;
 
-        const completed =
-            allHandovers.filter(
-                h => normalizeStatus(h.status) === "COMPLETED"
-            ).length;
+        const completed = allHandovers.filter(
+            h => normalizeStatus(h.status) === "COMPLETED"
+        ).length;
 
         document.getElementById("countAll").textContent =
             allHandovers.length;
@@ -435,46 +425,34 @@
             completed;
     }
 
-    function setFilter(filter, button)
-    {
+    function setFilter(filter, button) {
         currentFilter = filter;
 
-        document
-            .querySelectorAll(".filter-btn")
-            .forEach(btn =>
-                btn.classList.remove("active")
-            );
+        document.querySelectorAll(".filter-btn").forEach(btn => {
+            btn.classList.remove("active");
+        });
 
         button.classList.add("active");
-
         renderHandovers();
     }
 
-    function renderHandovers()
-    {
-        const content =
-            document.getElementById("content");
+    function renderHandovers() {
+        const content = document.getElementById("content");
 
-        let filtered =
-            allHandovers.filter(function(handover)
-            {
-                if(currentFilter === "ALL")
-                {
-                    return true;
-                }
+        const filtered = allHandovers.filter(function (handover) {
+            if (currentFilter === "ALL") {
+                return true;
+            }
 
-                return normalizeStatus(handover.status) ===
-                       currentFilter;
-            });
+            return normalizeStatus(handover.status) === currentFilter;
+        });
 
-        if(filtered.length === 0)
-        {
+        if (filtered.length === 0) {
             content.innerHTML =
                 `<div class="empty">
                     No ${currentFilter === "ALL" ? "" : currentFilter.toLowerCase() + " "}
                     handovers found.
                 </div>`;
-
             return;
         }
 
@@ -484,10 +462,8 @@
             </div>`;
     }
 
-    function createHandoverCard(handover)
-    {
-        const status =
-            normalizeStatus(handover.status);
+    function createHandoverCard(handover) {
+        const status = normalizeStatus(handover.status);
 
         const lostReport =
             handover.lostReport ||
@@ -526,8 +502,7 @@
             handover.lost_user_id ||
             "Unknown";
 
-        const receiverEmail =
-            lostUser.email || "";
+        const receiverEmail = lostUser.email || "";
 
         const founder =
             founderUser.name ||
@@ -536,20 +511,12 @@
             handover.founder_user_id ||
             "Unknown";
 
-        const place =
-            handover.handover_place ||
-            "";
-
-        const date =
-            handover.handover_date ||
-            "";
-
-        const time =
-            handover.handover_time ||
-            "";
-
+        const place = handover.handover_place || "";
+        const date = handover.handover_date || "";
+        const time = handover.handover_time || "";
         const completedAt =
             handover.handed_over_at ||
+            handover.handedOverAt ||
             "";
 
         const verificationId =
@@ -557,19 +524,21 @@
             handover.verificationId ||
             "";
 
+        const handoverId =
+            handover.id ||
+            handover._id ||
+            "";
+
         let actionHtml = "";
 
-        if(status === "COMPLETED")
-        {
+        if (status === "COMPLETED") {
             actionHtml =
                 `<button
                     class="action-btn secondary"
-                    onclick="viewDetails('${escapeJs(handover.id || handover._id || "")}')">
+                    onclick="viewDetails('${escapeJs(handoverId)}')">
                     View Details
                 </button>`;
-        }
-        else
-        {
+        } else {
             actionHtml =
                 `<button
                     class="action-btn"
@@ -579,6 +548,11 @@
                         : "Enter Pickup Code"}
                 </button>`;
         }
+
+        const statusClass =
+            ["PENDING", "SCHEDULED", "COMPLETED"].includes(status)
+                ? status.toLowerCase()
+                : "other";
 
         return `
             <div class="handover-card">
@@ -594,7 +568,7 @@
                         </div>
                     </div>
 
-                    <span class="status ${status.toLowerCase()}">
+                    <span class="status ${statusClass}">
                         ${escapeHtml(status)}
                     </span>
                 </div>
@@ -626,7 +600,7 @@
                 <div class="info-row">
                     <div class="label">Date</div>
                     <div class="value">
-                        ${escapeHtml(date || "Not scheduled")}
+                        ${escapeHtml(formatDateOnly(date) || "Not scheduled")}
                     </div>
                 </div>
 
@@ -658,14 +632,9 @@
         `;
     }
 
-    function openHandover(verificationId)
-    {
-        if(!verificationId)
-        {
-            alert(
-                "Verification ID is missing for this handover."
-            );
-
+    function openHandover(verificationId) {
+        if (!verificationId) {
+            alert("Verification ID is missing for this handover.");
             return;
         }
 
@@ -673,79 +642,111 @@
             `founder-handover.html?verification_id=${encodeURIComponent(verificationId)}`;
     }
 
-    function viewDetails(handoverId)
-    {
-        const handover =
-            allHandovers.find(
-                h =>
-                    String(h.id || h._id) ===
-                    String(handoverId)
-            );
+    function viewDetails(handoverId) {
+        const handover = allHandovers.find(h =>
+            String(h.id || h._id || "") === String(handoverId)
+        );
 
-        if(!handover)
-        {
+        if (!handover) {
             alert("Handover details not found.");
             return;
         }
 
+        const lostReport =
+            handover.lostReport ||
+            handover.lost_report ||
+            {};
+
+        const foundReport =
+            handover.foundReport ||
+            handover.found_report ||
+            {};
+
+        const lostUser =
+            handover.lostUser ||
+            handover.lost_user ||
+            {};
+
         const receiver =
-            handover.lostUser?.name ||
-            handover.lostUser?.email ||
+            lostUser.name ||
+            lostUser.full_name ||
+            lostUser.email ||
             handover.lost_user_id ||
             "Unknown";
 
         alert(
             "Handover Completed\n\n" +
             "Item: " +
-            (handover.lostReport?.item_type ||
-             handover.foundReport?.item_type ||
-             "Unknown") +
+            (lostReport.item_type || foundReport.item_type || "Unknown") +
             "\n\nReceived by: " +
             receiver +
             "\n\nPlace: " +
             (handover.handover_place || "Not specified") +
             "\nDate: " +
-            (handover.handover_date || "Not specified") +
+            (formatDateOnly(handover.handover_date) || "Not specified") +
             "\nTime: " +
             (handover.handover_time || "Not specified") +
             "\n\nCompleted at: " +
-            formatDateTime(handover.handed_over_at)
+            formatDateTime(
+                handover.handed_over_at ||
+                handover.handedOverAt
+            )
         );
     }
 
-    function goBack()
-    {
-        window.location.href =
-            "profileview.html#dashboard";
+    function goBack() {
+        window.location.href = "profileview.html#dashboard";
     }
 
-    function normalizeStatus(status)
-    {
+    function normalizeStatus(status) {
         return String(status || "PENDING")
             .trim()
             .toUpperCase();
     }
 
-    function formatDateTime(value)
-    {
-        if(!value)
-        {
+    // Keep date-only strings as calendar dates to avoid timezone shifts.
+    function formatDateOnly(value) {
+        if (!value) {
+            return "";
+        }
+
+        const text = String(value).trim();
+
+        // ISO date: YYYY-MM-DD
+        let match = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (match) {
+            return `${match[3]}-${match[2]}-${match[1]}`;
+        }
+
+        // DD-MM-YYYY, DD/MM/YYYY or DD.MM.YYYY
+        match = text.match(/^(\d{2})[-/.](\d{2})[-/.](\d{4})$/);
+        if (match) {
+            return `${match[1]}-${match[2]}-${match[3]}`;
+        }
+
+        // If the value includes a time, format it as a date-time.
+        if (text.includes("T")) {
+            return formatDateTime(text);
+        }
+
+        return text;
+    }
+
+    function formatDateTime(value) {
+        if (!value) {
             return "Not available";
         }
 
-        const date =
-            new Date(value);
+        const date = new Date(value);
 
-        if(Number.isNaN(date.getTime()))
-        {
+        if (Number.isNaN(date.getTime())) {
             return String(value);
         }
 
         return date.toLocaleString();
     }
 
-    function escapeHtml(value)
-    {
+    function escapeHtml(value) {
         return String(value ?? "")
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
@@ -754,13 +755,13 @@
             .replace(/'/g, "&#039;");
     }
 
-    function escapeJs(value)
-    {
+    function escapeJs(value) {
         return String(value ?? "")
             .replace(/\\/g, "\\\\")
-            .replace(/'/g, "\\'");
+            .replace(/'/g, "\\'")
+            .replace(/\r/g, "\\r")
+            .replace(/\n/g, "\\n");
     }
-
 </script>
 
 </body>

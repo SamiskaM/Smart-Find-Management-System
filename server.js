@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 const { exec } = require("child_process");
+const crypto = require("crypto");
 
 const {
     compareDescriptions
@@ -24,6 +25,13 @@ const MONGO_URI =
     process.env.MONGO_URI ||
     "mongodb://127.0.0.1:27017/clf";
 
+
+
+
+
+
+
+
 // ======================================================
 // MIDDLEWARE
 // ======================================================
@@ -32,6 +40,42 @@ app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
+
+
+// ======================================================
+// PASSWORD HASHING
+// ======================================================
+
+function hashPassword(password) {
+    const salt = crypto.randomBytes(16).toString("hex");
+
+    const hash = crypto.scryptSync(password, salt, 64).toString("hex");
+
+    return `scrypt$${salt}$${hash}`;
+}
+
+function verifyPassword(password, storedPassword) {
+
+    // Support existing plain-text accounts
+    if (!storedPassword.startsWith("scrypt$")) {
+        return password === storedPassword;
+    }
+
+    const parts = storedPassword.split("$");
+    const salt = parts[1];
+    const originalHash = parts[2];
+
+    const newHash = crypto.scryptSync(password, salt, 64);
+
+    const oldHash = Buffer.from(originalHash, "hex");
+
+    return oldHash.length === newHash.length &&
+        crypto.timingSafeEqual(oldHash, newHash);
+}
+
+
+
+
 
 
 // ======================================================
@@ -986,7 +1030,7 @@ app.post("/signup", async (req, res) => {
     try {
 
         console.log("\n📥 Signup request received");
-        console.log("Data:", req.body);
+        
 
         const {
             user_id,
@@ -1049,7 +1093,7 @@ app.post("/signup", async (req, res) => {
 
             email: cleanEmail,
 
-            password: password,
+            password: hashPassword(password),
 
             phone: phone,
 
@@ -1168,6 +1212,10 @@ app.post("/signup", async (req, res) => {
 // GET ALL OPEN FOUND REPORTS
 // ======================================================
 
+// ======================================================
+// GET ALL OPEN FOUND REPORTS
+// ======================================================
+
 app.get(
     "/found-reports",
     async (req, res) => {
@@ -1178,23 +1226,53 @@ app.get(
                 "\n📦 Loading found reports for Browse Items..."
             );
 
-            const reports =
-                await FoundReport.find({
-                    status: "OPEN"
-                }).sort({
-                    created_at: -1
-                });
+            const reports = await FoundReport.find({ status: "OPEN" })
+            .select("-private_details")
+            .sort({ created_at: -1 });
+
+
+            // ------------------------------------------
+            // GET FOUNDER EMAIL FOR EACH REPORT
+            // ------------------------------------------
+
+            const reportsWithFounder =
+                await Promise.all(
+
+                    reports.map(async (report) => {
+
+                        const founder =
+                            await User.findById(
+                                report.user_id
+                            ).select("email");
+
+                        return {
+
+                            ...report.toObject(),
+
+                            founder_email:
+                                founder
+                                    ? founder.email
+                                    : "Not available"
+
+                        };
+
+                    })
+
+                );
+
 
             console.log(
                 "Found reports available:",
-                reports.length
+                reportsWithFounder.length
             );
+
 
             res.json({
 
                 success: true,
 
-                reports: reports
+                reports:
+                    reportsWithFounder
 
             });
 
@@ -1218,9 +1296,6 @@ app.get(
         }
     }
 );
-
-
-
 
 // ======================================================
 // GET FOUND REPORTS FOR ONE USER
@@ -1311,20 +1386,24 @@ app.post("/signin", async (req, res) => {
         const cleanEmail =
             email.toLowerCase().trim();
 
-        const user =
-            await User.findOne({
-                email: cleanEmail,
-                password: password
-            });
+        const user = await User.findOne({
+    email: cleanEmail
+});
 
-        if (!user) {
+if (!user || !verifyPassword(password, user.password)) {
+    return res.status(401).json({
+        success: false,
+        error: "Invalid email or password"
+    });
+}
 
-            return res.status(401).json({
-                success: false,
-                error:
-                    "Invalid email or password"
-            });
-        }
+// Upgrade an existing plain-text password after successful login
+if (!user.password.startsWith("scrypt$")) {
+    user.password = hashPassword(password);
+    await user.save();
+}
+
+        
 
         console.log(
             "✅ Login successful:",
@@ -1403,6 +1482,186 @@ app.post("/signin", async (req, res) => {
     }
 });
 
+
+// ======================================================
+// FORGOT PASSWORD - VERIFY EMAIL AND ROLL NUMBER
+// ======================================================
+
+app.post("/forgot-password/verify", async (req, res) => {
+
+    try {
+
+        const { email, register_no } = req.body;
+
+        if (!email || !register_no) {
+            return res.status(400).json({
+                success: false,
+                error: "Email and Roll Number are required"
+            });
+        }
+
+        const user = await User.findOne({
+            email: email.toLowerCase().trim(),
+            register_no: register_no.trim()
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                error: "Email or Roll Number does not match"
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Details verified successfully"
+        });
+
+    } catch (error) {
+
+        console.error("Forgot password verification error:", error);
+
+        res.status(500).json({
+            success: false,
+            error: "Server error"
+        });
+    }
+});
+
+
+// ======================================================
+// FORGOT PASSWORD - UPDATE PASSWORD
+// ======================================================
+
+app.post("/forgot-password/reset", async (req, res) => {
+
+    try {
+
+        const { email, register_no, new_password, confirm_password } = req.body;
+
+        if (!email || !register_no || !new_password || !confirm_password) {
+            return res.status(400).json({
+                success: false,
+                error: "All fields are required"
+            });
+        }
+
+        if (new_password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                error: "Password must contain at least 6 characters"
+            });
+        }
+
+        if (new_password !== confirm_password) {
+            return res.status(400).json({
+                success: false,
+                error: "Passwords do not match"
+            });
+        }
+
+        const user = await User.findOne({
+            email: email.toLowerCase().trim(),
+            register_no: register_no.trim()
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                error: "Email or Roll Number does not match"
+            });
+        }
+
+        user.password = hashPassword(new_password);
+
+        await user.save();
+
+        res.json({
+            success: true,
+            message: "Password reset successfully"
+        });
+
+    } catch (error) {
+
+        console.error("Password reset error:", error);
+
+        res.status(500).json({
+            success: false,
+            error: "Server error"
+        });
+    }
+});
+
+// ======================================================
+// CHANGE PASSWORD - EDIT PROFILE
+// ======================================================
+
+app.put("/users/:id/change-password", async (req, res) => {
+
+    try {
+
+        const {
+            current_password,
+            new_password,
+            confirm_password
+        } = req.body;
+
+        if (!current_password || !new_password || !confirm_password) {
+            return res.status(400).json({
+                success: false,
+                error: "All password fields are required"
+            });
+        }
+
+        if (new_password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                error: "New password must contain at least 6 characters"
+            });
+        }
+
+        if (new_password !== confirm_password) {
+            return res.status(400).json({
+                success: false,
+                error: "New passwords do not match"
+            });
+        }
+
+        const user = await User.findById(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                error: "User not found"
+            });
+        }
+
+        if (!verifyPassword(current_password, user.password)) {
+            return res.status(401).json({
+                success: false,
+                error: "Current password is incorrect"
+            });
+        }
+
+        user.password = hashPassword(new_password);
+
+        await user.save();
+
+        res.json({
+            success: true,
+            message: "Password changed successfully"
+        });
+
+    } catch (error) {
+
+        console.error("Change password error:", error);
+
+        res.status(500).json({
+            success: false,
+            error: "Server error"
+        });
+    }
+});
 
 // ======================================================
 // UPDATE USER PROFILE
@@ -1586,6 +1845,59 @@ app.put("/users/:id", async (req, res) => {
 });
 
 
+
+// ======================================================
+// DATE-BASED MATCHING
+// ======================================================
+
+function getDateValue(value) {
+    if (!value) return null;
+
+    const date = String(value).trim();
+    let parts;
+    let year, month, day;
+
+    // YYYY-MM-DD format
+    parts = date.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+
+    if (parts) {
+        year = Number(parts[1]);
+        month = Number(parts[2]);
+        day = Number(parts[3]);
+    } else {
+        // DD-MM-YYYY, DD/MM/YYYY or DD.MM.YYYY
+        parts = date.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/);
+
+        if (!parts) return null;
+
+        day = Number(parts[1]);
+        month = Number(parts[2]);
+        year = Number(parts[3]);
+    }
+
+    const result = new Date(Date.UTC(year, month - 1, day));
+
+    if (
+        result.getUTCFullYear() !== year ||
+        result.getUTCMonth() !== month - 1 ||
+        result.getUTCDate() !== day
+    ) {
+        return null;
+    }
+
+    return result.getTime();
+}
+
+function isValidMatchDate(lostDate, foundDate) {
+    if (!lostDate || !foundDate) return true;
+
+    const lost = getDateValue(lostDate);
+    const found = getDateValue(foundDate);
+
+    if (lost === null || found === null) return false;
+
+    return found >= lost;
+}
 
 
 // ======================================================
@@ -1796,7 +2108,6 @@ function calculateAttributeScore(lost, found) {
 
 
 
-
 // ======================================================
 // CREATE MATCH BETWEEN ONE LOST AND ONE FOUND
 // ======================================================
@@ -1807,6 +2118,23 @@ async function createMatch(
 ) {
 
     try {
+
+        // ----------------------------------------------
+        // DATE VALIDATION
+        // ----------------------------------------------
+
+        if (!isValidMatchDate(
+            lost.date_lost,
+            found.date_found
+        )) {
+
+            console.log(
+                "❌ Date mismatch - skipping match"
+            );
+
+            return null;
+        }
+
 
         console.log("");
         console.log(
@@ -1851,7 +2179,6 @@ async function createMatch(
 
 
         // Convert -1 to 1 range into percentage
-        // SBERT cosine is normally 0 to 1 here.
         let descriptionPercent =
             descriptionScore * 100;
 
@@ -1873,7 +2200,8 @@ async function createMatch(
                 lost,
                 found
             );
-            
+
+
         // ----------------------------------------------
         // CLIP IMAGE SCORE
         // ----------------------------------------------
@@ -1884,45 +2212,32 @@ async function createMatch(
             lost.image_data &&
             found.image_data
         ) {
+
             console.log(
-            "🖼️ Comparing images with CLIP..."
-        );
+                "🖼️ Comparing images with CLIP..."
+            );
 
-        const imageScore =
-            await compareImages(
-            lost.image_data,
-            found.image_data
-        );
+            const imageScore =
+                await compareImages(
+                    lost.image_data,
+                    found.image_data
+                );
 
-        imagePercent =
-            imageScore * 100;
+            imagePercent =
+                imageScore * 100;
 
-        console.log(
-            "Image Score:",
-            imagePercent.toFixed(2) + "%"
-        );
+            console.log(
+                "Image Score:",
+                imagePercent.toFixed(2) + "%"
+            );
         }
         else {
+
             console.log(
                 "🖼️ Image comparison skipped - image missing"
             );
         }
 
-        // ----------------------------------------------
-        // FINAL SCORE
-        // ----------------------------------------------
-
-        /*
-            Description = 40%
-            Attributes  = 60%
-
-            Attribute score already combines:
-            Category 15
-            Item type 10
-            Color 15
-            Brand 10
-            Location 10
-        */
 
         // ----------------------------------------------
         // FINAL HYBRID MATCH SCORE
@@ -1934,6 +2249,7 @@ async function createMatch(
             lost.image_data &&
             found.image_data
         ) {
+
             // Description = 50%
             // Image       = 20%
             // Attributes  = 30%
@@ -1944,12 +2260,13 @@ async function createMatch(
                 (attributeScore * 0.30);
         }
         else {
-        // If image is not available,
-        // calculate using available text + attributes.
 
-        finalScore =
-        (descriptionPercent * 0.70) +
-        (attributeScore * 0.30);
+            // Description = 70%
+            // Attributes  = 30%
+
+            finalScore =
+                (descriptionPercent * 0.70) +
+                (attributeScore * 0.30);
         }
 
 
@@ -1977,12 +2294,6 @@ async function createMatch(
         // ----------------------------------------------
         // MATCH THRESHOLD
         // ----------------------------------------------
-
-        /*
-            Project-defined threshold.
-
-            60% or above = possible match
-        */
 
         if (finalScore < 60) {
 
@@ -2054,6 +2365,7 @@ async function createMatch(
                 status:
                     "POSSIBLE_MATCH"
             });
+
 
         const savedMatch =
             await newMatch.save();
@@ -2672,10 +2984,31 @@ app.get(
                     );
 
 
-                if (!foundReport) {
+                const lostReport =
+                    await LostReport.findById(
+                        match.lost_report_id
+                    );
+
+
+                // --------------------------------------
+                // DATE VALIDATION
+                // --------------------------------------
+
+                if (
+                    !foundReport ||
+                    !lostReport ||
+                    !isValidMatchDate(
+                        lostReport.date_lost,
+                        foundReport.date_found
+                    )
+                ) {
+
+                    console.log(
+                        "❌ Invalid date match - skipped:",
+                        match._id
+                    );
 
                     continue;
-
                 }
 
 
@@ -2806,8 +3139,6 @@ app.get(
 );
 
 
-
-
 // ======================================================
 // VIEW MATCHES FOR A FOUND REPORT
 // ======================================================
@@ -2869,10 +3200,31 @@ app.get(
                     );
 
 
-                if (!lostReport) {
+                const foundReport =
+                    await FoundReport.findById(
+                        match.found_report_id
+                    );
+
+
+                // ======================================
+                // DATE VALIDATION
+                // ======================================
+
+                if (
+                    !lostReport ||
+                    !foundReport ||
+                    !isValidMatchDate(
+                        lostReport.date_lost,
+                        foundReport.date_found
+                    )
+                ) {
+
+                    console.log(
+                        "❌ Invalid date match - skipped:",
+                        match._id
+                    );
 
                     continue;
-
                 }
 
 
@@ -2899,18 +3251,11 @@ app.get(
                         match._id,
 
 
-                    // Claim ID if the Lost User
-                    // has already claimed this match
-
                     claim_id:
                         claim
                             ? claim._id
                             : null,
 
-
-                    // Claim status
-                    // PENDING / VERIFICATION_STARTED
-                    // or null if there is no claim
 
                     claim_status:
                         claim
@@ -3022,6 +3367,8 @@ app.get(
 
     }
 );
+
+
 // ======================================================
 // START VERIFICATION
 // ======================================================
@@ -7509,6 +7856,7 @@ app.get(
     }
 );
 
+
 // ======================================================
 // DASHBOARD - GET POSSIBLE MATCHES FOR USER
 // ======================================================
@@ -7527,6 +7875,7 @@ app.get(
                 userId
             );
 
+
             // ------------------------------------------
             // FIND LOST REPORTS OF THIS USER
             // ------------------------------------------
@@ -7538,10 +7887,12 @@ app.get(
                     created_at: -1
                 });
 
+
             console.log(
                 "Lost reports of user:",
                 lostReports.length
             );
+
 
             if (lostReports.length === 0) {
 
@@ -7560,6 +7911,7 @@ app.get(
                 lostReports.map(
                     report => report._id
                 );
+
 
             const matches =
                 await Match.find({
@@ -7585,6 +7937,7 @@ app.get(
 
             const result = [];
 
+
             for (const match of matches) {
 
                 const lost =
@@ -7592,15 +7945,38 @@ app.get(
                         match.lost_report_id
                     );
 
+
                 const found =
                     await FoundReport.findById(
                         match.found_report_id
                     );
 
-                if (!lost || !found) {
+
+                // --------------------------------------
+                // DATE VALIDATION
+                // --------------------------------------
+
+                if (
+                    !lost ||
+                    !found ||
+                    !isValidMatchDate(
+                        lost.date_lost,
+                        found.date_found
+                    )
+                ) {
+
+                    console.log(
+                        "❌ Invalid date match - skipped:",
+                        match._id
+                    );
+
                     continue;
                 }
 
+
+                // ------------------------------------------
+                // ADD MATCH TO RESULT
+                // ------------------------------------------
 
                 result.push({
 
@@ -7618,6 +7994,11 @@ app.get(
 
                     status:
                         match.status,
+
+
+                    // --------------------------------------
+                    // LOST REPORT DETAILS
+                    // --------------------------------------
 
                     lost_report: {
 
@@ -7645,6 +8026,11 @@ app.get(
                         description:
                             lost.description
                     },
+
+
+                    // --------------------------------------
+                    // FOUND REPORT DETAILS
+                    // --------------------------------------
 
                     found_report: {
 
@@ -7678,7 +8064,9 @@ app.get(
                         image_data:
                             found.image_data
                     }
+
                 });
+
             }
 
 
@@ -7687,6 +8075,10 @@ app.get(
                 result.length
             );
 
+
+            // ------------------------------------------
+            // SEND RESPONSE
+            // ------------------------------------------
 
             res.json({
 
@@ -7707,6 +8099,7 @@ app.get(
                 error
             );
 
+
             res.status(500).json({
 
                 success: false,
@@ -7717,10 +8110,11 @@ app.get(
                 details:
                     error.message
             });
+
         }
+
     }
 );
-
 
 // ======================================================
 // GET LOST REPORTS FOR A USER

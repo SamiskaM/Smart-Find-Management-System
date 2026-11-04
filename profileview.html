@@ -376,6 +376,11 @@
     line-height:1;
   }
   .toggle-pass:hover{ color:var(--brass-2); }
+  .forgot-field input,
+  .edit-field input{padding-right:32px;}
+  .forgot-field .toggle-pass,
+  .edit-field .toggle-pass{top:3px;right:0;z-index:2;}
+
 
   select.role{
     width:100%; background:var(--ink-1); color:var(--brass-2);
@@ -870,7 +875,7 @@
         </div>
         <div class="row-between">
           <label class="remember"><input type="checkbox"> Remember me</label>
-          <a href="#">Forgot password?</a>
+          <a href="#" id="forgotPasswordLink">Forgot password?</a>
         </div>
         <button type="submit" class="submit">Sign In</button>
         <p class="foot-note">New here? <a href="#" style="color:var(--brass-2); text-decoration:none;" onclick="switchTab('signup'); return false;">Create an account</a></p>
@@ -963,6 +968,48 @@
       </form>
     </div>
   </main>
+
+
+  <!-- ---------- FORGOT PASSWORD ---------- -->
+  <div class="forgot-overlay" id="forgotOverlay" aria-hidden="true">
+    <div class="forgot-backdrop" id="forgotBackdrop"></div>
+    <div class="forgot-card" role="dialog" aria-modal="true" aria-labelledby="forgotTitle">
+      <button class="forgot-close" id="forgotClose" type="button" aria-label="Close">×</button>
+      <div class="forgot-heading">
+        <span>ACCOUNT RECOVERY</span>
+        <h2 id="forgotTitle">Forgot Password</h2>
+        <p>Verify your college email and roll number to reset your password.</p>
+      </div>
+
+      <form id="forgotVerifyForm" class="forgot-form">
+        <div class="forgot-field">
+          <input type="email" id="forgotEmail" placeholder=" " required>
+          <label for="forgotEmail">College Email</label>
+        </div>
+        <div class="forgot-field">
+          <input type="text" id="forgotRoll" placeholder=" " required>
+          <label for="forgotRoll">Roll Number</label>
+        </div>
+        <button class="submit" type="submit" id="forgotVerifyBtn">Verify Details</button>
+      </form>
+
+      <form id="forgotResetForm" class="forgot-form" style="display:none;">
+        <div class="forgot-field">
+          <input type="password" id="forgotNewPassword" placeholder=" " minlength="6" required>
+          <label for="forgotNewPassword">New Password</label>
+          <button type="button" class="toggle-pass" data-target="forgotNewPassword" aria-label="Show password">👁</button>
+        </div>
+        <div class="forgot-field">
+          <input type="password" id="forgotConfirmPassword" placeholder=" " minlength="6" required>
+          <label for="forgotConfirmPassword">Confirm New Password</label>
+          <button type="button" class="toggle-pass" data-target="forgotConfirmPassword" aria-label="Show password">👁</button>
+        </div>
+        <button class="submit" type="submit" id="forgotResetBtn">Reset Password</button>
+      </form>
+
+      <p class="forgot-message" id="forgotMessage" role="status"></p>
+    </div>
+  </div>
 
   <div class="success-overlay" id="successOverlay">
     <div class="success-card">
@@ -1107,7 +1154,7 @@
         <div class="dash-card">
           <h3>My Activity</h3>
           <p>Items reported by you</p>
-          <div class="dash-stat">0</div>
+          <div class="dash-stat" id="myActivityCount">0</div>
         </div>
         <div class="dash-card profile-card" id="profileCard" role="button" tabindex="0">
           <h3>Profile</h3>
@@ -1250,6 +1297,34 @@
           <button class="submit" type="submit">Save Changes</button>
         </div>
       </form>
+
+      <!-- ---------- CHANGE PASSWORD ---------- -->
+      <div class="password-section">
+        <div class="password-section-heading">
+          <h3>Reset Password</h3>
+          <p>Change your account password using your current password.</p>
+        </div>
+        <form id="changePasswordForm" class="edit-form">
+          <div class="edit-field">
+            <input type="password" id="currentPassword" placeholder=" " minlength="6" required>
+            <label for="currentPassword">Current Password</label>
+            <button type="button" class="toggle-pass" data-target="currentPassword" aria-label="Show password">👁</button>
+          </div>
+          <div class="edit-field">
+            <input type="password" id="newProfilePassword" placeholder=" " minlength="6" required>
+            <label for="newProfilePassword">New Password</label>
+            <button type="button" class="toggle-pass" data-target="newProfilePassword" aria-label="Show password">👁</button>
+          </div>
+          <div class="edit-field">
+            <input type="password" id="confirmProfilePassword" placeholder=" " minlength="6" required>
+            <label for="confirmProfilePassword">Confirm New Password</label>
+            <button type="button" class="toggle-pass" data-target="confirmProfilePassword" aria-label="Show password">👁</button>
+          </div>
+          <div class="edit-actions">
+            <button class="submit" type="submit">Change Password</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -1396,6 +1471,45 @@
     return cu[key] || fallback;
   }
 
+  async function loadMyActivity(){
+    const countElement = document.getElementById('myActivityCount');
+    const currentUser = JSON.parse(sessionStorage.getItem('campusCurrentUser') || '{}');
+
+    if (!countElement) return;
+    if (!currentUser.id){
+      countElement.textContent = '0';
+      return;
+    }
+
+    countElement.textContent = '...';
+
+    try{
+      const userId = encodeURIComponent(currentUser.id);
+      const [lostResponse, foundResponse] = await Promise.all([
+        fetch(`/lost-reports/user/${userId}`),
+        fetch(`/found-reports/user/${userId}`)
+      ]);
+
+      const [lostData, foundData] = await Promise.all([
+        lostResponse.json(),
+        foundResponse.json()
+      ]);
+
+      if (!lostResponse.ok || !foundResponse.ok ||
+          !lostData.success || !foundData.success){
+        throw new Error('Unable to load your activity');
+      }
+
+      const lostCount = Array.isArray(lostData.reports) ? lostData.reports.length : 0;
+      const foundCount = Array.isArray(foundData.reports) ? foundData.reports.length : 0;
+      countElement.textContent = String(lostCount + foundCount);
+    }
+    catch(error){
+      console.error('My Activity loading error:', error);
+      countElement.textContent = '—';
+    }
+  }
+
   function showDashboard(){
     successOverlay.classList.remove('show');
     document.querySelector('.auth-wrap').style.display = 'none';
@@ -1411,6 +1525,7 @@
     const savedPhoto = getCU('photo', '');
     const wrap = document.getElementById('dashPhotoWrap');
     wrap.innerHTML = savedPhoto ? `<img src="${savedPhoto}" alt="Profile photo">` : '👤';
+    loadMyActivity();
     checkNotifications();
   }
 
@@ -2755,6 +2870,191 @@ forms.signin.addEventListener('submit', async e => {
     if(e.key === 'Escape' && editOverlay.classList.contains('show')) closeEditProfile();
   });
 
+
+  // ---------- Forgot Password ----------
+  const forgotOverlay = document.getElementById('forgotOverlay');
+  const forgotVerifyForm = document.getElementById('forgotVerifyForm');
+  const forgotResetForm = document.getElementById('forgotResetForm');
+  const forgotMessage = document.getElementById('forgotMessage');
+
+  function openForgotPassword(){
+    forgotVerifyForm.reset();
+    forgotResetForm.reset();
+    forgotVerifyForm.style.display = 'flex';
+    forgotResetForm.style.display = 'none';
+    forgotMessage.textContent = '';
+    forgotMessage.className = 'forgot-message';
+    forgotOverlay.classList.add('show');
+    forgotOverlay.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeForgotPassword(){
+    forgotOverlay.classList.remove('show');
+    forgotOverlay.setAttribute('aria-hidden', 'true');
+  }
+
+  document.getElementById('forgotPasswordLink').addEventListener('click', e => {
+    e.preventDefault();
+    openForgotPassword();
+  });
+  document.getElementById('forgotClose').addEventListener('click', closeForgotPassword);
+  document.getElementById('forgotBackdrop').addEventListener('click', closeForgotPassword);
+
+  forgotVerifyForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!forgotVerifyForm.checkValidity()){
+      forgotVerifyForm.reportValidity();
+      return;
+    }
+
+    const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+    const register_no = document.getElementById('forgotRoll').value.trim().toUpperCase();
+    const btn = document.getElementById('forgotVerifyBtn');
+    btn.disabled = true;
+    btn.textContent = 'Verifying…';
+    forgotMessage.textContent = '';
+
+    try {
+      const res = await fetch('/forgot-password/verify', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email, register_no})
+      });
+      const result = await res.json();
+
+      if (!res.ok || !result.success){
+        forgotMessage.textContent = result.error || 'Email or roll number does not match.';
+        forgotMessage.classList.add('error');
+        return;
+      }
+
+      forgotVerifyForm.style.display = 'none';
+      forgotResetForm.style.display = 'flex';
+      forgotMessage.textContent = 'Details verified. Enter your new password.';
+      forgotMessage.classList.add('success');
+    } catch (err) {
+      console.error('Forgot password verification error:', err);
+      forgotMessage.textContent = 'Could not reach the server. Please try again.';
+      forgotMessage.classList.add('error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Verify Details';
+    }
+  });
+
+  forgotResetForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!forgotResetForm.checkValidity()){
+      forgotResetForm.reportValidity();
+      return;
+    }
+
+    const new_password = document.getElementById('forgotNewPassword').value;
+    const confirm_password = document.getElementById('forgotConfirmPassword').value;
+    if (new_password !== confirm_password){
+      forgotMessage.textContent = 'New passwords do not match.';
+      forgotMessage.className = 'forgot-message error';
+      return;
+    }
+
+    const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+    const register_no = document.getElementById('forgotRoll').value.trim().toUpperCase();
+    const btn = document.getElementById('forgotResetBtn');
+    btn.disabled = true;
+    btn.textContent = 'Resetting…';
+    forgotMessage.textContent = '';
+
+    try {
+      const res = await fetch('/forgot-password/reset', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email, register_no, new_password, confirm_password})
+      });
+      const result = await res.json();
+
+      if (!res.ok || !result.success){
+        forgotMessage.textContent = result.error || 'Could not reset password.';
+        forgotMessage.className = 'forgot-message error';
+        return;
+      }
+
+      closeForgotPassword();
+      document.getElementById('siEmail').value = email;
+      document.getElementById('siPass').value = '';
+      switchTab('signin');
+      alert('Password reset successfully. Please sign in with your new password.');
+    } catch (err) {
+      console.error('Password reset error:', err);
+      forgotMessage.textContent = 'Could not reach the server. Please try again.';
+      forgotMessage.className = 'forgot-message error';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Reset Password';
+    }
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && forgotOverlay.classList.contains('show')) closeForgotPassword();
+  });
+
+  // ---------- Change Password from Edit Profile ----------
+  const changePasswordForm = document.getElementById('changePasswordForm');
+  changePasswordForm.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    if (!changePasswordForm.checkValidity()){
+      changePasswordForm.reportValidity();
+      return;
+    }
+
+    const cu = JSON.parse(sessionStorage.getItem('campusCurrentUser') || '{}');
+    if (!cu.id){
+      alert('User ID not found. Please logout and sign in again.');
+      return;
+    }
+
+    const current_password = document.getElementById('currentPassword').value;
+    const new_password = document.getElementById('newProfilePassword').value;
+    const confirm_password = document.getElementById('confirmProfilePassword').value;
+
+    if (new_password !== confirm_password){
+      alert('New passwords do not match.');
+      return;
+    }
+    if (current_password === new_password){
+      alert('New password must be different from the current password.');
+      return;
+    }
+
+    const btn = changePasswordForm.querySelector('button[type="submit"]');
+    const oldText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Changing…';
+
+    try {
+      const res = await fetch(`/users/${encodeURIComponent(cu.id)}/change-password`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({current_password, new_password, confirm_password})
+      });
+      const result = await res.json();
+
+      if (!res.ok || !result.success){
+        alert(result.error || 'Could not change password.');
+        return;
+      }
+
+      changePasswordForm.reset();
+      alert('Password changed successfully.');
+    } catch (err) {
+      console.error('Change password error:', err);
+      alert('Could not reach the server. Please make sure server.js is running.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = oldText;
+    }
+  });
+
   // gentle idle drift so the scene feels alive before the first move
   onMove(mouseX, mouseY);
 
@@ -3074,6 +3374,34 @@ forms.signin.addEventListener('submit', async e => {
         font-size:14px;
     }
 }
+
+
+/* ---------- FORGOT PASSWORD MODAL ---------- */
+.forgot-overlay{position:fixed;inset:0;z-index:260;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease;}
+.forgot-overlay.show{opacity:1;pointer-events:auto;}
+.forgot-backdrop{position:absolute;inset:0;background:rgba(3,6,10,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+.forgot-card{position:relative;z-index:2;width:min(420px,92vw);padding:34px 30px 26px;border:1px solid var(--glass-border);border-radius:16px;background:linear-gradient(155deg,rgba(20,29,43,.97),rgba(8,12,18,.99));box-shadow:0 30px 80px rgba(0,0,0,.65),0 0 35px rgba(232,196,104,.12);}
+.forgot-close{position:absolute;right:14px;top:10px;width:32px;height:32px;border-radius:50%;border:1px solid rgba(232,196,104,.35);background:rgba(0,0,0,.25);color:var(--brass-2);font-size:24px;line-height:1;cursor:pointer;}
+.forgot-heading{text-align:center;margin-bottom:24px;}
+.forgot-heading span,.password-section-heading h3{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--brass-1);}
+.forgot-heading h2{font-family:'Cormorant Garamond',serif;font-size:34px;margin:6px 0;color:var(--parchment);}
+.forgot-heading p,.password-section-heading p{font-size:12px;line-height:1.5;color:var(--slate);margin:0;}
+.forgot-form{display:flex;flex-direction:column;gap:18px;}
+.forgot-field{position:relative;}
+.forgot-field input{width:100%;background:transparent;border:0;border-bottom:1px solid rgba(232,196,104,.25);color:var(--brass-2);font:14px 'Jost',sans-serif;padding:9px 2px;outline:none;}
+.forgot-field label{position:absolute;left:2px;top:9px;color:var(--slate);font-size:13px;pointer-events:none;transition:all .2s ease;}
+.forgot-field input:focus{border-bottom-color:var(--brass-2);}
+.forgot-field input:focus + label,.forgot-field input:not(:placeholder-shown) + label{top:-11px;font-size:10px;color:var(--brass-1);letter-spacing:.06em;text-transform:uppercase;}
+.forgot-form .submit{width:100%;}
+.forgot-message{min-height:16px;margin:14px 0 0;text-align:center;font-size:11px;color:var(--slate);}
+.forgot-message.error{color:#ff7777;}
+.forgot-message.success{color:var(--brass-2);}
+.password-section{margin-top:22px;padding-top:20px;border-top:1px solid rgba(232,196,104,.2);}
+.password-section-heading{margin-bottom:15px;}
+.password-section-heading h3{margin:0 0 7px;font-size:11px;}
+.password-section .edit-form{gap:17px;}
+.password-section .edit-actions{margin-top:0;}
+@media(max-width:520px){.forgot-card{padding:30px 22px 22px;}}
 
 </style>
 
