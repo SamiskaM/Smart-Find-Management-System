@@ -1,12 +1,18 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Browse Items - Campus Lost & Found</title>
+
+    <title>Browse Found Items | Campus Lost & Found</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
     <style>
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -14,491 +20,968 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background: #080808;
-            color: #f5f5f5;
             min-height: 100vh;
+            background: #0b0b0b;
+            color: #f2eee7;
+            font-family: "Jost", sans-serif;
         }
 
-        header {
-            background: #111;
-            padding: 22px 7%;
+        /* ================= TOP BAR ================= */
+
+        .topbar {
+            height: 76px;
+            padding: 0 45px;
+
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #c9a227;
-            flex-wrap: wrap;
-            gap: 15px;
+            justify-content: space-between;
+
+            border-bottom: 1px solid rgba(190, 154, 72, 0.25);
+
+            background: #0d0d0d;
         }
 
-        header h2 {
-            color: #d4af37;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-mark {
+            width: 38px;
+            height: 38px;
+
+            border: 1px solid #b9984e;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: #c8a85c;
+
+            font-family: "Cormorant Garamond", serif;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .brand-text h2 {
+            font-family: "Cormorant Garamond", serif;
+            font-size: 21px;
+            font-weight: 600;
+
+            color: #f4efe5;
+        }
+
+        .brand-text span {
+            display: block;
+
+            font-family: "JetBrains Mono", monospace;
+            font-size: 9px;
+
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+
+            color: #9c8c6d;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .user-name {
+            color: #b7aa91;
+            font-size: 14px;
         }
 
         .back-btn {
-            background: #d4af37;
-            color: #111;
-            padding: 10px 18px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            text-decoration: none;
+            border: 1px solid rgba(190, 154, 72, 0.45);
+            background: transparent;
+
+            color: #d5c49c;
+
+            padding: 9px 16px;
+
+            font-family: "Jost", sans-serif;
+            font-size: 13px;
+
             cursor: pointer;
+
+            transition: 0.2s;
         }
 
         .back-btn:hover {
-            background: #f0cf62;
+            background: rgba(190, 154, 72, 0.08);
+            border-color: #c5a45c;
         }
 
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 35px auto;
+        /* ================= MAIN ================= */
+
+        .page {
+            width: min(1200px, calc(100% - 40px));
+            margin: 0 auto;
+
+            padding: 55px 0 70px;
         }
 
-        .page-title {
-            text-align: center;
-            margin-bottom: 30px;
+        .page-heading {
+            margin-bottom: 35px;
         }
 
-        .page-title h1 {
-            color: #d4af37;
+        .page-heading .small-title {
+            font-family: "JetBrains Mono", monospace;
+
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+
+            color: #9c8c6d;
+
             margin-bottom: 10px;
         }
 
-        .page-title p {
-            color: #aaa;
+        .page-heading h1 {
+            font-family: "Cormorant Garamond", serif;
+
+            font-size: 46px;
+            line-height: 1;
+
+            font-weight: 600;
+
+            color: #f3eee4;
         }
 
-        .filters {
+        .page-heading p {
+            margin-top: 12px;
+
+            max-width: 650px;
+
+            color: #9f998e;
+
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* ================= FILTER AREA ================= */
+
+        .filter-box {
+            border: 1px solid rgba(190, 154, 72, 0.22);
+
+            background: #101010;
+
+            padding: 22px;
+
+            margin-bottom: 35px;
+
             display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
+
+            grid-template-columns: 1fr 230px;
+
+            gap: 18px;
+        }
+
+        .filter-group label {
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-family: "JetBrains Mono", monospace;
+
+            font-size: 10px;
+
+            letter-spacing: 1.5px;
+
+            text-transform: uppercase;
+
+            color: #9c8c6d;
         }
 
         .filter-input,
         .filter-select {
             width: 100%;
-            padding: 13px;
-            border: 1px solid #555;
-            border-radius: 7px;
-            background: #171717;
-            color: white;
+
+            height: 44px;
+
+            border: 1px solid #302d27;
+
+            background: #0b0b0b;
+
+            color: #eee8dd;
+
+            padding: 0 13px;
+
             outline: none;
-            font-size: 15px;
+
+            font-family: "Jost", sans-serif;
+
+            font-size: 13px;
         }
 
         .filter-input:focus,
         .filter-select:focus {
-            border-color: #d4af37;
+            border-color: #9d8042;
         }
 
-        .item-count {
-            color: #d4af37;
-            margin-bottom: 20px;
+        .filter-input::placeholder {
+            color: #6e6a62;
         }
 
-        .items-grid {
+        /* ================= ITEMS HEADER ================= */
+
+        .items-header {
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 18px;
+        }
+
+        .items-header h2 {
+            font-family: "Cormorant Garamond", serif;
+
+            font-size: 27px;
+
+            color: #eee7da;
+
+            font-weight: 600;
+        }
+
+        .items-count {
+            font-family: "JetBrains Mono", monospace;
+
+            font-size: 10px;
+
+            letter-spacing: 1px;
+
+            color: #8d8679;
+        }
+
+        /* ================= ITEMS GRID ================= */
+
+        .items-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 22px;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 20px;
         }
 
         .item-card {
-            background: #151515;
-            border: 1px solid #444;
-            border-radius: 12px;
+            border: 1px solid rgba(190, 154, 72, 0.18);
+
+            background: #101010;
+
             overflow: hidden;
-            transition: 0.3s;
+
+            transition:
+                transform 0.2s ease,
+                border-color 0.2s ease;
         }
 
         .item-card:hover {
-            transform: translateY(-5px);
-            border-color: #d4af37;
-            box-shadow: 0 5px 18px rgba(212, 175, 55, 0.15);
+            transform: translateY(-3px);
+
+            border-color: rgba(190, 154, 72, 0.45);
         }
+
+        /* ================= IMAGE ================= */
 
         .item-image {
             width: 100%;
-            height: 190px;
-            object-fit: cover;
-            background: #222;
-            display: block;
-        }
+            height: 210px;
 
-        .no-image {
-            height: 150px;
+            background: #161616;
+
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #222;
-            color: #aaa;
-            font-size: 15px;
+
+            overflow: hidden;
         }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+        }
+
+        .no-image {
+            font-family: "JetBrains Mono", monospace;
+
+            font-size: 10px;
+
+            letter-spacing: 1px;
+
+            text-transform: uppercase;
+
+            color: #68635a;
+        }
+
+        /* ================= ITEM CONTENT ================= */
 
         .item-content {
-            padding: 18px;
+            padding: 20px;
         }
 
-        .item-content h3 {
-            color: #d4af37;
-            margin-bottom: 12px;
-            font-size: 20px;
-        }
-
-        .item-content p {
-            color: #ccc;
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 7px;
-            overflow-wrap: anywhere;
-        }
-
-        .item-content strong {
-            color: #eee;
-        }
-
-        .category-tag {
+        .item-category {
             display: inline-block;
-            background: #332b13;
-            color: #e5c45c;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
+
+            margin-bottom: 8px;
+
+            padding: 5px 9px;
+
+            border: 1px solid rgba(190, 154, 72, 0.25);
+
+            color: #bba16a;
+
+            font-family: "JetBrains Mono", monospace;
+
+            font-size: 9px;
+
+            letter-spacing: 1px;
+
+            text-transform: uppercase;
+        }
+
+        .item-title {
+            font-family: "Cormorant Garamond", serif;
+
+            font-size: 25px;
+
+            color: #f1ece3;
+
+            font-weight: 600;
+
             margin-bottom: 12px;
         }
 
-        .empty-message,
-        .error-message,
-        .loading-message {
-            text-align: center;
-            padding: 35px 15px;
-            color: #aaa;
-            background: #151515;
-            border: 1px solid #444;
-            border-radius: 10px;
+        .item-details {
+            display: grid;
+
+            gap: 8px;
+
+            margin-bottom: 15px;
+        }
+
+        .detail-row {
+            display: flex;
+
+            gap: 8px;
+
+            font-size: 12px;
+
+            color: #9b968c;
+        }
+
+        .detail-label {
+            min-width: 70px;
+
+            color: #756f65;
+
+            font-family: "JetBrains Mono", monospace;
+
+            font-size: 9px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.5px;
+        }
+
+        .item-description {
+            padding-top: 14px;
+
+            border-top: 1px solid #27251f;
+
+            color: #99938a;
+
+            font-size: 12px;
+
+            line-height: 1.6;
+        }
+
+        /* ================= EMPTY / LOADING ================= */
+
+        .message-card {
             grid-column: 1 / -1;
-        }
 
-        .error-message {
-            color: #ff7777;
-        }
+            border: 1px solid rgba(190, 154, 72, 0.18);
 
-        .retry-btn {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background: #d4af37;
-            color: #111;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+            background: #101010;
 
-        footer {
+            padding: 55px 25px;
+
             text-align: center;
-            padding: 25px;
-            color: #777;
-            margin-top: 50px;
-            border-top: 1px solid #333;
+        }
+
+        .message-card h3 {
+            font-family: "Cormorant Garamond", serif;
+
+            font-size: 27px;
+
+            color: #e9e2d5;
+
+            margin-bottom: 8px;
+        }
+
+        .message-card p {
+            color: #858077;
+
+            font-size: 13px;
+        }
+
+        .loading {
+            font-family: "JetBrains Mono", monospace;
+
+            font-size: 11px;
+
+            letter-spacing: 1px;
+
+            color: #a58a52;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 900px) {
+
+            .items-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
         }
 
         @media (max-width: 650px) {
-            .filters {
+
+            .topbar {
+                height: auto;
+
+                padding: 18px 20px;
+
+                gap: 15px;
+
+                align-items: flex-start;
+            }
+
+            .top-actions {
+                flex-direction: column;
+
+                align-items: flex-end;
+
+                gap: 8px;
+            }
+
+            .page {
+                width: min(100% - 28px, 1200px);
+
+                padding-top: 35px;
+            }
+
+            .page-heading h1 {
+                font-size: 38px;
+            }
+
+            .filter-box {
                 grid-template-columns: 1fr;
             }
 
-            header {
-                padding: 18px 5%;
+            .items-container {
+                grid-template-columns: 1fr;
             }
 
-            .container {
-                width: 92%;
-            }
         }
+
     </style>
 </head>
 
 <body>
 
-<header>
-    <h2>Campus Lost & Found</h2>
-    <a href="profileview.html" class="back-btn">Back to Dashboard</a>
-</header>
+    <!-- ================= TOP BAR ================= -->
 
-<div class="container">
+    <header class="topbar">
 
-    <div class="page-title">
-        <h1>Browse Found Items</h1>
-        <p>Search for items reported as found on campus.</p>
-    </div>
+        <div class="brand">
 
-    <div class="filters">
+            <div class="brand-mark">
+                LF
+            </div>
 
-        <input
-            type="text"
-            id="searchInput"
-            class="filter-input"
-            placeholder="Search by item, color, brand or location..."
-        >
+            <div class="brand-text">
+                <h2>Campus Lost & Found</h2>
+                <span>Browse Found Items</span>
+            </div>
 
-        <select id="categoryFilter" class="filter-select">
-            <option value="all">All Categories</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Books">Books</option>
-            <option value="Wallet">Wallet</option>
-            <option value="ID Card">ID Card</option>
-            <option value="Keys">Keys</option>
-            <option value="Bag">Bag</option>
-            <option value="Clothing">Clothing</option>
-            <option value="Accessories">Accessories</option>
-            <option value="Documents">Documents</option>
-            <option value="Other">Other</option>
-        </select>
+        </div>
 
-    </div>
+        <div class="top-actions">
 
-    <p class="item-count" id="itemCount">Loading items...</p>
+            <span class="user-name" id="userName">
+                Student
+            </span>
 
-    <div class="items-grid" id="itemsContainer">
-        <div class="loading-message">Loading found items...</div>
-    </div>
+            <button
+                class="back-btn"
+                type="button"
+                onclick="window.location.href='profileview.html#dashboard'">
 
-</div>
+                ← Dashboard
 
-<footer>
-    Campus Lost & Found Management System
-</footer>
+            </button>
 
-<script>
-    let foundItems = [];
+        </div>
 
-    const itemsContainer = document.getElementById("itemsContainer");
-    const searchInput = document.getElementById("searchInput");
-    const categoryFilter = document.getElementById("categoryFilter");
-    const itemCount = document.getElementById("itemCount");
+    </header>
 
 
-    // Prevent HTML injection when displaying database values
-    function escapeHTML(value) {
-        return String(value ?? "").replace(/[&<>"']/g, function(char) {
-            return {
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#39;"
-            }[char];
-        });
-    }
+    <!-- ================= MAIN ================= -->
+
+    <main class="page">
+
+        <section class="page-heading">
+
+            <div class="small-title">
+                Found Items
+            </div>
+
+            <h1>Browse Items</h1>
+
+            <p>
+                Browse items reported as found on campus.
+                Use the search and category filter to find items
+                that may match something you have lost.
+            </p>
+
+        </section>
 
 
-    // Format date without changing the calendar day
-    function formatDate(value) {
-        if (!value) return "Not available";
+        <!-- ================= FILTER ================= -->
 
-        const datePart = String(value).split("T")[0];
-        const parts = datePart.split("-");
+        <section class="filter-box">
 
-        if (parts.length === 3) {
-            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            <div class="filter-group">
+
+                <label for="searchInput">
+                    Search Items
+                </label>
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    class="filter-input"
+                    placeholder="Search by item, color, brand or location...">
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label for="categoryFilter">
+                    Category
+                </label>
+
+                <select
+                    id="categoryFilter"
+                    class="filter-select">
+
+                    <option value="all">
+                        All Categories
+                    </option>
+
+                    <option value="Accessories">
+                        Accessories
+                    </option>
+
+                    <option value="Electronics">
+                        Electronics
+                    </option>
+
+                    <option value="Books">
+                        Books
+                    </option>
+
+                    <option value="Documents">
+                        Documents
+                    </option>
+
+                    <option value="Clothing">
+                        Clothing
+                    </option>
+
+                    <option value="Personal Items">
+                        Personal Items
+                    </option>
+
+                    <option value="Others">
+                        Others
+                    </option>
+
+                </select>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= ITEMS ================= -->
+
+        <div class="items-header">
+
+            <h2>Found Items</h2>
+
+            <span
+                class="items-count"
+                id="itemsCount">
+                0 ITEMS
+            </span>
+
+        </div>
+
+
+        <section
+            class="items-container"
+            id="itemsContainer">
+
+            <div class="message-card">
+
+                <div class="loading">
+                    Loading found items...
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        /*
+         * ==========================================
+         * GET CURRENT USER
+         * ==========================================
+         */
+
+        function getCurrentUser()
+        {
+            try
+            {
+                const user =
+                    JSON.parse(
+                        sessionStorage.getItem(
+                            "campusCurrentUser"
+                        )
+                    );
+
+                return user || {};
+
+            }
+            catch(error)
+            {
+                return {};
+            }
         }
 
-        return escapeHTML(value);
-    }
 
+        /*
+         * ==========================================
+         * LOAD USER NAME
+         * ==========================================
+         */
 
-    // Display found item cards
-    function createItemCard(item) {
+        function loadUserName()
+        {
+            const user = getCurrentUser();
 
-        const title = escapeHTML(item.item_type || "Unknown Item");
-        const category = escapeHTML(item.category || "Other");
-        const color = escapeHTML(item.color || "Not specified");
-        const brand = escapeHTML(item.brand || "Not specified");
-        const location = escapeHTML(item.location || "Not specified");
-        const description = escapeHTML(item.description || "No description provided.");
-        const founderEmail = escapeHTML(item.founder_email || "Not available");
-        const dateFound = formatDate(item.date_found);
-        const timeFound = escapeHTML(item.time_found || "Not available");
+            const nameElement =
+                document.getElementById("userName");
 
-        let imageHTML = `
-            <div class="no-image">No Image Available</div>
-        `;
-
-        // Show image only when a valid image data URL is available
-        if (
-            typeof item.image_data === "string" &&
-            item.image_data.startsWith("data:image/")
-        ) {
-            imageHTML = `
-                <img
-                    class="item-image"
-                    src="${escapeHTML(item.image_data)}"
-                    alt="${title}"
-                    onerror="this.style.display='none'"
-                >
-            `;
+            if(user.name)
+            {
+                nameElement.textContent = user.name;
+            }
         }
 
-        return `
-            <div class="item-card">
 
-                ${imageHTML}
+        /*
+         * ==========================================
+         * TEMPORARY SAMPLE DATA
+         *
+         * This will be replaced with the
+         * /found-reports API in Step 2.
+         * ==========================================
+         */
 
-                <div class="item-content">
+        let foundItems = [];
+        async function loadFoundItems(){
+            const container =
+            document.getElementById("itemsContainer");
 
-                    <span class="category-tag">${category}</span>
+            try{
+                container.innerHTML = `
+                <div class="message-card">
+                    <div class="loading">
+                        Loading found items...
+                    </div>
+                </div>
+                `;
+                const response =
+                await fetch("/found-reports");
 
-                    <h3>${title}</h3>
+                const result =
+                await response.json();
 
-                    <p><strong>Color:</strong> ${color}</p>
+                if(!response.ok || !result.success)
+                {
+                    throw new Error(
+                    result.error || "Failed to load found items"
+                    );
+                }
 
-                    <p><strong>Brand:</strong> ${brand}</p>
+                // Browse only items that are still available.
+                // Completed / handed-over items remain in the database
+                // for the Founder and Lost User, but are not shown here.
+                foundItems = (result.reports || []).filter(item => {
+                    const status = String(item.status || "OPEN").toUpperCase();
+                    return status === "OPEN";
+                });
 
-                    <p><strong>Location:</strong> ${location}</p>
+                displayItems(foundItems);
+            }
+            catch(error)
+            {
+                console.error(
+                "❌ Browse items error:",
+                error
+                );
 
-                    <p><strong>Date Found:</strong> ${dateFound}</p>
+                container.innerHTML = `
+                <div class="message-card">
+                    <h3>Unable to Load Items</h3>
+                    <p>
+                        ${escapeHTML(error.message)}
+                    </p>
+                </div>
+                `;
 
-                    <p><strong>Time Found:</strong> ${timeFound}</p>
+                document.getElementById("itemsCount").textContent =
+                "0 ITEMS";
+            }
+        }
 
-                    <p><strong>Description:</strong> ${description}</p>
+        /*
+         * ==========================================
+         * DISPLAY ITEMS
+         * ==========================================
+         */
 
-                    <p><strong>Reported By:</strong> ${founderEmail}</p>
+        function displayItems(items)
+        {
+            const container =
+                document.getElementById(
+                    "itemsContainer"
+                );
+
+            const countElement =
+                document.getElementById(
+                    "itemsCount"
+                );
+
+
+            countElement.textContent =
+                `${items.length} ITEM${items.length === 1 ? "" : "S"}`;
+
+
+            if(items.length === 0)
+            {
+                container.innerHTML = `
+
+                    <div class="message-card">
+
+                        <h3>No Found Items</h3>
+
+                        <p>
+                            There are currently no found items
+                            available to browse.
+                        </p>
+
+                    </div>
+
+                `;
+
+                return;
+            }
+
+
+            container.innerHTML =
+                items.map(item => createItemCard(item)).join("");
+        }
+
+
+        /*
+         * ==========================================
+         * CREATE ITEM CARD
+         * ==========================================
+         */
+
+        function createItemCard(item)
+{
+    return `
+
+        <article class="item-card">
+
+            <div class="item-content">
+
+                <h3 class="item-title">
+                    ${escapeHTML(item.item_type || "Found Item")}
+                </h3>
+
+                <div class="item-details">
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Founder Email
+                        </span>
+
+                        <span>
+                            ${escapeHTML(item.founder_email || "Not available")}
+                        </span>
+
+                    </div>
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Found Date
+                        </span>
+
+                        <span>
+                            ${escapeHTML(item.date_found || "Not specified")}
+                        </span>
+
+                    </div>
 
                 </div>
 
             </div>
-        `;
-    }
+
+        </article>
+
+    `;
+}
+        /*
+         * ==========================================
+         * SEARCH + CATEGORY FILTER
+         * ==========================================
+         */
+
+        function filterItems()
+        {
+            const searchText =
+                document
+                    .getElementById("searchInput")
+                    .value
+                    .toLowerCase()
+                    .trim();
 
 
-    // Load found items from backend
-    async function loadFoundItems() {
-
-        itemsContainer.innerHTML = `
-            <div class="loading-message">Loading found items...</div>
-        `;
-
-        itemCount.textContent = "Loading items...";
-
-        try {
-
-            const response = await fetch("/found-reports");
-
-            const responseText = await response.text();
-
-            let result;
-
-            try {
-                result = JSON.parse(responseText);
-            } catch (error) {
-                throw new Error(
-                    "Server returned an invalid response. Please check the backend."
-                );
-            }
-
-            if (!response.ok || !result.success) {
-                throw new Error(
-                    result.error ||
-                    result.message ||
-                    "Failed to load found items."
-                );
-            }
-
-            if (!Array.isArray(result.reports)) {
-                throw new Error("Invalid found items data received from server.");
-            }
-
-            // Show only reports that are still open
-            foundItems = result.reports.filter(function(item) {
-                return String(item.status || "OPEN").toUpperCase() === "OPEN";
-            });
-
-            displayItems();
-
-        } catch (error) {
-
-            console.error("Browse items error:", error);
-
-            itemCount.textContent = "Unable to load items.";
-
-            itemsContainer.innerHTML = `
-                <div class="error-message">
-                    <p>${escapeHTML(error.message)}</p>
-                    <button class="retry-btn" onclick="loadFoundItems()">
-                        Try Again
-                    </button>
-                </div>
-            `;
-        }
-    }
+            const category =
+                document
+                    .getElementById("categoryFilter")
+                    .value;
 
 
-    // Search and category filtering
-    function displayItems() {
+            const filtered =
+                foundItems.filter(item =>
+                {
+                    const searchableText = [
 
-        const searchText = searchInput.value.trim().toLowerCase();
-        const selectedCategory = categoryFilter.value.toLowerCase();
+                        item.item_type,
+                        item.category,
+                        item.color,
+                        item.brand,
+                        item.location,
+                        item.description
 
-        const filteredItems = foundItems.filter(function(item) {
+                    ]
+                    .join(" ")
+                    .toLowerCase();
 
-            const searchableText = [
-                item.item_type,
-                item.category,
-                item.color,
-                item.brand,
-                item.location,
-                item.description
-            ].join(" ").toLowerCase();
 
-            const matchesSearch = searchableText.includes(searchText);
+                    const matchesSearch =
+                        !searchText ||
+                        searchableText.includes(searchText);
 
-            const matchesCategory =
-                selectedCategory === "all" ||
-                String(item.category || "").toLowerCase() === selectedCategory;
 
-            return matchesSearch && matchesCategory;
-        });
+                    const matchesCategory =
+                        category === "all" ||
+                        item.category === category;
 
-        itemCount.textContent =
-            `Showing ${filteredItems.length} of ${foundItems.length} found items`;
 
-        if (filteredItems.length === 0) {
+                    return (
+                        matchesSearch &&
+                        matchesCategory
+                    );
+                });
 
-            itemsContainer.innerHTML = `
-                <div class="empty-message">
-                    <h3>No Found Items Available</h3>
-                    <p>Try changing your search or category filter.</p>
-                </div>
-            `;
 
-            return;
+            displayItems(filtered);
         }
 
-        itemsContainer.innerHTML = filteredItems
-            .map(createItemCard)
-            .join("");
-    }
+
+        /*
+         * ==========================================
+         * HTML SAFETY
+         * ==========================================
+         */
+
+        function escapeHTML(value)
+        {
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
 
 
-    // Search when user types
-    searchInput.addEventListener("input", displayItems);
+        /*
+         * ==========================================
+         * EVENTS
+         * ==========================================
+         */
+
+        document
+            .getElementById("searchInput")
+            .addEventListener(
+                "input",
+                filterItems
+            );
 
 
-    // Filter when category changes
-    categoryFilter.addEventListener("change", displayItems);
+        document
+            .getElementById("categoryFilter")
+            .addEventListener(
+                "change",
+                filterItems
+            );
 
 
-    // Load items when page opens
-    document.addEventListener("DOMContentLoaded", loadFoundItems);
+        /*
+         * ==========================================
+         * PAGE START
+         * ==========================================
+         */
 
-    // Also load if this script runs after DOMContentLoaded
-    if (document.readyState !== "loading") {
+        loadUserName();
+
+        
         loadFoundItems();
-    }
 
-</script>
+    </script>
 
 </body>
 </html>
